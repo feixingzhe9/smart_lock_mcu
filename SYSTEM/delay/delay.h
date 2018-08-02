@@ -24,9 +24,38 @@
 //V1.5修改说明 20120902
 //在delay_us加入ucos上锁，防止由于ucos打断delay_us的执行，可能导致的延时不准。
 ////////////////////////////////////////////////////////////////////////////////// 	 
+
+
+
+#define asm            __asm
+#define delay_300ns()     do {asm("nop");asm("nop");asm("nop");asm("nop");\
+                              asm("nop");asm("nop");asm("nop");asm("nop");\
+                              asm("nop");asm("nop");asm("nop");asm("nop");\
+                              asm("nop");asm("nop");asm("nop");asm("nop");\
+                              asm("nop");asm("nop");asm("nop");asm("nop");\
+                              asm("nop");asm("nop");} while(1==0)
+                                
+#define delay_600ns()     do { asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");asm("nop");asm("nop");\
+                               asm("nop");asm("nop");} while(1==0)
+                                
+#define delay_us(n)       do { for(uint32_t i=0;i<n;i++){delay_300ns();delay_600ns();}\
+                                } while(0==1)
+
+                                
+                                
 void delay_init(void);
 void delay_ms(u16 nms);
-void delay_us(u32 nus);
+
 
 #ifdef __cplusplus
 }

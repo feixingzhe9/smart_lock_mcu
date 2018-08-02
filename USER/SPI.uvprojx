@@ -754,6 +754,11 @@
               <FileType>8</FileType>
               <FilePath>..\HARDWARE\STMFLASH\stmflash.cpp</FilePath>
             </File>
+            <File>
+              <FileName>myiic.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\HARDWARE\IIC\myiic.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

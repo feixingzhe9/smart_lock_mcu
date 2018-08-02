@@ -38,11 +38,11 @@ int main(void)
     init();
 
 #if 1 //test code   
-    u8 datatemp[SIZE];    
+      
     STMFLASH_Write(FLASH_SAVE_ADDR,(u16*)TEXT_Buffer,SIZE);
 #endif
-#if 0
-    
+#if 1
+    u8 datatemp[SIZE];  
     STMFLASH_Read(FLASH_SAVE_ADDR,(u16*)datatemp,SIZE);
 #endif
     
