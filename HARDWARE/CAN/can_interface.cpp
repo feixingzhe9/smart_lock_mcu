@@ -1,6 +1,8 @@
 #include "can_interface.h"
 #include "string.h"
 
+#define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
+
 can_interface can(0x66, "500K");
 //"1M" "800K" "500K" "250K" "125K" "100K" "50K" "20K" "10K"
 #define TIMINGS_NUM (sizeof(CAN_Timings)/sizeof(struct can_timing_t))
@@ -351,7 +353,7 @@ uint16_t cmd_procesing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t 
                         data_out[0] = strlen(sw_version) - 11;
                         return (data_out[0] + 1);
                     }
-                    break;
+                    //break;
    
                 case CAN_SOURCE_ID_CAN_TEST:
                     can_test_cnt++;
@@ -386,9 +388,9 @@ void can_protocol(void)
         uint8_t seg_polo = 0;  
         uint8_t rx_data_len = 0;
         
-        //uint8_t buf_index = 0;
-        //uint8_t seg_num = 0;
-        //seg_num = rx_buf.CanData_Struct.SegNum;
+//        uint8_t buf_index = 0;
+//        uint8_t seg_num = 0;
+//        seg_num = rx_buf.CanData_Struct.SegNum;
         
         memset(&id, 0, sizeof(id));
         memset(&rx_buf, 0, sizeof(rx_buf));
@@ -429,9 +431,9 @@ void can_protocol(void)
             {
                 if(can_long_frame_buf->can_rcv_buf[i].used_len > 0)
                 {
-                    //if(os_get_time() - can_long_frame_buf->can_rcv_buf[i].start_time > CAN_LONG_FRAME_TIME_OUT)
+                    if(get_tick() - can_long_frame_buf->can_rcv_buf[i].start_time > CAN_LONG_FRAME_TIME_OUT)
                     {
-                        //can_long_frame_buf->FreeBuf(i);
+                        can_long_frame_buf->FreeBuf(i);
                     }
                 }     
             }
@@ -450,30 +452,30 @@ void can_protocol(void)
                 
                 if((buf_index == CAN_LONG_BUF_FULL) || (buf_index >= CAN_LONG_BUF_NUM))
                 {
-                    CanProtocolLog("LONG FRAME RCV BUF IS FULL! ! ! !\r\n");
+                    //CanProtocolLog("LONG FRAME RCV BUF IS FULL! ! ! !\r\n");
                     
                     goto exit;
                 }
                 memcpy(&can_long_frame_buf->can_rcv_buf[buf_index].rcv_buf[0], rx_buf.CanData_Struct.Data, CAN_ONE_FRAME_DATA_LENTH);
                 can_long_frame_buf->can_rcv_buf[buf_index].used_len = CAN_ONE_FRAME_DATA_LENTH;
                 can_long_frame_buf->can_rcv_buf[buf_index].can_id = id.CANx_ID;
-                can_long_frame_buf->can_rcv_buf[buf_index].start_time = os_get_time();
-                CanProtocolLog("begin\r\n");
+                can_long_frame_buf->can_rcv_buf[buf_index].start_time = get_tick();
+                //CanProtocolLog("begin\r\n");
             }
             else if((seg_polo == TRANSING) || (seg_polo == END))
             {
                 buf_index = can_long_frame_buf->GetTheBufById(id.CANx_ID);
                 if((buf_index == CAN_BUF_NO_THIS_ID) || (buf_index >= CAN_LONG_BUF_NUM))
                 {
-                    CanProtocolLog("ERROR ! !\r\n long buff index is %d",buf_index);
+                    //CanProtocolLog("ERROR ! !\r\n long buff index is %d",buf_index);
                     goto exit;
                 }
-                can_long_frame_buf->can_rcv_buf[buf_index].start_time = os_get_time();
+                can_long_frame_buf->can_rcv_buf[buf_index].start_time = get_tick();
                 if(seg_polo == TRANSING)
                 {
                     memcpy(&can_long_frame_buf->can_rcv_buf[buf_index].rcv_buf[seg_num*CAN_ONE_FRAME_DATA_LENTH], rx_buf.CanData_Struct.Data, CAN_ONE_FRAME_DATA_LENTH);
                     can_long_frame_buf->can_rcv_buf[buf_index].used_len += CAN_ONE_FRAME_DATA_LENTH;
-                    CanProtocolLog("transing\r\n");
+                    //CanProtocolLog("transing\r\n");
                 }
                 if(seg_polo == END)
                 {
@@ -486,10 +488,11 @@ void can_protocol(void)
                     
                     CanTX( MICO_CAN1, id.CANx_ID, can_long_frame_buf->can_rcv_buf[buf_index].rcv_buf, can_long_frame_buf->can_rcv_buf[buf_index].used_len);  // test :send the data back;             
                     can_long_frame_buf->FreeBuf(buf_index);
-                    CanProtocolLog("end\r\n");
+                    //CanProtocolLog("end\r\n");
                 }       
             }
 #endif
         }
     }
+
 }

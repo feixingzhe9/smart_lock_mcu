@@ -5,13 +5,9 @@
 
 class LEDClass {
 public:
-#if 0
-#define LED0 PAout(8)// PA8
-#define LED1 PDout(2)// PD2
-#else
-#define LED0 PCout(9)// PC11
-#define LED1 PCout(9)// PC11
-#endif
+#define LED_PIN         GPIO_Pin_9
+#define LED_PORT        GPIOC
+#define LED_RCC_APB2    RCC_APB2Periph_GPIOC
 	void led_init(void);//≥ı ºªØ
     void led_on(void);
     void led_off(void);

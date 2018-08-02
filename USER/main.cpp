@@ -6,10 +6,20 @@
 #include "hall.h"
 #include "rfid.h"
 #include "can_interface.h"
+#include "stmflash.h"
 
 static void init_exti(void);
 static void sys_indicator(void);
 
+
+
+#if 1   //test code
+
+#define FLASH_SAVE_ADDR  0X08070000 				//设置FLASH 保存地址(必须为偶数)
+const u8 TEXT_Buffer[]={"STM32 FLASH TEST"};
+#define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
+
+#endif
 static void init()
 {
     sys_tick_init();
@@ -27,11 +37,19 @@ int main(void)
 {
     init();
 
+#if 1 //test code   
+    u8 datatemp[SIZE];    
+    STMFLASH_Write(FLASH_SAVE_ADDR,(u16*)TEXT_Buffer,SIZE);
+#endif
+#if 0
+    
+    STMFLASH_Read(FLASH_SAVE_ADDR,(u16*)datatemp,SIZE);
+#endif
+    
     while(1)
     {
         rfid_task();
         can_protocol();
-
         sys_indicator();	   
     }
 }
