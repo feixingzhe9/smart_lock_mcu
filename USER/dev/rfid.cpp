@@ -48,15 +48,8 @@ void rfid_init()
 
 void rfid_task()
 {	
-		if (mfrc522 == &mfrc522_A)
-		{
-				mfrc522 = &mfrc522_B;
-		}
-		else
-		{
-			  mfrc522 = &mfrc522_A;
-		}
-	
+
+	mfrc522 = &mfrc522_A;
 		// Look for new cards
 		if (mfrc522->PICC_IsNewCardPresent()) {
 			// Select one of the cards

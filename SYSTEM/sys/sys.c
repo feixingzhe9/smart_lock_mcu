@@ -28,9 +28,6 @@ uint32_t get_tick(void)
     return sys_tick_cnt;
 }
 
-
-
-
 void platform_mcu_reset(void)
 {
     NVIC_SystemReset();
