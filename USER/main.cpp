@@ -17,9 +17,7 @@ static void init()
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
 		uart_init(115200);	 	//串口初始化为115200
 		LED.led_init();			     //LED端口初始化
-		hall_init();
 		rfid_init();
-//		super_rfid_init();
 		printf("RFID Driver version:%s\r\n", SW_VERSION);
 	  init_exti();
 	
@@ -28,14 +26,11 @@ static void init()
 
 int main(void)
 {
-	//u16 i=0;
-
 	init();
 	
 	while(1)
 	{
 		rfid_task();
-		hall_task();
         can_protocol();
 		
 		delay_ms(10);
