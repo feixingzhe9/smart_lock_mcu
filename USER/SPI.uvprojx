@@ -884,6 +884,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>platform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SYSTEM\sys\platform.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

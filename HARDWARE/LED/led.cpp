@@ -5,7 +5,7 @@
 
 LEDClass LED;
 
-void LEDClass::LED_Init(void)
+void LEDClass::led_init(void)
 {
  
  GPIO_InitTypeDef  GPIO_InitStructure;
@@ -18,4 +18,13 @@ void LEDClass::LED_Init(void)
  GPIO_Init(GPIOC, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.11
  GPIO_SetBits(GPIOC,GPIO_Pin_9);						 //PA.11 输出高
 }
+
+void LEDClass::led_on(void)
+{
+    GPIO_SetBits(GPIOC,GPIO_Pin_9);
+}
  
+void LEDClass::led_off(void)
+{
+    GPIO_ResetBits(GPIOC,GPIO_Pin_9);
+}

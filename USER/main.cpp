@@ -5,18 +5,18 @@
 #include "usart.h"
 #include "hall.h"
 #include "rfid.h"
-//#include "super_rfid.h"
 #include "can_interface.h"
 
 
 static void init_exti(void);
+static void sys_indicator(void);
 
 static void init()
 {
-		delay_init();	    	 //延时函数初始化	  
+		sys_tick_init();
 		NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
 		uart_init(115200);	 	//串口初始化为115200
-		LED.LED_Init();			     //LED端口初始化
+		LED.led_init();			     //LED端口初始化
 		hall_init();
 		rfid_init();
 //		super_rfid_init();
@@ -28,7 +28,7 @@ static void init()
 
 int main(void)
 {
-	u16 i=0;
+	//u16 i=0;
 
 	init();
 	
@@ -36,15 +36,10 @@ int main(void)
 	{
 		rfid_task();
 		hall_task();
-//		super_rfid_task();
         can_protocol();
 		
 		delay_ms(10);
-		if (++i >= 10)
-		{
-			LED0 =! LED0;//提示系统正在运行	
-			i = 0;
-		}		   
+        sys_indicator();	   
 	}
 }
 
@@ -81,3 +76,22 @@ static void init_exti(void)
 }
 
 
+#define INDICATOR_LED_PERIOD    500/SYSTICK_PERIOD
+static void sys_indicator(void)
+{
+    static u16 cnt = 0;
+    static u32 start_tick = 0;
+    if(get_tick() - start_tick >= INDICATOR_LED_PERIOD)
+    {
+        cnt++;
+        if(cnt % 2 == 1)
+        {
+            LED.led_on();
+        }
+        else
+        {
+            LED.led_off();
+        }
+        start_tick = get_tick();
+    }
+}

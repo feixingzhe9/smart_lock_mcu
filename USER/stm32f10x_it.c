@@ -76,8 +76,15 @@ void PendSV_Handler(void)
 {
 }
  
+extern uint32_t sys_tick_cnt;
+/**
+  * @brief  This function handles SysTick Handler.
+  * @param  None
+  * @retval None
+  */
 void SysTick_Handler(void)
 {
+    sys_tick_cnt++;
 }
 
 /******************************************************************************/

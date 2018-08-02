@@ -12,7 +12,9 @@ public:
 #define LED0 PCout(9)// PC11
 #define LED1 PCout(9)// PC11
 #endif
-	void LED_Init(void);//初始化
+	void led_init(void);//初始化
+    void led_on(void);
+    void led_off(void);
 };
 
 extern LEDClass LED;

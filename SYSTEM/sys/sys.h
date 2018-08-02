@@ -65,7 +65,13 @@
 
 
 
+#define SYSTICK_PERIOD       1      //1ms
+
+void platform_mcu_reset(void);
+extern void sys_tick_init(void);
+uint32_t get_tick(void);
 void NVIC_Configuration(void);
+void sys_tick_init(void);
 
 #ifdef __cplusplus
 }
