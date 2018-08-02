@@ -1,0 +1,12 @@
+*.exe
+*.o
+*.map
+*.ini
+*.lst
+*.TMP
+*.uvoptx
+*.uvguix.Administrator
+
+*/DebugConfig/*
+OBJ/*
+JLinkLog.txt
