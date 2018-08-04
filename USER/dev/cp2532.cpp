@@ -5,7 +5,7 @@
 
 uint8_t ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 uint8_t quick_read_ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
-u16 cp2532_test = 0;
+u16 touch_key_value = 0;
 u16 read_byte(u8 read_addr)
 {
     u8 low_data = 0;
@@ -72,10 +72,10 @@ void touch_key_task(void)
     uint32_t start_tick = 0;
     if(get_tick() - start_tick >= TOUCH_KEY_PERIOD)
     {
-        cp2532_test = read_byte(0x31);
-        if(cp2532_test)
+        touch_key_value = read_byte(0x31);
+        if(touch_key_value)
         {
-            upload_touch_key_data(cp2532_test);
+            upload_touch_key_data(touch_key_value);
         }
         start_tick = get_tick();
     }

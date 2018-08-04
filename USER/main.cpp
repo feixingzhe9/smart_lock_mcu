@@ -9,6 +9,8 @@
 #include "stmflash.h"
 #include "myiic.h"
 #include "cp2532.h"
+#include "timer.h"
+#include "beeper.h"
 
 static void init_exti(void);
 static void sys_indicator(void);
@@ -32,6 +34,10 @@ static void init()
     printf("RFID Driver version:%s\r\n", SW_VERSION);
     init_exti();
     IIC_Init();
+    //TIM3_PWM_Init(100,100);	 //不分频。PWM频率=72000/900=8Khz
+    //TIM_SetCompare3(TIM3,50);
+    
+    beeper_init(100,50);
 
     return;
 }
@@ -54,14 +60,13 @@ int main(void)
     
     cp2532_test = read_byte(0x31);
 #endif  
-
-    
-    
+   
     while(1)
     {
         rfid_task();
         touch_key_task();
         can_protocol();
+        beeper_task(touch_key_value);
         sys_indicator();
         
     }
@@ -101,6 +106,8 @@ static void init_exti(void)
 
 
 #define INDICATOR_LED_PERIOD    500/SYSTICK_PERIOD
+
+extern void set_beeper_low(void);
 static void sys_indicator(void)
 {
     static u16 cnt = 0;
@@ -118,6 +125,9 @@ static void sys_indicator(void)
         else
         {
             LED.led_off();
+            //TIM_Cmd(TIM3, DISABLE);  //使能TIM3
+            //set_beeper_low();
+            
         }
         start_tick = get_tick();//SDA_OUT();IIC_SDA = 1;
     }

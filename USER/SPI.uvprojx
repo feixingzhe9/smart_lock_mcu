@@ -764,6 +764,11 @@
               <FileType>8</FileType>
               <FilePath>..\HARDWARE\IIC\myiic.cpp</FilePath>
             </File>
+            <File>
+              <FileName>timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\HARDWARE\TIMER\timer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

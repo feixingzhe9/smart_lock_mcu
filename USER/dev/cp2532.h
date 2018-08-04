@@ -13,6 +13,8 @@
 #define I2C_CP2532_QUICK_READ_ADDR      (I2C_CP2532_QUICK_ADDR<<1)
 
 
+extern u16 touch_key_value;
+
 u16 read_byte(u8 read_addr);
 u16 quick_read(void);
 void touch_key_task(void);
