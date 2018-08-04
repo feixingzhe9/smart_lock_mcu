@@ -37,7 +37,7 @@ static void init()
     //TIM3_PWM_Init(100,100);	 //²»·ÖÆµ¡£PWMÆµÂÊ=72000/900=8Khz
     //TIM_SetCompare3(TIM3,50);
     
-    beeper_init(100,50);
+    beeper_init(200,50);
 
     return;
 }
@@ -66,7 +66,7 @@ int main(void)
         rfid_task();
         touch_key_task();
         can_protocol();
-        beeper_task(touch_key_value);
+        beeper_task();
         sys_indicator();
         
     }

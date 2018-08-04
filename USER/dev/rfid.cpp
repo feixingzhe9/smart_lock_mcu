@@ -46,6 +46,7 @@ void rfid_init()
 }
 
 
+u32 rfid_start_tick = 0;
 void rfid_task()
 {	
 
@@ -110,6 +111,7 @@ void rfid_task()
 				uart_print_type_and_key(buffer_type, buffer_key);
 				
 				upload_rfid_data(&upload_msg, buffer_type, buffer_key);
+                rfid_start_tick = get_tick();
 
 				#endif
 			}

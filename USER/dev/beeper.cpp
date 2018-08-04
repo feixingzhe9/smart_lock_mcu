@@ -1,5 +1,7 @@
 #include "beeper.h"
 #include "timer.h"
+#include "cp2532.h"
+extern u32 rfid_start_tick;
 
 
 void beeper_init(u16 arr,u16 psc)
@@ -42,6 +44,8 @@ void beeper_init(u16 arr,u16 psc)
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable; //比较输出使能
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM3 OC3
     
+    TIM_SetCompare3(TIM3,50);
+    
 }
 
 void beeper_on(u16 hz)
@@ -76,15 +80,14 @@ void beeper_off(void)
 }
 
 
-#define BEEPER_TIME   30/SYSTICK_PERIOD
-void beeper_task(u16 key_value)
+#define TOUCH_KEY_BEEPER_TIME   30/SYSTICK_PERIOD
+void touch_key_beeper_task(u16 key_value)
 {
     static u16 key_value_last = 0;
     static u32 start_tick = 0;
     static bool beeper_status = false;
-    
-    
-    if(get_tick() - start_tick >= BEEPER_TIME)
+       
+    if(get_tick() - start_tick >= TOUCH_KEY_BEEPER_TIME)
     {
         if(beeper_status == true)
         {
@@ -92,20 +95,46 @@ void beeper_task(u16 key_value)
             beeper_status = false;
         }       
     }
-    //if(key_value != 0)
-    {
         
-        if(key_value_last != key_value)
+    if(key_value_last != key_value)
+    {
+        key_value_last = key_value;
+        start_tick = get_tick();
+        if(key_value != 0)
         {
-            key_value_last = key_value;
-            start_tick = get_tick();
-            if(key_value != 0)
-            {
-                beeper_on(0);
-                beeper_status = true;
-            }   
-        }
+            beeper_on(0);
+            beeper_status = true;
+        }   
     }
+}
+
+
+#define RFID_BEEPER_TIME    120/SYSTICK_PERIOD
+void rfid_beeper_task(u32 rfid_start_tick)
+{
+    static bool rfid_beeper_status = false;
+    if(get_tick() - rfid_start_tick <= RFID_BEEPER_TIME)
+    {
+        if(rfid_beeper_status == false)
+        {
+            beeper_on(0);
+            rfid_beeper_status = true;
+        }       
+    }
+    else
+    {
+        if(rfid_beeper_status == true)
+        {
+            beeper_off();
+            rfid_beeper_status = false;
+        }       
+    }
+}
+
+void beeper_task(void)
+{
+    touch_key_beeper_task(touch_key_value);
+    rfid_beeper_task(rfid_start_tick);
 }
 
 

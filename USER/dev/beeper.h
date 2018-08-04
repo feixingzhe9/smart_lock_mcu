@@ -3,7 +3,7 @@
 #include "stdio.h"	
 #include "sys.h"
 
-void beeper_task(u16 key_value);
+void beeper_task(void);
 
 void beeper_init(u16 arr,u16 psc);
 
