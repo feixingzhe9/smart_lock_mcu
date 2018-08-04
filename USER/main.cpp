@@ -28,14 +28,14 @@ static void init()
     NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
     uart_init(115200);	 	//串口初始化为115200
     LED.led_init();			     //LED端口初始化
-    //rfid_init();
+    rfid_init();
     printf("RFID Driver version:%s\r\n", SW_VERSION);
-    //init_exti();
+    init_exti();
     IIC_Init();
 
     return;
 }
-u16 cp2532_test = 0;
+
 int main(void)
 {
     init();
@@ -53,13 +53,17 @@ int main(void)
 #if 0
     
     cp2532_test = read_byte(0x31);
-#endif    
+#endif  
+
+    
     
     while(1)
     {
-        //rfid_task();
-        //can_protocol();
-        sys_indicator();	   
+        rfid_task();
+        touch_key_task();
+        can_protocol();
+        sys_indicator();
+        
     }
 }
 
@@ -104,7 +108,7 @@ static void sys_indicator(void)
     if(get_tick() - start_tick >= INDICATOR_LED_PERIOD)
     {
         cnt++;
-        cp2532_test = read_byte(0x31);
+        //cp2532_test = read_byte(0x31);
         //cp2532_test = quick_read();
         
         if(cnt % 2 == 1)
