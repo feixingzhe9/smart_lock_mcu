@@ -504,6 +504,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>cp2532.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\dev\cp2532.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
