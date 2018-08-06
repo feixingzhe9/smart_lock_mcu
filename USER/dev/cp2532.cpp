@@ -2,7 +2,8 @@
 #include "myiic.h"
 #include "can_interface.h"
 #include "delay.h"
-#include "string.h"
+#include <string.h>
+#include "lock.h"
 
 uint8_t ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 uint8_t quick_read_ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
@@ -205,10 +206,7 @@ pass_word_info_t pass_word_info_t_ram = {0};
 pass_word_info_t *pass_word_info = &pass_word_info_t_ram;
 
 
-//static void delete_head_pass_word(void)
-//{
-//    
-//}
+
 
 static void shift_letf_pass_word(void)
 {
@@ -226,26 +224,44 @@ static void insert_one_pass_word(pass_word_t *key_info)
 {
     if(pass_word_info->lenth < PASS_WORD_LENTH)
     {
-//        pass_word_info->pass_word_buf[pass_word_info->lenth].pass_word = key_info->pass_word;
         memcpy( &(pass_word_info->pass_word_buf[pass_word_info->lenth]), key_info, sizeof(pass_word_t));
         pass_word_info->lenth++;
     }
     else
     {
-//        for(u8 i = 1 ; i < PASS_WORD_LENTH; i++)
-//        {
-//            memcpy( &(pass_word_info->pass_word_buf[i - 1]), &(pass_word_info->pass_word_buf[i]), sizeof(pass_word_t));
-//        }
-//        pass_word_info->lenth = PASS_WORD_LENTH;
         shift_letf_pass_word();
         memcpy(&(pass_word_info->pass_word_buf[pass_word_info->lenth]), key_info, sizeof(pass_word_t));
         pass_word_info->lenth++;
     }
 }
 
-void pass_work_proc(u16 key_value)
+void pass_work_proc(void)
 {
+    char password[PASS_WORD_LENTH];
+    char psss_word_test[PASS_WORD_LENTH] = {'1', '2', '3', '4'};
+    if(pass_word_info->lenth == PASS_WORD_LENTH)
+    {
+        for(u8 i = 0; i < pass_word_info->lenth; i++)
+        {
+            password[i] = pass_word_info->pass_word_buf[i].pass_word;
+        }
+    }
+    else
+    {
+        return ;
+    }
     
+    for(u8 i = 0; i < PASS_WORD_LENTH; i++)
+    {
+        if(password[i] != psss_word_test[i])
+        {
+            return ;
+        }
+            
+    }
+    printf("get right password");
+    lock_1.is_need_to_unlock = true;
+
 }
 
 
@@ -268,16 +284,24 @@ u16 touch_key_filter(u16 key_value)
         if(key)
         {
             u8 key_true_value = get_true_key_value(key);
-            if(key_true_value > 0)
+            if((key_true_value != 'a') && (key_true_value != 'b'))
             {
-                pass_word.start_tick = get_tick();
-                pass_word.pass_word = key_true_value;
-                insert_one_pass_word(&pass_word);
+                if(key_true_value > 0)
+                {
+                    pass_word.start_tick = get_tick();
+                    pass_word.pass_word = key_true_value;
+                    insert_one_pass_word(&pass_word);
+                }
+                else
+                {
+                    printf("key error ! \r\n");
+                }
             }
-            else
+            else if(key_true_value == 'b')
             {
-                printf("key error ! \r\n");
+                pass_work_proc();
             }
+            
             
         }
         

@@ -25,12 +25,28 @@ class LockClass
             GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 //IO口速度为50MHz
             GPIO_Init(lock_port, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.9
             GPIO_ResetBits(lock_port,lock_pin);	        // default value: reset
+            
+            
+            is_need_to_unlock = false;
+            lock_status = false;
+            start_tick = 0;
         }
 
         void lock_on(void);
         void lock_off(void);
+        void lock_task(void);
+            
         GPIO_TypeDef*  lock_port;
         uint16_t lock_pin;
+        u32 start_tick;
+        bool is_need_to_unlock;
+        bool lock_status;
 };
 
+
+void all_lock_task(void);
+
+extern LockClass lock_1;
+extern LockClass lock_2;
+extern LockClass lock_3;
 #endif

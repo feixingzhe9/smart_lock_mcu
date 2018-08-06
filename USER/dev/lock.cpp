@@ -18,7 +18,30 @@ void LockClass::lock_off(void)
 }
 
 
-void lock_task(void)
+#define LOCK_CTRL_PERIOD    100/SYSTICK_PERIOD
+void LockClass::lock_task(void)
 {
-    
+    if(this->is_need_to_unlock == true)
+    {
+        if(this->start_tick == 0)
+        {
+            this->start_tick = get_tick();
+            this->lock_on();
+            this->lock_status = true;
+        }
+               
+        if(get_tick() - this->start_tick >= LOCK_CTRL_PERIOD)
+        {
+            this->start_tick = 0;
+            this->is_need_to_unlock = false;
+            this->lock_off();
+        }
+    }
+}
+
+void all_lock_task(void)
+{
+    lock_1.lock_task();
+    lock_2.lock_task();
+    lock_3.lock_task();
 }

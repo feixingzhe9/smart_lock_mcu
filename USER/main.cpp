@@ -11,6 +11,7 @@
 #include "cp2532.h"
 #include "timer.h"
 #include "beeper.h"
+#include "lock.h"
 
 static void init_exti(void);
 static void sys_indicator(void);
@@ -65,6 +66,7 @@ int main(void)
     {
         rfid_task();
         touch_key_task();
+        all_lock_task();
         can_protocol();
         beeper_task();
         sys_indicator();
