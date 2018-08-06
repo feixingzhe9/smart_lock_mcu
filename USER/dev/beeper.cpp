@@ -133,7 +133,7 @@ void rfid_beeper_task(u32 rfid_start_tick)
 
 void beeper_task(void)
 {
-    touch_key_beeper_task(touch_key_value);
+    touch_key_beeper_task( get_key_value() );
     rfid_beeper_task(rfid_start_tick);
 }
 

@@ -514,6 +514,11 @@
               <FileType>8</FileType>
               <FilePath>.\dev\beeper.cpp</FilePath>
             </File>
+            <File>
+              <FileName>lock.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\dev\lock.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
