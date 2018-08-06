@@ -2,6 +2,7 @@
 #include "myiic.h"
 #include "can_interface.h"
 #include "delay.h"
+#include "string.h"
 
 uint8_t ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 uint8_t quick_read_ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
@@ -64,6 +65,16 @@ static void upload_touch_key_data(u16 key_value)
     return;
 }
 
+void set_key_value(u16 key_vlaue)
+{
+    touch_key_value = key_vlaue;
+}
+
+u16 get_key_value(void)
+{
+    return touch_key_value;
+}
+
 
 
 #define KEY_VALUE_0     (1<<7)
@@ -79,17 +90,6 @@ static void upload_touch_key_data(u16 key_value)
 #define KEY_VALUE_A     (1<<11)
 #define KEY_VALUE_B     (1<<0)
 
-
-
-void set_key_value(u16 key_vlaue)
-{
-    touch_key_value = key_vlaue;
-}
-
-u16 get_key_value(void)
-{
-    return touch_key_value;
-}
 
 /* 判断一次只有一个按键按下，若有多个按键同时按下 返回false， 只有一个按键按下 返回 true 
 u16 key_value: 按键值
@@ -125,13 +125,166 @@ static bool is_key_valid(u16 key_value)
     }   
 }
 
+
+static u8 get_true_key_value(u16 key_value)
+{
+    u8 key_true_value = 0;
+    
+    if(key_value & KEY_VALUE_0)
+    {
+        key_true_value = '0';
+    }
+    else if(key_value & KEY_VALUE_1)
+    {
+        key_true_value = '1';
+    }
+    else if(key_value & KEY_VALUE_2)
+    {
+        key_true_value = '2';
+    }
+    else if(key_value & KEY_VALUE_3)
+    {
+        key_true_value = '3';
+    }
+    else if(key_value & KEY_VALUE_4)
+    {
+        key_true_value = '4';
+    }
+    else if(key_value & KEY_VALUE_5)
+    {
+        key_true_value = '5';
+    }
+    else if(key_value & KEY_VALUE_6)
+    {
+        key_true_value = '6';
+    }
+    else if(key_value & KEY_VALUE_7)
+    {
+        key_true_value = '7';
+    }
+    else if(key_value & KEY_VALUE_8)
+    {
+        key_true_value = '8';
+    }
+    else if(key_value & KEY_VALUE_9)
+    {
+        key_true_value = '9';
+    }
+    else if(key_value & KEY_VALUE_A)
+    {
+        key_true_value = 'a';
+    }
+    else if(key_value & KEY_VALUE_B)
+    {
+        key_true_value = 'b';
+    }
+    else
+    {
+        return 0;
+    }
+    
+    return key_true_value;
+}
+
+
+#define PASS_WORD_LENTH     4
+struct pass_word_t
+{
+    u16 pass_word;
+    u32 start_tick;
+};
+
+struct pass_word_info_t
+{
+    pass_word_t pass_word_buf[PASS_WORD_LENTH];
+    u8 lenth;
+};
+
+
+pass_word_info_t pass_word_info_t_ram = {0};
+pass_word_info_t *pass_word_info = &pass_word_info_t_ram;
+
+
+//static void delete_head_pass_word(void)
+//{
+//    
+//}
+
+static void shift_letf_pass_word(void)
+{
+    if(pass_word_info->lenth > 0)
+    {
+        for(u8 i = 1; i <  pass_word_info->lenth; i++)
+        {
+            memcpy( &(pass_word_info->pass_word_buf[i - 1]), &(pass_word_info->pass_word_buf[i]), sizeof(pass_word_t));
+        }
+        pass_word_info->lenth--;
+    }    
+}
+
+static void insert_one_pass_word(pass_word_t *key_info)
+{
+    if(pass_word_info->lenth < PASS_WORD_LENTH)
+    {
+//        pass_word_info->pass_word_buf[pass_word_info->lenth].pass_word = key_info->pass_word;
+        memcpy( &(pass_word_info->pass_word_buf[pass_word_info->lenth]), key_info, sizeof(pass_word_t));
+        pass_word_info->lenth++;
+    }
+    else
+    {
+//        for(u8 i = 1 ; i < PASS_WORD_LENTH; i++)
+//        {
+//            memcpy( &(pass_word_info->pass_word_buf[i - 1]), &(pass_word_info->pass_word_buf[i]), sizeof(pass_word_t));
+//        }
+//        pass_word_info->lenth = PASS_WORD_LENTH;
+        shift_letf_pass_word();
+        memcpy(&(pass_word_info->pass_word_buf[pass_word_info->lenth]), key_info, sizeof(pass_word_t));
+        pass_word_info->lenth++;
+    }
+}
+
+void pass_work_proc(u16 key_value)
+{
+    
+}
+
+
+
 u16 touch_key_filter(u16 key_value)
 {
     static u16 key = 0;
+    static uint8_t filter_cnt = 0;
+    pass_word_t pass_word;
+    filter_cnt++;
+    if(key != key_value)
+    {
+        filter_cnt = 0;
+    }
     
     key = key_value;
+    if(filter_cnt == 0)     //if need add button 
+    {
+        printf("get key \r\n");
+        if(key)
+        {
+            u8 key_true_value = get_true_key_value(key);
+            if(key_true_value > 0)
+            {
+                pass_word.start_tick = get_tick();
+                pass_word.pass_word = key_true_value;
+                insert_one_pass_word(&pass_word);
+            }
+            else
+            {
+                printf("key error ! \r\n");
+            }
+            
+        }
+        
+        return key;
+    }
     
-    return  key;
+    return  0;
 }
 
 #define TOUCH_KEY_PERIOD    80/SYSTICK_PERIOD
@@ -157,3 +310,8 @@ void touch_key_task(void)
     }
     
 }
+
+
+
+
+

@@ -1,6 +1,6 @@
 #ifndef __CP2532_H_
 #define __CP2532_H_
-#include "stdio.h"	
+#include <stdio.h>	
 #include "sys.h"
 
 #define I2C_CP2532_ADDR     0x2c
