@@ -22,7 +22,7 @@ static void sys_indicator(void);
 #if 1   //test code
 
 #define FLASH_SAVE_ADDR  0X08070000 				//设置FLASH 保存地址(必须为偶数)
-const u8 TEXT_Buffer[]={"STM32 FLASH TEST"};
+const u8 TEXT_Buffer[]={"5678"};
 #define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
 
 #endif
@@ -31,20 +31,16 @@ static void init()
 {
     sys_tick_init();
     NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
-//    uart_1_init(115200);	 	//串口1初始化为115200
     uart_1_init(9600);	 	//串口1初始化为9600
     uart_2_init(9600);      //串口2初始化为9600
-    uart_3_init(9600);      //串口3初始化为9600
-    
+    uart_3_init(9600);      //串口3初始化为9600   
     LED.led_init();			     //LED端口初始化
     rfid_init();
     printf("RFID Driver version:%s\r\n", SW_VERSION);
     init_exti();
-    IIC_Init();
-    
-    beeper_init(200,50);
-    
-    TIM2_Int_Init(499,7199);    // timer to control locks
+    i2c_init();    
+    beeper_init(200,50);    
+    tim2_int_init(499,7199);    // timer to control locks
 
     return;
 }
@@ -57,11 +53,10 @@ int main(void)
 
 #if 0 //test code   of flash  
       
-    STMFLASH_Write(FLASH_SAVE_ADDR,(u16*)TEXT_Buffer,SIZE);
+    flash_write(FLASH_SAVE_ADDR,(u16*)TEXT_Buffer,SIZE);
 #endif
-#if 0
-    u8 datatemp[SIZE];  
-    STMFLASH_Read(FLASH_SAVE_ADDR,(u16*)datatemp,SIZE);
+#if 1
+    flash_read(FLASH_SAVE_ADDR,(u16*)psss_word_in_flash,SIZE);
 #endif
         
 #if 0

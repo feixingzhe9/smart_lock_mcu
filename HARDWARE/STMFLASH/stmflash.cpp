@@ -46,7 +46,7 @@ void STMFLASH_Write_NoCheck(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite)
 #define STM_SECTOR_SIZE	2048
 #endif		 
 u16 STMFLASH_BUF[STM_SECTOR_SIZE/2];//最多是2K字节
-void STMFLASH_Write(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite)	
+void flash_write(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite)	
 {
 	u32 secpos;	   //扇区地址
 	u16 secoff;	   //扇区内偏移地址(16位字计算)
@@ -62,7 +62,7 @@ void STMFLASH_Write(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite)
 	if(NumToWrite<=secremain)secremain=NumToWrite;//不大于该扇区范围
 	while(1) 
 	{	
-		STMFLASH_Read(secpos*STM_SECTOR_SIZE+STM32_FLASH_BASE,STMFLASH_BUF,STM_SECTOR_SIZE/2);//读出整个扇区的内容
+		flash_read(secpos*STM_SECTOR_SIZE+STM32_FLASH_BASE,STMFLASH_BUF,STM_SECTOR_SIZE/2);//读出整个扇区的内容
 		for(i=0;i<secremain;i++)//校验数据
 		{
 			if(STMFLASH_BUF[secoff+i]!=0XFFFF)break;//需要擦除  	  
@@ -96,7 +96,7 @@ void STMFLASH_Write(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite)
 //ReadAddr:起始地址
 //pBuffer:数据指针
 //NumToWrite:半字(16位)数
-void STMFLASH_Read(u32 ReadAddr,u16 *pBuffer,u16 NumToRead)   	
+void flash_read(u32 ReadAddr,u16 *pBuffer,u16 NumToRead)   	
 {
 	u16 i;
 	for(i=0;i<NumToRead;i++)
@@ -111,7 +111,7 @@ void STMFLASH_Read(u32 ReadAddr,u16 *pBuffer,u16 NumToRead)
 //WriteData:要写入的数据
 void Test_Write(u32 WriteAddr,u16 WriteData)   	
 {
-	STMFLASH_Write(WriteAddr,&WriteData,1);//写入一个字 
+	flash_write(WriteAddr,&WriteData,1);//写入一个字 
 }
 
 

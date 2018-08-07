@@ -25,7 +25,7 @@
 //arr：自动重装值。
 //psc：时钟预分频数
 //这里使用的是定时器2!
-void TIM2_Int_Init(u16 arr,u16 psc)
+void tim2_int_init(u16 arr,u16 psc)
 {
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     NVIC_InitTypeDef NVIC_InitStructure;

@@ -5,7 +5,6 @@ QRCodeClass qr_code_1(1);
 QRCodeClass qr_code_2(2);
 QRCodeClass qr_code_3(3);
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,7 +18,6 @@ void USART1_IRQHandler(void)                	//串口1中断服务程序
         qr_code_1.put_one_data(data, get_tick());
     } 
 }
-
 
 void USART3_IRQHandler(void)                	//串口3中断服务程序
 {
@@ -47,6 +45,7 @@ void USART2_IRQHandler(void)                	//串口3中断服务程序
   }
 #endif
 
+  
 u8 qr_test_data_1[QR_DATA_LENTH] = {0};
 u8 qr_test_data_2[QR_DATA_LENTH] = {0};
 u8 qr_test_data_3[QR_DATA_LENTH] = {0};

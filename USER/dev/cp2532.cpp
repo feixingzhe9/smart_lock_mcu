@@ -188,7 +188,6 @@ static u8 get_true_key_value(u16 key_value)
 }
 
 
-#define PASS_WORD_LENTH     4
 struct pass_word_t
 {
     u16 pass_word;
@@ -247,11 +246,11 @@ static void insert_one_pass_word(pass_word_t *key_info)
         pass_word_info->lenth++;
     }
 }
-
+char psss_word_in_flash[PASS_WORD_LENTH] = {0};
 void pass_work_proc(void)
 {
     char password[PASS_WORD_LENTH];
-    char psss_word_test[PASS_WORD_LENTH] = {'1', '2', '3', '4'};
+    
     if(pass_word_info->lenth == PASS_WORD_LENTH)
     {
         for(u8 i = 0; i < pass_word_info->lenth; i++)
@@ -266,7 +265,7 @@ void pass_work_proc(void)
     
     for(u8 i = 0; i < PASS_WORD_LENTH; i++)
     {
-        if(password[i] != psss_word_test[i])
+        if(password[i] != psss_word_in_flash[i])
         {
             return ;
         }            

@@ -15,7 +15,7 @@
  
  
 //≥ı ºªØIIC
-void IIC_Init(void)
+void i2c_init(void)
 {					     
 	GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_APB2PeriphClockCmd(	RCC_APB2Periph_GPIOB, ENABLE );	

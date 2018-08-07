@@ -15,17 +15,17 @@ class QRCodeClass
             data_cnt = 0;
             memset(qr_data, 0, sizeof(qr_data));
         }   
-
-        void upload_qr_data(void);
+        
         void put_one_data(u8 data, u32 start_tick);
-        void clear_data(void);
         void task(void);
-            
+
+    private:       
+        void clear_data(void);
+        void upload_qr_data(void);
         u32 tick;
         u8 qr_data[QR_DATA_LENTH];
         u16 data_cnt;
-        u8 my_id;
-        
+        u8 my_id;       
 };
 
 extern QRCodeClass qr_code_1;
