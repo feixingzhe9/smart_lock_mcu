@@ -32,7 +32,10 @@ static void init()
     sys_tick_init();
     NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
 //    uart_1_init(115200);	 	//串口1初始化为115200
-    uart_1_init(9600);	 	//串口1初始化为115200
+    uart_1_init(9600);	 	//串口1初始化为9600
+    uart_2_init(9600);      //串口2初始化为9600
+    uart_3_init(9600);      //串口3初始化为9600
+    
     LED.led_init();			     //LED端口初始化
     rfid_init();
     printf("RFID Driver version:%s\r\n", SW_VERSION);
@@ -73,8 +76,7 @@ int main(void)
         all_qr_data_task();
         can_protocol();
         beeper_task();
-        sys_indicator();
-               
+        sys_indicator();               
     }
 }
 

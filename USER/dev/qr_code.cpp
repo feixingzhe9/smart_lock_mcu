@@ -20,16 +20,52 @@ void USART1_IRQHandler(void)                	//串口1中断服务程序
     } 
 }
 
+
+void USART3_IRQHandler(void)                	//串口3中断服务程序
+{
+    u8 data;
+
+    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+    {
+        data =USART_ReceiveData(USART3);//(USART3->DR);	//读取接收到的数据
+        qr_code_3.put_one_data(data, get_tick());
+    } 
+}
+
+void USART2_IRQHandler(void)                	//串口3中断服务程序
+{
+    u8 data;
+
+    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+    {
+        data =USART_ReceiveData(USART2);//(USART3->DR);	//读取接收到的数据
+        qr_code_2.put_one_data(data, get_tick());
+    } 
+}
+
 #ifdef __cplusplus
   }
 #endif
 
-u8 qr_test_data[QR_DATA_LENTH] = {0};
+u8 qr_test_data_1[QR_DATA_LENTH] = {0};
+u8 qr_test_data_2[QR_DATA_LENTH] = {0};
+u8 qr_test_data_3[QR_DATA_LENTH] = {0};
 void QRCodeClass::upload_qr_data(void)  //upload data through CAN bus
 {
     //----  test code  ----//
-
-    memcpy(qr_test_data, this->qr_data, sizeof(this->qr_data));
+    switch(this->my_id)
+    {
+        case 1:
+            memcpy(qr_test_data_1, this->qr_data, sizeof(this->qr_data));
+            break;
+        case 2:
+            memcpy(qr_test_data_2, this->qr_data, sizeof(this->qr_data));
+            break;
+        case 3:
+            memcpy(qr_test_data_3, this->qr_data, sizeof(this->qr_data));
+            break;
+        default : break;
+    }    
 }
 
 void QRCodeClass::put_one_data(u8 data, u32 start_tick)
@@ -57,9 +93,7 @@ void QRCodeClass::task(void)
         if(get_tick() - this->tick > QR_CODE_UPLOAD_DELAY_TIME)
         {
             this->upload_qr_data();
-            this->clear_data();  
-//            upload_qr_data();
-//            clear_data();             
+            this->clear_data();              
         }
     }   
 }

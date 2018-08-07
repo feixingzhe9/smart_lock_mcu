@@ -31,6 +31,8 @@ extern u8  USART_RX_BUF13[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×
 
 //Èç¹ûÏë´®¿ÚÖĞ¶Ï½ÓÊÕ£¬Çë²»Òª×¢ÊÍÒÔÏÂºê¶¨Òå
 void uart_1_init(u32 bound);
+void uart_3_init(u32 bound);
+void uart_2_init(u32 bound);
 
 #ifdef  __cplusplus
 }  
