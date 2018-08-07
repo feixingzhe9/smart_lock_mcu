@@ -46,6 +46,7 @@ static void init()
 int main(void)
 {
     init();
+    u16 test_cnt = 0;
 
 #if 0 //test code   of flash  
       
@@ -71,6 +72,16 @@ int main(void)
         beeper_task();
         sys_indicator();
         
+//        test_cnt++;
+//        if(test_cnt % 2 == 1)
+//        {
+//            lock_1.lock_off();
+//        }
+//        else
+//        {
+//            lock_1.lock_on();
+//        }
+               
     }
 }
 

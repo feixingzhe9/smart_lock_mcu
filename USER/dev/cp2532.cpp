@@ -220,6 +220,19 @@ static void shift_letf_pass_word(void)
     }    
 }
 
+static void clear_pass_word(void)
+{
+    pass_word_t pass_word;
+    pass_word.pass_word = 0;
+    pass_word.start_tick = 0;
+    
+    for(u8 i = 1; i <  pass_word_info->lenth; i++)
+    {
+        memcpy( &(pass_word_info->pass_word_buf[i]), &pass_word, sizeof(pass_word_t));
+    }
+    pass_word_info->lenth = 0;
+}
+
 static void insert_one_pass_word(pass_word_t *key_info)
 {
     if(pass_word_info->lenth < PASS_WORD_LENTH)
@@ -256,17 +269,20 @@ void pass_work_proc(void)
         if(password[i] != psss_word_test[i])
         {
             return ;
-        }
-            
+        }            
     }
+    
+    
+    // ----   get right password here  ----//
     printf("get right password");
+    clear_pass_word();
     lock_1.is_need_to_unlock = true;
 
 }
 
 
 
-u16 touch_key_filter(u16 key_value)
+static u16 touch_key_proc(u16 key_value)
 {
     static u16 key = 0;
     static uint8_t filter_cnt = 0;
@@ -320,7 +336,7 @@ void touch_key_task(void)
         touch_key_value_raw = read_byte(0x31);
         if(is_key_valid(touch_key_value_raw) == true)
         {
-            set_key_value( touch_key_filter(touch_key_value_raw) );
+            set_key_value( touch_key_proc(touch_key_value_raw) );
         }
         else
         {
