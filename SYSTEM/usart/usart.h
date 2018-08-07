@@ -15,7 +15,7 @@ extern "C" {
 //ÐÞÕýÁËprintfµÚÒ»¸ö×Ö·û¶ªÊ§µÄbug
 //V1.4ÐÞ¸ÄËµÃ÷
 //1,ÐÞ¸Ä´®¿Ú³õÊ¼»¯IOµÄbug
-//2,ÐÞ¸ÄÁËUSART_RX_STA,Ê¹µÃ´®¿Ú×î´ó½ÓÊÕ×Ö½ÚÊýÎª2µÄ14´Î·½
+
 //3,Ôö¼ÓÁËUSART_REC_LEN,ÓÃÓÚ¶¨Òå´®¿Ú×î´óÔÊÐí½ÓÊÕµÄ×Ö½ÚÊý(²»´óÓÚ2µÄ14´Î·½)
 //4,ÐÞ¸ÄÁËEN_USART1_RXµÄÊ¹ÄÜ·½Ê½
 ////////////////////////////////////////////////////////////////////////////////// 	
@@ -28,9 +28,9 @@ extern u8  USART_RX_BUF_3[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×
 #if EN_USART1_RX	  	
 extern u8  USART_RX_BUF13[USART_REC_LEN]; //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.Ä©×Ö½ÚÎª»»ÐÐ·û 
 #endif
-extern u16 USART_RX_STA;         		//½ÓÊÕ×´Ì¬±ê¼Ç	
+
 //Èç¹ûÏë´®¿ÚÖÐ¶Ï½ÓÊÕ£¬Çë²»Òª×¢ÊÍÒÔÏÂºê¶¨Òå
-void uart_init(u32 bound);
+void uart_1_init(u32 bound);
 
 #ifdef  __cplusplus
 }  

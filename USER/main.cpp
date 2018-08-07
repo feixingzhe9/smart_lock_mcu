@@ -12,6 +12,7 @@
 #include "timer.h"
 #include "beeper.h"
 #include "lock.h"
+#include "qr_code.h"
 
 static void init_exti(void);
 static void sys_indicator(void);
@@ -30,7 +31,8 @@ static void init()
 {
     sys_tick_init();
     NVIC_Configuration(); 	 //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
-    uart_init(115200);	 	//串口初始化为115200
+//    uart_1_init(115200);	 	//串口1初始化为115200
+    uart_1_init(9600);	 	//串口1初始化为115200
     LED.led_init();			     //LED端口初始化
     rfid_init();
     printf("RFID Driver version:%s\r\n", SW_VERSION);
@@ -58,8 +60,7 @@ int main(void)
     u8 datatemp[SIZE];  
     STMFLASH_Read(FLASH_SAVE_ADDR,(u16*)datatemp,SIZE);
 #endif
-    
-    
+        
 #if 0
     
     cp2532_test = read_byte(0x31);
@@ -69,20 +70,10 @@ int main(void)
     {
         rfid_task();
         touch_key_task();
-        
+        all_qr_data_task();
         can_protocol();
         beeper_task();
         sys_indicator();
-        
-//        test_cnt++;
-//        if(test_cnt % 2 == 1)
-//        {
-//            lock_1.lock_off();
-//        }
-//        else
-//        {
-//            lock_1.lock_on();
-//        }
                
     }
 }
@@ -130,21 +121,25 @@ static void sys_indicator(void)
     if(get_tick() - start_tick >= INDICATOR_LED_PERIOD)
     {
         cnt++;
-        //cp2532_test = read_byte(0x31);
-        //cp2532_test = quick_read();
         
         if(cnt % 2 == 1)
         {
-            LED.led_on();//SDA_IN();
+            LED.led_on();
         }
         else
         {
-            LED.led_off();
-            //TIM_Cmd(TIM3, DISABLE);  //使能TIM3
-            //set_beeper_low();
-            
+            LED.led_off();  
         }
-        start_tick = get_tick();//SDA_OUT();IIC_SDA = 1;
+        start_tick = get_tick();
+ 
+        
+        // ----  test code for lock ----//
+//        if(cnt % 6 == 1)
+//        {
+//            lock_1.is_need_to_unlock = true;
+//            lock_2.is_need_to_unlock = true;
+//            lock_3.is_need_to_unlock = true;
+//        }
     }
     
 }
