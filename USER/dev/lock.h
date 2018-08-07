@@ -34,7 +34,7 @@ class LockClass
 
         void lock_on(void);
         void lock_off(void);
-        void lock_task(void);
+        void lock_task(u32 tick);
             
         GPIO_TypeDef*  lock_port;
         uint16_t lock_pin;
@@ -44,7 +44,7 @@ class LockClass
 };
 
 
-void all_lock_task(void);
+void all_lock_task(u32 tick);
 
 extern LockClass lock_1;
 extern LockClass lock_2;

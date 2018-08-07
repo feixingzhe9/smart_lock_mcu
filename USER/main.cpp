@@ -25,6 +25,7 @@ const u8 TEXT_Buffer[]={"STM32 FLASH TEST"};
 #define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
 
 #endif
+
 static void init()
 {
     sys_tick_init();
@@ -35,10 +36,10 @@ static void init()
     printf("RFID Driver version:%s\r\n", SW_VERSION);
     init_exti();
     IIC_Init();
-    //TIM3_PWM_Init(100,100);	 //不分频。PWM频率=72000/900=8Khz
-    //TIM_SetCompare3(TIM3,50);
     
     beeper_init(200,50);
+    
+    TIM2_Int_Init(499,7199);    // timer to control locks
 
     return;
 }
@@ -46,6 +47,7 @@ static void init()
 int main(void)
 {
     init();
+    
     u16 test_cnt = 0;
 
 #if 0 //test code   of flash  
@@ -67,7 +69,7 @@ int main(void)
     {
         rfid_task();
         touch_key_task();
-        all_lock_task();
+        
         can_protocol();
         beeper_task();
         sys_indicator();

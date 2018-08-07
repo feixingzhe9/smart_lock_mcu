@@ -26,6 +26,7 @@
 #include "sys.h"
 #include "usart.h"
 #include "stm32f10x.h"
+
  
 void NMI_Handler(void)
 {
@@ -106,3 +107,8 @@ void EXTI9_5_IRQHandler(void)
 	EXTI_ClearITPendingBit(EXTI_Line6);
 	NVIC_SystemReset();
 }
+
+
+extern void all_lock_task(u32 tick);
+
+
