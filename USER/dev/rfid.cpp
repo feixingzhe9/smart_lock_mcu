@@ -6,6 +6,7 @@
 #include "usart.h"
 #include "delay.h"
 #include "can_interface.h"
+#include "lock.h"
 
 MFRC522 mfrc522_B(chipSelectPinRfid2, resetPowerDownPinRfid2, &SPI_2, SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0, SPI2));
 MFRC522 mfrc522_A(chipSelectPinRfid1, resetPowerDownPinRfid1, &SPI_1, SPISettings(SPI_CLOCK_DIV8, MSBFIRST, SPI_MODE0, SPI1));
@@ -21,10 +22,23 @@ char rfid_in_flash[RFID_WORD_LENTH] = {0};
 
 static bool match_rfid(char *rfid_in_flash, char *rfid)
 {
+    for(u8 i = 0; i < RFID_WORD_LENTH; i++)
+    {
+        if(rfid_in_flash[i] != rfid[i])
+        {
+            return false;
+        }          
+    }
     return true;
 }
 
-
+void super_rfid_unlock_proc(char *rfid_in_flash, char *rfid)
+{
+    if(match_rfid(rfid_in_flash, rfid) == true)
+    {
+        lock_1.start_to_unlock();   // test code: only for lock 1.
+    }
+}
 
 void rfid_init()
 {		
@@ -121,6 +135,13 @@ void rfid_task()
 				uart_print_type_and_key(buffer_type, buffer_key);
 				
 				upload_rfid_data(&upload_msg, buffer_type, buffer_key);
+                u16 rfid_int = buffer_key[14];
+                rfid_int = rfid_int<<8;
+                rfid_int += buffer_key[15];
+                char rfid_str[10] = {0};
+                sprintf(rfid_str,"%d",rfid_int);     
+                super_rfid_unlock_proc(rfid_in_flash, rfid_str);
+                
                 rfid_start_tick = get_tick();
 
 				#endif
