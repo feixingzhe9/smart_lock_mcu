@@ -1,5 +1,5 @@
 #include "qr_code.h"
-
+#include "can_interface.h"
 
 QRCodeClass qr_code_1(1);
 QRCodeClass qr_code_2(2);
@@ -52,19 +52,38 @@ u8 qr_test_data_3[QR_DATA_LENTH] = {0};
 void QRCodeClass::upload_qr_data(void)  //upload data through CAN bus
 {
     //----  test code  ----//
+    can_message_t password_msg;    
+    can_id_union id; 
     switch(this->my_id)
     {
         case 1:
             memcpy(qr_test_data_1, this->qr_data, sizeof(this->qr_data));
+            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_1;
             break;
         case 2:
             memcpy(qr_test_data_2, this->qr_data, sizeof(this->qr_data));
+            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_2;
             break;
         case 3:
             memcpy(qr_test_data_3, this->qr_data, sizeof(this->qr_data));
+            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_3;
             break;
         default : break;
-    }    
+    }
+     
+    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+    
+    id.can_id_struct.res = 0;
+    id.can_id_struct.ack = 0;
+    id.can_id_struct.func_id = 0;
+    
+    
+    password_msg.data_len = 5;
+    can.can_send( &password_msg );
+    
+    Can1_TX(id.can_id,this->qr_data, this->data_cnt);
+
+    
 }
 
 void QRCodeClass::put_one_data(u8 data, u32 start_tick)
@@ -97,6 +116,11 @@ void QRCodeClass::task(void)
     }   
 }
 
+
+static void upload_qr_data(const u8 * qr_data, u8 len)
+{
+
+}
 void all_qr_data_task(void)
 {
     qr_code_1.task();

@@ -1,6 +1,7 @@
 #include "can_interface.h"
 #include "string.h"
 #include "lock.h"
+#include "delay.h"
 
 #define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
 
@@ -150,6 +151,118 @@ uint8_t can_interface::can_send(struct can_message_t *m)
 	
 	return CAN_Transmit(CAN1, &transmit_msg);
 }
+
+
+
+
+
+
+#define ONLYONCE       0x00
+#define BEGIN         0x01
+#define TRANSING       0x02
+#define END            0x03
+
+
+
+CanTxMsg TxMessage;
+void Can1_TX(uint32_t CANx_ID,uint8_t* pdata,uint16_t len)
+{
+  //return ;
+	uint16_t t_len;
+	uint16_t roundCount;
+	uint8_t modCount;
+	CAN_DATA_UNION TxMsg = {0};
+	//CanTxMsgTypeDef *TxMessage = platform_can_drivers[can_type].handle->pTxMsg;
+    
+	t_len = len;
+	roundCount = t_len/7;
+	modCount = t_len%7;
+	
+	TxMessage.ExtId = CANx_ID;
+	TxMessage.IDE   = CAN_ID_EXT;					 //????
+	TxMessage.RTR   = CAN_RTR_DATA;				 //??????
+	//if(roundCount <= 1)
+    if(t_len <= 7)
+    {
+        TxMsg.CanData_Struct.SegPolo = ONLYONCE;
+        TxMessage.DLC = t_len+1;		
+        
+        
+        memcpy(&TxMessage.Data[1],pdata,t_len);
+        TxMessage.Data[0] = TxMsg.CanData[0];
+        
+        if((CAN_USED->TSR&0x1C000000))
+        {
+            CAN_Transmit(CAN1, &TxMessage);//
+            delay_ms(10);
+        }
+        else
+        {
+            printf("TX busy ! \r\n");
+        }
+        return ;
+    }
+    
+	{
+		int num;
+        {
+            for(num = 0; num < roundCount; num++)
+            {		
+        //SET SEGPOLO				
+                if( num == 0)
+                {
+                    TxMsg.CanData_Struct.SegPolo = BEGIN;
+                }
+                else
+                {
+                    TxMsg.CanData_Struct.SegPolo = TRANSING;
+                }
+                
+                if( modCount == 0 && num == roundCount-1)
+                {
+                    TxMsg.CanData_Struct.SegPolo = END;
+                }
+                            
+                TxMsg.CanData_Struct.SegNum = num;
+                memcpy(TxMsg.CanData_Struct.Data, &pdata[num*7], 7);
+                memcpy(TxMessage.Data, TxMsg.CanData, 8);
+                TxMessage.DLC = 8;
+                if((CAN_USED->TSR&0x1C000000))
+                {
+                    CAN_Transmit(CAN1, &TxMessage);//
+                    delay_ms(10);
+                }
+                else
+                {
+                    printf("TX busy ! \r\n");
+                }
+                
+                //TRANSMIT LAST MSG
+                if( modCount !=0 && num == roundCount-1 )
+                {
+                    num++;
+                    TxMsg.CanData_Struct.SegPolo = END;
+                    TxMsg.CanData_Struct.SegNum = num;
+                    memcpy(TxMsg.CanData_Struct.Data,&pdata[num*7],modCount);
+                    memcpy(TxMessage.Data,TxMsg.CanData,modCount+1);
+                    TxMessage.DLC = modCount+1;
+                    if((CAN_USED->TSR&0x1C000000))
+                    {
+                        CAN_Transmit(CAN1, &TxMessage);//
+                        delay_ms(10);
+                    }
+                    else
+                    {
+                        printf("TX busy ! \r\n");
+                    }
+                }
+            }
+            
+        }       
+	}
+}
+
+
 
 struct can_message_t can_interface::can_read()
 {

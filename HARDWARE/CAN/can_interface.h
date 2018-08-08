@@ -2,6 +2,9 @@
 #define CAN_INTERFACE_H
 
 #include "sys.h"
+#include <stdio.h>	
+
+#define CAN_USED    CAN1
 
 #define LOCK_CAN_MAC_SRC_ID     0xd6
 #define CAN_FILTER_ID           (0x00d6 << 13)
@@ -26,9 +29,13 @@
 #define CAN_SOURCE_ID_LOCK_STATUS       0x81
 #define CAN_SOURCE_ID_PW_UPLOAD         0x82
 #define CAN_SOURCE_ID_RFID_UPLOAD       0x83
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD    0x83
-#define CAN_SOURCE_ID_SET_SUPER_PW      0x83
-#define CAN_SOURCE_ID_SET_SUPER_RFID    0x83
+
+#define CAN_SOURCE_ID_SET_SUPER_PW      0x84
+#define CAN_SOURCE_ID_SET_SUPER_RFID    0x85
+
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD_1  0x90
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD_2  0x91
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD_3  0x92
 
 
 
@@ -101,8 +108,9 @@ typedef union
 {
 	struct
 	{
+        uint8_t SegNum  : 6;
 		uint8_t SegPolo : 2;
-		uint8_t SegNum  : 6;
+		
         uint8_t Data[7];
 	} __attribute__ ((packed)) CanData_Struct;
 	uint8_t CanData[8];
@@ -193,6 +201,8 @@ uint8_t can_receive();
 
 extern can_interface can;
 extern void can_protocol(void);
+
+extern void Can1_TX(uint32_t CANx_ID,uint8_t* pdata,uint16_t len);
 //extern can_interface can(0x66, "500K");
 #endif // CAN_INTERFACE_H
 
