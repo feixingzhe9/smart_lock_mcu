@@ -3,8 +3,8 @@
 
 #include "sys.h"
 
-#define RFID_CAN_MAC_SRC_ID     0xd5
-#define CAN_FILTER_ID           (0x00d5 << 13)
+#define LOCK_CAN_MAC_SRC_ID     0xd6
+#define CAN_FILTER_ID           (0x00d6 << 13)
 #define CAN_FILTER_MASK         (0x00ff << 13)
 
 
@@ -22,38 +22,22 @@
 #define CAN_SOURCE_ID_CAN_TEST              0x03
 
 
+#define CAN_SOURCE_ID_UNLOCK            0x80
+#define CAN_SOURCE_ID_LOCK_STATUS       0x81
+#define CAN_SOURCE_ID_PW_UPLOAD         0x82
+#define CAN_SOURCE_ID_RFID_UPLOAD       0x83
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD    0x83
+#define CAN_SOURCE_ID_SET_SUPER_PW      0x83
+#define CAN_SOURCE_ID_SET_SUPER_RFID    0x83
+
+
+
 #define CAN_LONG_FRAME_TIME_OUT     5000/SYSTICK_PERIOD
     
 #define CAN_ONE_FRAME_DATA_LENTH    7
 #define CAN_SEG_NUM_MAX             64
 #define CAN_LONG_FRAME_LENTH_MAX    (CAN_ONE_FRAME_DATA_LENTH*CAN_SEG_NUM_MAX)
 
-typedef struct
-{
-    uint32_t can_id;
-    uint32_t start_time; 
-    uint16_t used_len;
-    uint8_t rcv_buf[CAN_LONG_FRAME_LENTH_MAX];   
-}CAN_RCV_BUFFER_T;
-
-typedef uint8_t (*GetOneFreeBufFn)(void);
-typedef uint8_t (*GetTheBufByIdFn)(uint32_t);
-typedef void (*FreeBufFn)(uint8_t);
-
-#define CAN_LONG_BUF_NUM    2
-typedef struct
-{
-    CAN_RCV_BUFFER_T can_rcv_buf[CAN_LONG_BUF_NUM];
-    GetOneFreeBufFn GetOneFreeBuf; 
-    GetTheBufByIdFn GetTheBufById;
-    FreeBufFn FreeBuf;
-}CAN_LONG_BUF_T;
-
-
-#define ONLYONCE       0x00
-#define BEGIAN         0x01
-#define TRANSING       0x02
-#define END            0x03
 
 #if 0
 typedef union
@@ -83,19 +67,34 @@ typedef union
 } __attribute__ ((packed)) CAN_DATA_UNION;
 
 #else
+
 typedef union
 {
 	struct
 	{
-		uint32_t SourceID  : 8;
-		uint32_t FUNC_ID   : 4;
-		uint32_t ACK       : 1;
-		uint32_t DestMACID : 8;
-		uint32_t SrcMACID  : 8;
+		uint32_t source_id  : 8;
+		uint32_t func_id   : 4;
+		uint32_t ack       : 1;
+		uint32_t dest_mac_id : 8;
+		uint32_t src_mac_id  : 8;
 		uint32_t res       : 3;
-	} __attribute__ ((packed)) CanID_Struct;
-	uint32_t  CANx_ID;
-} __attribute__ ((packed)) CAN_ID_UNION;
+	}__attribute__ ((packed)) can_id_struct;
+	uint32_t  can_id;
+} __attribute__ ((packed)) can_id_union;
+
+//typedef union
+//{
+//	struct
+//	{
+//		uint32_t SourceID  : 8;
+//		uint32_t FUNC_ID   : 4;
+//		uint32_t ACK       : 1;
+//		uint32_t DestMACID : 8;
+//		uint32_t SrcMACID  : 8;
+//		uint32_t res       : 3;
+//	} __attribute__ ((packed)) CanID_Struct;
+//	uint32_t  CANx_ID;
+//} __attribute__ ((packed)) CAN_ID_UNION;
 
 
 typedef union
@@ -109,6 +108,39 @@ typedef union
 	uint8_t CanData[8];
 } __attribute__ ((packed)) CAN_DATA_UNION;
 #endif
+
+
+typedef struct
+{
+    can_id_union can_id;
+    
+    uint32_t start_time; 
+    uint16_t used_len;
+    uint8_t rcv_buf[CAN_LONG_FRAME_LENTH_MAX];   
+}CAN_RCV_BUFFER_T;
+
+typedef uint8_t (*GetOneFreeBufFn)(void);
+typedef uint8_t (*GetTheBufByIdFn)(uint32_t);
+typedef void (*FreeBufFn)(uint8_t);
+
+#define CAN_LONG_BUF_NUM    2
+typedef struct
+{
+    CAN_RCV_BUFFER_T can_rcv_buf[CAN_LONG_BUF_NUM];
+    GetOneFreeBufFn GetOneFreeBuf; 
+    GetTheBufByIdFn GetTheBufById;
+    FreeBufFn FreeBuf;
+}CAN_LONG_BUF_T;
+
+
+#define ONLYONCE       0x00
+#define BEGIAN         0x01
+#define TRANSING       0x02
+#define END            0x03
+
+
+
+
 struct can_timing_t {
 	const char *baud;
 	uint16_t brp; // brp[0:9]

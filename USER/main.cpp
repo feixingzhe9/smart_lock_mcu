@@ -20,11 +20,9 @@ static void sys_indicator(void);
 
 
 #if 1   //test code
-
 #define FLASH_SAVE_ADDR  0X08070000 				//设置FLASH 保存地址(必须为偶数)
-const u8 TEXT_Buffer[]={"5678"};
 #define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
-
+const u8 TEXT_Buffer[]={"5678"};
 #endif
 
 static void init()
@@ -48,14 +46,12 @@ static void init()
 int main(void)
 {
     init();
-    
-    u16 test_cnt = 0;
 
-#if 0 //test code   of flash  
-      
+#if 0   //test code   of flash    
     flash_write(FLASH_SAVE_ADDR,(u16*)TEXT_Buffer,SIZE);
 #endif
-#if 1
+    
+#if 1   //test code   of flash   
     flash_read(FLASH_SAVE_ADDR,(u16*)psss_word_in_flash,SIZE);
 #endif
         
@@ -93,6 +89,25 @@ static void init_exti(void)
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource6);
     exit_init_structure.EXTI_Line = EXTI_Line6;
     EXTI_Init(&exit_init_structure);
+    
+//    //----  cp2532 touch key int  ----//
+//    GPIO_InitTypeDef GPIO_InitStructure;
+//    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);	//使能GPIOG时钟
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//浮空输入
+//    GPIO_Init(GPIOG, &GPIO_InitStructure);  //初始化PG11
+//    //----  cp2532 touch key int  ----//
+//    GPIO_EXTILineConfig(GPIO_PortSourceGPIOG, GPIO_PinSource11);
+//    exit_init_structure.EXTI_Line = EXTI_Line11;
+//    EXTI_Init(&exit_init_structure);
+//    
+//    //----  cp2532 touch key int  ----//
+//    NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//    NVIC_Init(&NVIC_InitStructure); 
+    
 
     NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;

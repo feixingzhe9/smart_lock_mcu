@@ -1,5 +1,6 @@
 #include "can_interface.h"
 #include "string.h"
+#include "lock.h"
 
 #define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
 
@@ -164,15 +165,15 @@ void can_interface::canAckBack(uint32_t CANx_ID, const uint8_t * const pdata, ui
 {
   uint16_t t_len;
   struct can_message_t TxMessage;
-  CAN_ID_UNION id;
+  can_id_union id;
   uint8_t src_mac_id_temp;
   CAN_DATA_UNION TxMsg;
   
-  id.CANx_ID = CANx_ID;
-  id.CanID_Struct.ACK = 1;
-  src_mac_id_temp = id.CanID_Struct.DestMACID;
-  id.CanID_Struct.DestMACID = id.CanID_Struct.SrcMACID;
-  id.CanID_Struct.SrcMACID = src_mac_id_temp;
+  id.can_id = CANx_ID;
+  id.can_id_struct.ack = 1;
+  src_mac_id_temp = id.can_id_struct.dest_mac_id;
+  id.can_id_struct.dest_mac_id = id.can_id_struct.src_mac_id;
+  id.can_id_struct.src_mac_id = src_mac_id_temp;
   
   t_len = len;
   if( t_len <=7 )
@@ -294,7 +295,7 @@ static uint8_t GetOneFreeBuf(void)
 }
 static void FreeBuf(uint8_t index)
 {
-    can_long_frame_buf->can_rcv_buf[index].can_id = 0;
+    can_long_frame_buf->can_rcv_buf[index].can_id.can_id = 0;
     can_long_frame_buf->can_rcv_buf[index].used_len = 0;
 }
 #define CAN_BUF_NO_THIS_ID      0xfe
@@ -302,7 +303,7 @@ static uint8_t GetTheBufById(uint32_t id)
 {
     for(uint8_t i = 0; i < CAN_LONG_BUF_NUM; i++)
     {
-        if(id == can_long_frame_buf->can_rcv_buf[i].can_id)
+        if(id == can_long_frame_buf->can_rcv_buf[i].can_id.can_id)
         {
             return i;
         }
@@ -322,47 +323,49 @@ void CanLongBufInit(void)
 
 
 
-char sw_version[] = "NoahC001M18A007";
+char sw_version[] = "smart_lock_mcu_001";
 #define CMD_NOT_FOUND   0
-uint16_t cmd_procesing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t data_in_len, uint8_t *data_out)
+uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t data_in_len, uint8_t *data_out)
 {
 
-    id->CanID_Struct.ACK = 1;   
-    id->CanID_Struct.DestMACID = id->CanID_Struct.SrcMACID;
-    id->CanID_Struct.SrcMACID = RFID_CAN_MAC_SRC_ID;
-    id->CanID_Struct.res = 0;
+    id->can_id_struct.ack = 1;   
+    id->can_id_struct.dest_mac_id = id->can_id_struct.src_mac_id;
+    id->can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+    id->can_id_struct.res = 0;
 
     static uint32_t can_test_cnt = 0;
      
-    switch(id->CanID_Struct.FUNC_ID)
+    switch(id->can_id_struct.func_id)
     {
         case CAN_FUN_ID_RESET:
             
             break;
         case CAN_FUN_ID_WRITE:
         case CAN_FUN_ID_READ:
-            switch(id->CanID_Struct.SourceID)
+            switch(id->can_id_struct.source_id)
             {
                 case CAN_SOURCE_ID_READ_VERSION:
-
-                    //if(data_in_len == 1)
-                    {
-                        //memcpy(&data_out[1],SW_VERSION[11],sizeof(SW_VERSION) - 11);
-                        //data_out[0] = strlen(SW_VERSION) - 11;
-                        memcpy(&data_out[1],&sw_version[11],sizeof(sw_version) - 11);
-                        data_out[0] = strlen(sw_version) - 11;
-                        return (data_out[0] + 1);
-                    }
-                    //break;
+                    memcpy(&data_out[1],&sw_version[15],sizeof(sw_version) - 15);
+                    data_out[0] = strlen(sw_version) - 15;
+                    return (data_out[0] + 1);
    
                 case CAN_SOURCE_ID_CAN_TEST:
                     can_test_cnt++;
                     memcpy(&data_out[0], (uint8_t *)&can_test_cnt, sizeof(can_test_cnt));
                     return sizeof(can_test_cnt);
+                
+                case CAN_SOURCE_ID_UNLOCK:
+                    {
+                        u32 to_unlock = *(u32 *)&data_in[0];
+                        if(to_unlock & (1<<0))
+                        {
+                            lock_1.is_need_to_unlock = true;                        
+                        }                   
+                        return 0;
+                    }
                 default :
                     break;
             }
-
 
         default: 
         break;
@@ -381,7 +384,7 @@ void can_protocol(void)
         can_data = can.can_read();
         
         
-        CAN_ID_UNION id;
+        can_id_union id;
         CAN_DATA_UNION rx_buf;
         
         uint16_t tx_len = 0;
@@ -396,7 +399,7 @@ void can_protocol(void)
         memset(&rx_buf, 0, sizeof(rx_buf));
         
         memcpy(rx_buf.CanData,  can_data.data, can_data.data_len);
-        id.CANx_ID = can_data.id;
+        id.can_id = can_data.id;
         seg_polo = rx_buf.CanData_Struct.SegPolo;
         
         rx_data_len = can_data.data_len;
@@ -406,7 +409,7 @@ void can_protocol(void)
         if(seg_polo == ONLYONCE)
         {
             //if( (id.CanID_Struct.SourceID < SOURCE_ID_PREPARE_UPDATE) && (id.CanID_Struct.SourceID > SOURCE_ID_CHECK_TRANSMIT) )
-            if(RFID_CAN_MAC_SRC_ID == id.CanID_Struct.DestMACID)
+            if(LOCK_CAN_MAC_SRC_ID == id.can_id_struct.dest_mac_id)
             {
                 memset(CanTxdataBuff, 0 ,sizeof(CanTxdataBuff));
                 tx_len = cmd_procesing(&id, rx_buf.CanData_Struct.Data, rx_data_len - 1, CanTxdataBuff );
@@ -417,7 +420,7 @@ void can_protocol(void)
                     //CanTX( MICO_CAN1, id.CANx_ID, CanTxdataBuff, tx_len );
                     can_message_t can_send_msg;
                     memset(&can_send_msg, 0, sizeof(can_send_msg));
-                    can_send_msg.id = id.CANx_ID;
+                    can_send_msg.id = id.can_id;
                     can_send_msg.data_len = tx_len;
                     memcpy(can_send_msg.data , CanTxdataBuff, can_send_msg.data_len);
                     can.can_send( &can_send_msg );

@@ -108,7 +108,10 @@ void EXTI9_5_IRQHandler(void)
 	NVIC_SystemReset();
 }
 
+void EXTI15_10_IRQHandler(void)
+{
+    EXTI_ClearITPendingBit(EXTI_Line11);
+}
 
-extern void all_lock_task(u32 tick);
 
 
