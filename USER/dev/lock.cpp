@@ -17,6 +17,11 @@ void LockClass::lock_off(void)
    GPIO_ResetBits(this->lock_port, this->lock_pin);
 }
 
+void LockClass::start_to_unlock(void)
+{
+    this->is_need_to_unlock = true;
+}
+
 
 //#define LOCK_CTRL_PERIOD    100/SYSTICK_PERIOD
 //void LockClass::lock_task(u32 tick)

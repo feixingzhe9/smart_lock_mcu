@@ -35,12 +35,13 @@ class LockClass
         void lock_on(void);
         void lock_off(void);
         void lock_task(u32 tick);
+        void start_to_unlock(void);
             
         GPIO_TypeDef*  lock_port;
         uint16_t lock_pin;
-        u32 start_tick;
-        bool is_need_to_unlock;
-        bool lock_status;
+        volatile u32 start_tick;
+        volatile bool is_need_to_unlock;
+        volatile bool lock_status;
 };
 
 

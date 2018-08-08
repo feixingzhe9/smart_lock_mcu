@@ -77,7 +77,6 @@ u16 get_key_value(void)
 }
 
 
-
 #define KEY_VALUE_0     (1<<7)
 #define KEY_VALUE_1     (1<<8)
 #define KEY_VALUE_2     (1<<9)
@@ -200,11 +199,8 @@ struct pass_word_info_t
     u8 lenth;
 };
 
-
 pass_word_info_t pass_word_info_t_ram = {0};
 pass_word_info_t *pass_word_info = &pass_word_info_t_ram;
-
-
 
 
 static void shift_letf_pass_word(void)
@@ -246,13 +242,41 @@ static void insert_one_pass_word(pass_word_t *key_info)
         pass_word_info->lenth++;
     }
 }
+
+
+static void upload_password(const char *password)
+{
+    can_message_t password_msg;    
+    can_id_union id; 
+    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+    id.can_id_struct.source_id = CAN_SOURCE_ID_PW_UPLOAD;
+    id.can_id_struct.res = 0;
+    id.can_id_struct.ack = 0;
+    id.can_id_struct.func_id = 0;
+    
+    password_msg.id = id.can_id;
+    password_msg.data[0] = 0x00;
+    memcpy( (void *)&password_msg.data[1], password, 4 );
+    password_msg.data_len = 5;
+    can.can_send( &password_msg );
+}
+
+#define PASSWORD_EXIST_TIME     4000/SYSTICK_PERIOD
 char psss_word_in_flash[PASS_WORD_LENTH] = {0};
-void pass_work_proc(void)
+static void pass_work_proc(void)
 {
     char password[PASS_WORD_LENTH];
     
-    if(pass_word_info->lenth == PASS_WORD_LENTH)
+    for(u8 i = 0; i < pass_word_info->lenth; i++)
     {
+        if(get_tick() - pass_word_info->pass_word_buf[i].start_tick >= PASSWORD_EXIST_TIME)
+        {
+            shift_letf_pass_word();
+        }
+    }   
+    
+    if(pass_word_info->lenth == PASS_WORD_LENTH)
+    {   
         for(u8 i = 0; i < pass_word_info->lenth; i++)
         {
             password[i] = pass_word_info->pass_word_buf[i].pass_word;
@@ -263,6 +287,8 @@ void pass_work_proc(void)
         return ;
     }
     
+    upload_password(password);  //upload password whether it is super password
+    
     for(u8 i = 0; i < PASS_WORD_LENTH; i++)
     {
         if(password[i] != psss_word_in_flash[i])
@@ -270,18 +296,15 @@ void pass_work_proc(void)
             return ;
         }            
     }
-    
-    
+       
     // ----   get right password here  ----//
     printf("get right password");
     clear_pass_word();
-    lock_1.is_need_to_unlock = true;
+    lock_1.start_to_unlock();
 
 }
 
-
-
-static u16 touch_key_proc(u16 key_value)
+static u16 touch_key_proc(const u16 key_value)
 {
     static u16 key = 0;
     static uint8_t filter_cnt = 0;
@@ -315,14 +338,11 @@ static u16 touch_key_proc(u16 key_value)
             else if(key_true_value == 'b')
             {
                 pass_work_proc();
-            }
-            
-            
+            }   
         }
         
         return key;
-    }
-    
+    }   
     return  0;
 }
 

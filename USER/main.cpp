@@ -148,9 +148,6 @@ static void sys_indicator(void)
         // ----  test code for lock ----//
 //        if(cnt % 6 == 1)
 //        {
-//            lock_1.is_need_to_unlock = true;
-//            lock_2.is_need_to_unlock = true;
-//            lock_3.is_need_to_unlock = true;
 //        }
     }
     

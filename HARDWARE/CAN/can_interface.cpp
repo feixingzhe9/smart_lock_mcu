@@ -359,7 +359,7 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                         u32 to_unlock = *(u32 *)&data_in[0];
                         if(to_unlock & (1<<0))
                         {
-                            lock_1.is_need_to_unlock = true;                        
+                            lock_1.start_to_unlock();                        
                         }                   
                         return 0;
                     }
