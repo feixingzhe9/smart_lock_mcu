@@ -17,14 +17,6 @@
 static void init_exti(void);
 static void sys_indicator(void);
 
-
-
-#if 1   //test code
-#define FLASH_SAVE_ADDR  0X08070000 				//设置FLASH 保存地址(必须为偶数)
-#define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
-const u8 TEXT_Buffer[]={"5678"};
-#endif
-
 static void init()
 {
     sys_tick_init();
@@ -39,26 +31,16 @@ static void init()
     i2c_init();    
     beeper_init(200,50);    
     tim2_int_init(499,7199);    // timer to control locks
+    
+    get_rfid_in_flash(rfid_in_flash);
+    get_password_in_flash(psss_word_in_flash);
 
     return;
 }
 
 int main(void)
 {
-    init();
-
-#if 0   //test code   of flash    
-    flash_write(FLASH_SAVE_ADDR,(u16*)TEXT_Buffer,SIZE);
-#endif
-    
-#if 1   //test code   of flash   
-    flash_read(FLASH_SAVE_ADDR,(u16*)psss_word_in_flash,SIZE);
-#endif
-        
-#if 0
-    
-    cp2532_test = read_byte(0x31);
-#endif  
+    init();  
    
     while(1)
     {

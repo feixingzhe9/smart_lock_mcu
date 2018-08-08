@@ -16,6 +16,16 @@ static can_message_t upload_msg;
 static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, const byte *buffer_key);
 static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key);
 
+
+char rfid_in_flash[RFID_WORD_LENTH] = {0};
+
+static bool match_rfid(char *rfid_in_flash, char *rfid)
+{
+    return true;
+}
+
+
+
 void rfid_init()
 {		
 //		GPIO_InitTypeDef  GPIO_InitStructure;

@@ -2,6 +2,9 @@
 #include "string.h"
 #include "lock.h"
 #include "delay.h"
+#include "rfid.h"
+#include "cp2532.h"
+#include "stmflash.h"
 
 #define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
 
@@ -257,7 +260,6 @@ void Can1_TX(uint32_t CANx_ID,uint8_t* pdata,uint16_t len)
                     }
                 }
             }
-            
         }       
 	}
 }
@@ -476,6 +478,37 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                         }                   
                         return 0;
                     }
+                    
+                case CAN_SOURCE_ID_SET_SUPER_RFID:
+                {
+                    if(RFID_WORD_LENTH == data_in_len)
+                    {
+                        char rfid[RFID_WORD_LENTH] = {0};
+                        for(u8 i = 0; i < RFID_WORD_LENTH; i++)
+                        {
+                            rfid[i] = data_in[i];
+                        }
+                        save_rfid_to_flash(rfid);
+                        get_rfid_in_flash(rfid_in_flash);
+                    }
+                    return 0;
+                }
+                
+                case CAN_SOURCE_ID_SET_SUPER_PW:
+                {
+                    if(PASS_WORD_LENTH == data_in_len)
+                    {
+                        char password[PASS_WORD_LENTH] = {0};
+                        for(u8 i = 0; i < PASS_WORD_LENTH; i++)
+                        {
+                            password[i] = data_in[i];
+                        }
+                        save_password_to_flash(password);
+                        get_password_in_flash(psss_word_in_flash);
+                    }
+                    return 0;
+                }
+                
                 default :
                     break;
             }

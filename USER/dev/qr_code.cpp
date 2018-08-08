@@ -117,10 +117,6 @@ void QRCodeClass::task(void)
 }
 
 
-static void upload_qr_data(const u8 * qr_data, u8 len)
-{
-
-}
 void all_qr_data_task(void)
 {
     qr_code_1.task();

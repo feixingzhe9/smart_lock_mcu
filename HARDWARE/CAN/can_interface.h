@@ -10,8 +10,6 @@
 #define CAN_FILTER_ID           (0x00d6 << 13)
 #define CAN_FILTER_MASK         (0x00ff << 13)
 
-
-
 //////  function id define  //////
 #define CAN_FUN_ID_RESET        0x06
 #define CAN_FUN_ID_WRITE        0x01

@@ -33,7 +33,13 @@ void flash_write(u32 WriteAddr,u16 *pBuffer,u16 NumToWrite);		//从指定地址开始写
 void flash_read(u32 ReadAddr,u16 *pBuffer,u16 NumToRead);   		//从指定地址开始读出指定长度的数据
 
 //测试写入
-void Test_Write(u32 WriteAddr,u16 WriteData);								   
+void Test_Write(u32 WriteAddr,u16 WriteData);
+
+void save_rfid_to_flash(char *rfid);
+void save_password_to_flash(char *password);
+void get_rfid_in_flash(char *rfid);
+void get_password_in_flash(char *password);
+
 #endif
 
 

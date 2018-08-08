@@ -114,9 +114,32 @@ void Test_Write(u32 WriteAddr,u16 WriteData)
 	flash_write(WriteAddr,&WriteData,1);//写入一个字 
 }
 
+#define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
+#define RFID_SIZE           4
+#define PASSWORD_SIZE       4
+#define FLASH_SAVE_ADDR     0X08070000 				//设置FLASH 保存地址(必须为偶数)
 
+#define FLASH_PASSWORD_ADDR         0X08070000
+#define FLASH_RFID_ADDR             0X08070010
 
+void get_rfid_in_flash(char *rfid)
+{
+    flash_read(FLASH_RFID_ADDR, (u16*)rfid, RFID_SIZE);
+}
 
+void get_password_in_flash(char *password)
+{
+    flash_read(FLASH_PASSWORD_ADDR, (u16*)password, PASSWORD_SIZE);
+}
 
+void save_rfid_to_flash(char *rfid)
+{
+    flash_write(FLASH_RFID_ADDR,(u16*)rfid, RFID_SIZE);
+}
+
+void save_password_to_flash(char *password)
+{
+    flash_write(FLASH_PASSWORD_ADDR, (u16*)password, PASSWORD_SIZE);
+}
 
 
