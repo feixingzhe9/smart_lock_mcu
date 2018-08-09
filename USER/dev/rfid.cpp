@@ -51,22 +51,22 @@ void rfid_init()
 //		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;				 //PC.6 端口配置
 //		GPIO_Init(GPIOC, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.6
 
-		SPI_2.begin();
+//		SPI_2.begin();
 
-	  mfrc522 = &mfrc522_B;
-		mfrc522->PCD_Init();
-		mfrc522->PCD_SetAntennaGain(0x50);
-		printf("RFID_B DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
-		mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
+//	  mfrc522 = &mfrc522_B;
+//		mfrc522->PCD_Init();
+//		mfrc522->PCD_SetAntennaGain(0x50);
+//		printf("RFID_B DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
+//		mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
 
-		SPI_1.begin();
-	  mfrc522 = &mfrc522_A;
-		mfrc522->PCD_Init();
-		mfrc522->PCD_SetAntennaGain(0x50);
-		printf("RFID_A DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
-		mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
+    SPI_1.begin();
+    mfrc522 = &mfrc522_A;
+    mfrc522->PCD_Init();
+    mfrc522->PCD_SetAntennaGain(0x50);
+    printf("RFID_A DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
+    mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
 
-		return;
+    return;
 }
 
 
