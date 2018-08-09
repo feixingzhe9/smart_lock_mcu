@@ -26,22 +26,28 @@ class LockClass
             GPIO_Init(lock_port, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.9
             GPIO_ResetBits(lock_port,lock_pin);	        // default value: reset
             
-            
             is_need_to_unlock = false;
             lock_status = false;
             start_tick = 0;
+            self_lock = false;
         }
 
-        void lock_on(void);
-        void lock_off(void);
         void lock_task(u32 tick);
         void start_to_unlock(void);
-            
+        
+        volatile bool lock_status;
+        
+    private:
         GPIO_TypeDef*  lock_port;
         uint16_t lock_pin;
-        volatile u32 start_tick;
+    
         volatile bool is_need_to_unlock;
-        volatile bool lock_status;
+        volatile u32 start_tick;
+    
+        volatile bool self_lock;
+    
+        void lock_on(void);
+        void lock_off(void);
 };
 
 
@@ -50,4 +56,5 @@ void all_lock_task(u32 tick);
 extern LockClass lock_1;
 extern LockClass lock_2;
 extern LockClass lock_3;
+
 #endif

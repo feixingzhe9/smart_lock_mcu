@@ -47,24 +47,42 @@ void LockClass::start_to_unlock(void)
 
 
 #define LOCK_CTRL_PERIOD    100/50
+#define SELF_LOCK_TIME      3000/50
 void LockClass::lock_task(u32 tick)
 {
-    if(this->is_need_to_unlock == true)
+    if(false == this->self_lock)
     {
-        if(this->start_tick == 0)
+        if(true == this->is_need_to_unlock)
         {
-            this->start_tick = tick;
-            this->lock_on();
-            this->lock_status = true;
-        }
-               
-        if(tick - this->start_tick >= LOCK_CTRL_PERIOD)
-        {
-            this->start_tick = 0;
-            this->is_need_to_unlock = false;
-            this->lock_off();
+            if(this->start_tick == 0)
+            {
+                this->start_tick = tick;
+                this->lock_on();
+                this->lock_status = true;
+            }
+                   
+            if(tick - this->start_tick >= LOCK_CTRL_PERIOD)
+            {
+                this->start_tick = 0;
+                this->is_need_to_unlock = false;
+                this->lock_off();
+                this->self_lock = true;
+            }
         }
     }
+    
+    else
+    {
+        if(0 == this->start_tick)
+        {
+            this->start_tick = tick;
+        }
+        if(tick - this->start_tick >= SELF_LOCK_TIME)
+        {
+            this->self_lock = false;
+            this->start_tick = 0;
+        }
+    }   
 }
 
 
