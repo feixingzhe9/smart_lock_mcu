@@ -460,9 +460,9 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
             switch(id->can_id_struct.source_id)
             {
                 case CAN_SOURCE_ID_READ_VERSION:
-                    memcpy(&data_out[1],&sw_version[15],sizeof(sw_version) - 15);
-                    data_out[0] = strlen(sw_version) - 15;
-                    return (data_out[0] + 1);
+                    memcpy(&data_out[0], &sw_version[0], sizeof(sw_version));
+                    //data_out[0] = strlen(sw_version) - strlen("smart_lock_mcu_");
+                    return sizeof(sw_version);
    
                 case CAN_SOURCE_ID_CAN_TEST:
                     can_test_cnt++;
@@ -480,34 +480,39 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                     }
                     
                 case CAN_SOURCE_ID_SET_SUPER_RFID:
-                {
-                    if(RFID_WORD_LENTH == data_in_len)
                     {
-                        char rfid[RFID_WORD_LENTH] = {0};
-                        for(u8 i = 0; i < RFID_WORD_LENTH; i++)
+                        if(RFID_WORD_LENTH == data_in_len)
                         {
-                            rfid[i] = data_in[i];
+                            char rfid[RFID_WORD_LENTH] = {0};
+                            for(u8 i = 0; i < RFID_WORD_LENTH; i++)
+                            {
+                                rfid[i] = data_in[i];
+                            }
+                            save_rfid_to_flash(rfid);
+                            get_rfid_in_flash(rfid_in_flash);
+                            memcpy(data_out, rfid_in_flash, RFID_WORD_LENTH);
+                            return RFID_WORD_LENTH;
                         }
-                        save_rfid_to_flash(rfid);
-                        get_rfid_in_flash(rfid_in_flash);
+                        return 0;
                     }
-                    return 0;
-                }
                 
                 case CAN_SOURCE_ID_SET_SUPER_PW:
-                {
-                    if(PASS_WORD_LENTH == data_in_len)
                     {
-                        char password[PASS_WORD_LENTH] = {0};
-                        for(u8 i = 0; i < PASS_WORD_LENTH; i++)
+                        if(PASS_WORD_LENTH == data_in_len)
                         {
-                            password[i] = data_in[i];
+                            char password[PASS_WORD_LENTH] = {0};
+                            for(u8 i = 0; i < PASS_WORD_LENTH; i++)
+                            {
+                                password[i] = data_in[i];
+                            }
+                            save_password_to_flash(password);
+                            get_password_in_flash(psss_word_in_flash);
+                            memcpy(data_out, psss_word_in_flash, PASS_WORD_LENTH);
+                            return RFID_WORD_LENTH;
                         }
-                        save_password_to_flash(password);
-                        get_password_in_flash(psss_word_in_flash);
+                        return 0;
                     }
-                    return 0;
-                }
+                
                 
                 default :
                     break;
@@ -520,7 +525,7 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
     return CMD_NOT_FOUND;
 }
 
-uint8_t CanTxdataBuff[CAN_LONG_FRAME_LENTH_MAX] = {0};
+uint8_t can_tx_data_buf[CAN_LONG_FRAME_LENTH_MAX] = {0};
 void can_protocol(void)
 {
     while(can.is_can_has_data() == true)
@@ -557,19 +562,19 @@ void can_protocol(void)
             //if( (id.CanID_Struct.SourceID < SOURCE_ID_PREPARE_UPDATE) && (id.CanID_Struct.SourceID > SOURCE_ID_CHECK_TRANSMIT) )
             if(LOCK_CAN_MAC_SRC_ID == id.can_id_struct.dest_mac_id)
             {
-                memset(CanTxdataBuff, 0 ,sizeof(CanTxdataBuff));
-                tx_len = cmd_procesing(&id, rx_buf.CanData_Struct.Data, rx_data_len - 1, CanTxdataBuff );
+                memset(can_tx_data_buf, 0 ,sizeof(can_tx_data_buf));
+                tx_len = cmd_procesing(&id, rx_buf.CanData_Struct.Data, rx_data_len - 1, can_tx_data_buf );
                 //process the data here//
                 
                 if(tx_len > 0)
                 {
-                    //CanTX( MICO_CAN1, id.CANx_ID, CanTxdataBuff, tx_len );
-                    can_message_t can_send_msg;
-                    memset(&can_send_msg, 0, sizeof(can_send_msg));
-                    can_send_msg.id = id.can_id;
-                    can_send_msg.data_len = tx_len;
-                    memcpy(can_send_msg.data , CanTxdataBuff, can_send_msg.data_len);
-                    can.can_send( &can_send_msg );
+                    Can1_TX(id.can_id, can_tx_data_buf, tx_len );
+//                    can_message_t can_send_msg;
+//                    memset(&can_send_msg, 0, sizeof(can_send_msg));
+//                    can_send_msg.id = id.can_id;
+//                    can_send_msg.data_len = tx_len;
+//                    memcpy(can_send_msg.data , can_tx_data_buf, can_send_msg.data_len);
+//                    can.can_send( &can_send_msg );
                 }        
             }
         }
