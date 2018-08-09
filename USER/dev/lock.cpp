@@ -70,8 +70,9 @@ bool LockClass::is_to_my_turn(void)
 }
 
 
-#define LOCK_CTRL_PERIOD    100/50
-#define SELF_LOCK_TIME      3000/50
+#define LOCK_CTRL_PERIOD        100/50
+#define SELF_LOCK_TIME          1500/50
+#define BETWEEN_LOCK_TIME       300/50
 void LockClass::lock_task(u32 tick)
 {
     if(true == this->is_to_my_turn())
@@ -89,11 +90,22 @@ void LockClass::lock_task(u32 tick)
                        
                 if(tick - this->lock_period_start_tick >= LOCK_CTRL_PERIOD)
                 {
-                    this->lock_period_start_tick = 0;
-                    this->is_need_to_unlock = false;
+                    
                     this->lock_off();
-                    this->self_lock = true;
-                    this->remove_first_unlock();
+                    
+                    if(0 == this->between_lock_start_tick)
+                    {
+                        this->between_lock_start_tick = tick;
+                    }
+                    if(tick - this->between_lock_start_tick >= BETWEEN_LOCK_TIME)
+                    {
+                        this->remove_first_unlock();
+                        this->lock_period_start_tick = 0;
+                        this->is_need_to_unlock = false;
+                        this->self_lock = true;
+                        this->between_lock_start_tick = 0;
+                    }
+                    
                 }
             }
         }            

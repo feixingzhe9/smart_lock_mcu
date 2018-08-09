@@ -39,6 +39,8 @@ class LockClass
             lock_status = false;
             lock_period_start_tick = 0;
             self_lock_start_tick = 0;
+            between_lock_start_tick = 0;
+            
             self_lock = false;
             if(id > 0)
             {
@@ -65,6 +67,7 @@ class LockClass
         volatile bool is_need_to_unlock;
         volatile u32 lock_period_start_tick;
         volatile u32 self_lock_start_tick;
+        volatile u32 between_lock_start_tick;
     
         volatile bool self_lock;
     
