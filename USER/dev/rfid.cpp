@@ -36,7 +36,7 @@ void super_rfid_unlock_proc(char *rfid_in_flash, char *rfid)
 {
     if(match_rfid(rfid_in_flash, rfid) == true)
     {
-        lock_1.start_to_unlock();   // test code: only for lock 1.
+        start_to_unlock_all(); 
     }
 }
 

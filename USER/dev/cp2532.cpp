@@ -300,7 +300,7 @@ static void pass_work_proc(void)
     // ----   get right password here  ----//
     printf("get right password");
     clear_pass_word();
-    lock_1.start_to_unlock();
+    start_to_unlock_all();
 
 }
 

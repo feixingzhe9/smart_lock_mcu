@@ -2,16 +2,25 @@
 #define __LOCK__H_
 
 #include "sys.h"
+#include <stdio.h>
 
-void lock_task(void);
+#define LOCK_NUM_MAX        3
+struct lock_lock_ctrl_t
+{
+    volatile u8 lock_array[LOCK_NUM_MAX];
+    volatile u8 lock_cnt;
+    volatile u8 to_unlock_cnt;
+    u32 start_tick;
+};
 
 class LockClass 
 {
     public:
-        LockClass(GPIO_TypeDef* port, uint16_t pin)
+        LockClass(GPIO_TypeDef* port, uint16_t pin, u8 id, struct lock_lock_ctrl_t * lock_ctrl)
         {
             lock_port = port;
             lock_pin = pin;
+            lock_lock_ctrl = lock_ctrl;
             
             GPIO_InitTypeDef  GPIO_InitStructure;
         
@@ -28,8 +37,20 @@ class LockClass
             
             is_need_to_unlock = false;
             lock_status = false;
-            start_tick = 0;
+            lock_period_start_tick = 0;
+            self_lock_start_tick = 0;
             self_lock = false;
+            if(id > 0)
+            {
+                my_id = id;
+            }
+            else
+            {
+                printf("fatal: lock id CAN NOT be 0 ! ! !");
+            }
+            
+            lock_lock_ctrl->lock_cnt++;
+            lock_lock_ctrl->to_unlock_cnt = 0;
         }
 
         void lock_task(u32 tick);
@@ -42,19 +63,31 @@ class LockClass
         uint16_t lock_pin;
     
         volatile bool is_need_to_unlock;
-        volatile u32 start_tick;
+        volatile u32 lock_period_start_tick;
+        volatile u32 self_lock_start_tick;
     
         volatile bool self_lock;
     
+        struct lock_lock_ctrl_t *lock_lock_ctrl;
+        
+        u8 my_id;
+    
         void lock_on(void);
         void lock_off(void);
+        void remove_first_unlock(void);
+        bool is_to_my_turn(void);
+        bool search_unlock_array(u8 id);
 };
 
 
 void all_lock_task(u32 tick);
+void start_to_unlock_all(void);
+
 
 extern LockClass lock_1;
 extern LockClass lock_2;
 extern LockClass lock_3;
+
+
 
 #endif
