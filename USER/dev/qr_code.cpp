@@ -51,7 +51,6 @@ u8 qr_test_data_2[QR_DATA_LENTH] = {0};
 u8 qr_test_data_3[QR_DATA_LENTH] = {0};
 void QRCodeClass::upload_qr_data(void)  //upload data through CAN bus
 {
-    //----  test code  ----//
     can_message_t password_msg;    
     can_id_union id; 
     switch(this->my_id)

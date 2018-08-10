@@ -50,6 +50,8 @@ u16 quick_read(void)
 static can_message_t touch_key_message_ram;
 static can_message_t *touch_key_message = &touch_key_message_ram;
 
+
+//----  test code ----//
 static void upload_touch_key_data(u16 key_value)
 {
     uint8_t key_value_low = key_value&0xff;
@@ -361,10 +363,12 @@ void touch_key_task(void)
         {
             printf("key is invalid ! \r\n");
         }
+        
         if( get_key_value() )
         {
             upload_touch_key_data( get_key_value() );
         }
+        
         start_tick = get_tick();
     }
     

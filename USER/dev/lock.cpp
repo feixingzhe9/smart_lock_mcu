@@ -75,40 +75,133 @@ bool LockClass::is_to_my_turn(void)
 #define BETWEEN_LOCK_TIME       300/50
 void LockClass::lock_task(u32 tick)
 {
-    if(true == this->is_to_my_turn())
+//    if(true == this->is_to_my_turn())
+//    {
+//        if(false == this->self_lock)
+//        {
+//            if(true == this->is_need_to_unlock)
+//            {
+//                if(this->lock_period_start_tick == 0)
+//                {
+//                    this->lock_period_start_tick = tick;
+//                    this->lock_on();
+//                    this->lock_status = true;
+//                }
+//                       
+//                if(tick - this->lock_period_start_tick >= LOCK_CTRL_PERIOD)
+//                {       
+//                    this->lock_off();
+//                    
+//                    if(0 == this->between_lock_start_tick)
+//                    {
+//                        this->between_lock_start_tick = tick;
+//                    }
+//                    if(tick - this->between_lock_start_tick >= BETWEEN_LOCK_TIME)
+//                    {
+//                        this->remove_first_unlock();
+//                        this->lock_period_start_tick = 0;
+//                        this->is_need_to_unlock = false;
+//                        this->self_lock = true;
+//                        this->between_lock_start_tick = 0;
+//                    }                   
+//                }
+//            }
+//        }            
+//    }
+//    
+//    if(true == this->self_lock)
+//    {
+//        if(0 == this->self_lock_start_tick)
+//        {
+//            this->self_lock_start_tick = tick;
+//        }
+//        if(tick - this->self_lock_start_tick >= SELF_LOCK_TIME)
+//        {
+//            this->self_lock = false;
+//            this->self_lock_start_tick = 0;
+//        }
+//    }
+
+
+    switch(this->lock_machine_state)
     {
-        if(false == this->self_lock)
-        {
-            if(true == this->is_need_to_unlock)
+        case LOCK_MACHINE_STATE_WAIT_FOR_MY_TURN:
             {
-                if(this->lock_period_start_tick == 0)
+                if( true == this->is_to_my_turn() )
                 {
-                    this->lock_period_start_tick = tick;
-                    this->lock_on();
-                    this->lock_status = true;
+                    this->lock_machine_state = LOCK_MACHINE_STATE_WAIT_SELF_LOCK;
                 }
-                       
+                else
+                {                   
+                    break;
+                }      
+            }                
+            
+            
+        case LOCK_MACHINE_STATE_WAIT_SELF_LOCK:
+            {
+                if(false == this->self_lock)
+                {
+                    this->lock_machine_state = LOCK_MACHINE_STATE_LOCK_ON;                   
+                }
+                else
+                { 
+                    break;
+                }
+                
+            }
+        
+        case LOCK_MACHINE_STATE_LOCK_ON:
+            {
+                this->lock_on();
+                this->lock_period_start_tick = tick;
+                this->lock_status = true;
+                if(0 == this->between_lock_start_tick)
+                {
+                    this->between_lock_start_tick = tick;
+                }
+                this->lock_machine_state = LOCK_MACHINE_STATE_LOCK_OFF;
+                //break;
+            }
+            
+        case LOCK_MACHINE_STATE_LOCK_OFF:
+            {
                 if(tick - this->lock_period_start_tick >= LOCK_CTRL_PERIOD)
                 {
-                    
                     this->lock_off();
-                    
+                    this->lock_machine_state = LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY;
                     if(0 == this->between_lock_start_tick)
                     {
                         this->between_lock_start_tick = tick;
                     }
-                    if(tick - this->between_lock_start_tick >= BETWEEN_LOCK_TIME)
-                    {
-                        this->remove_first_unlock();
-                        this->lock_period_start_tick = 0;
-                        this->is_need_to_unlock = false;
-                        this->self_lock = true;
-                        this->between_lock_start_tick = 0;
-                    }
-                    
                 }
+                else
+                {
+//                    break;
+                }
+                break;
             }
-        }            
+            
+        case LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY:
+            { 
+                if(tick - this->between_lock_start_tick >= BETWEEN_LOCK_TIME)
+                {
+                    this->remove_first_unlock();
+                    this->lock_period_start_tick = 0;
+                    this->is_need_to_unlock = false;
+                    this->self_lock = true;
+                    this->between_lock_start_tick = 0;
+                    this->lock_machine_state = LOCK_MACHINE_STATE_WAIT_FOR_MY_TURN;
+                }
+                else
+                {
+                    break;
+                }                   
+            }
+                   
+        default :
+            break;
+            
     }
     
     if(true == this->self_lock)
@@ -122,7 +215,7 @@ void LockClass::lock_task(u32 tick)
             this->self_lock = false;
             this->self_lock_start_tick = 0;
         }
-    }       
+    }
 }
 
 

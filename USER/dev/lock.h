@@ -37,6 +37,7 @@ class LockClass
             
             is_need_to_unlock = false;
             lock_status = false;
+            lock_machine_state = 0;
             lock_period_start_tick = 0;
             self_lock_start_tick = 0;
             between_lock_start_tick = 0;
@@ -74,6 +75,15 @@ class LockClass
         struct lock_lock_ctrl_t *lock_lock_ctrl;
         
         u8 my_id;
+    
+    #define LOCK_MACHINE_STATE_WAIT_FOR_MY_TURN     0
+    #define LOCK_MACHINE_STATE_GET_TURN             1
+    #define LOCK_MACHINE_STATE_WAIT_SELF_LOCK       2
+    #define LOCK_MACHINE_STATE_LOCK_ON              3
+    #define LOCK_MACHINE_STATE_LOCK_OFF             4
+    #define LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY   5
+    
+        u8 lock_machine_state;
     
         void lock_on(void);
         void lock_off(void);
