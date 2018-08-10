@@ -1,24 +1,7 @@
 #include "timer.h"
 #include "led.h"
 #include "usart.h"
-#include "lock.h"
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK战舰STM32开发板
-//定时器 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2012/9/4
-//版本：V1.1
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
-//********************************************************************************
-//V1.1 20120904
-//1,增加TIM3_PWM_Init函数。
-//2,增加LED0_PWM_VAL宏定义，控制TIM3_CH2脉宽									  
-//////////////////////////////////////////////////////////////////////////////////  
-  
+#include "lock.h" 
   
 //通用定时器2中断初始化
 //这里时钟选择为APB1的2倍，而APB1为36M
@@ -66,13 +49,13 @@ void tim2_int_init(u16 arr,u16 psc)
     {
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update  );  //清除TIMx更新中断标志 
         all_lock_task(tick);
-        //LED1=!LED1;
     }
 }
 
 #ifdef __cplusplus
 }
 #endif
+
 
 //TIM3 PWM部分初始化 
 //PWM输出初始化
@@ -118,19 +101,6 @@ void TIM3_PWM_Init(u16 arr,u16 psc)
     //TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable; //比较输出使能
     //TIM_OC3Init(TIM3, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM3 OC3
 	
-
 }
 
-void set_beeper_low(void)
-{
-//    GPIO_InitTypeDef GPIO_InitStructure;
-//    
-//    //设置该引脚为复用输出功能,输出TIM3 CH2的PWM脉冲波形	GPIOB.5
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; //TIM_CH2
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化GPIO
-    
-    GPIO_ResetBits(GPIOB,GPIO_Pin_0);
-}
 

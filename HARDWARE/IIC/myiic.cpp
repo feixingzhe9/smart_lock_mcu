@@ -1,18 +1,5 @@
 #include "myiic.h"
 #include "delay.h"
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK战舰STM32开发板
-//IIC驱动 代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2012/9/9
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
-//////////////////////////////////////////////////////////////////////////////////
- 
  
 //初始化IIC
 void i2c_init(void)
@@ -81,6 +68,7 @@ void set_i2c_scl_out(uint8_t value)
     }      
 }
 
+
 //产生IIC起始信号
 void IIC_Start(void)
 {
@@ -96,7 +84,9 @@ void IIC_Start(void)
 	delay_us(4);
 	//IIC_SCL=0;//钳住I2C总线，准备发送或接收数据 
     set_i2c_scl_out(0);
-}	  
+}
+
+
 //产生IIC停止信号
 void IIC_Stop(void)
 {
@@ -113,6 +103,8 @@ void IIC_Stop(void)
     set_i2c_sda_out(1);   
 	delay_us(4);							   	
 }
+
+
 //等待应答信号到来
 //返回值：1，接收应答失败
 //        0，接收应答成功
@@ -229,30 +221,6 @@ u8 IIC_Read_Byte(unsigned char ack)
         IIC_Ack(); //发送ACK   
     return receive;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

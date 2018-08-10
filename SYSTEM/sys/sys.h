@@ -6,9 +6,7 @@
 #endif
 	 
 #include "stm32f10x.h"	 
-     
-//#define SW_VERSION                      "007"
-#define SW_VERSION	"NoahC001M18A007"
+
 
      
 

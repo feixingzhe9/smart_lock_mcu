@@ -26,7 +26,6 @@ static void init()
     uart_3_init(9600);      //串口3初始化为9600   
     LED.led_init();			     //LED端口初始化
     rfid_init();
-    printf("RFID Driver version:%s\r\n", SW_VERSION);
     init_exti();
     i2c_init();    
     beeper_init(200,50);    
@@ -107,7 +106,6 @@ static void init_exti(void)
 
 #define INDICATOR_LED_PERIOD    500/SYSTICK_PERIOD
 
-extern void set_beeper_low(void);
 static void sys_indicator(void)
 {
     static u16 cnt = 0;
@@ -125,12 +123,7 @@ static void sys_indicator(void)
             LED.led_off();  
         }
         start_tick = get_tick();
- 
-        
-        // ----  test code for lock ----//
-//        if(cnt % 6 == 1)
-//        {
-//        }
+         
     }
     
 }

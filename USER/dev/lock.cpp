@@ -52,8 +52,7 @@ void LockClass::remove_first_unlock(void)
             this->lock_lock_ctrl->lock_array[i - 1] = this->lock_lock_ctrl->lock_array[i];
         }
         this->lock_lock_ctrl->to_unlock_cnt--;
-        this->lock_lock_ctrl->lock_array[this->lock_lock_ctrl->to_unlock_cnt] = 0;
-        
+        this->lock_lock_ctrl->lock_array[this->lock_lock_ctrl->to_unlock_cnt] = 0;       
     }
 }
 
@@ -69,10 +68,10 @@ bool LockClass::is_to_my_turn(void)
     return false;
 }
 
-
-#define LOCK_CTRL_PERIOD        100/50
-#define SELF_LOCK_TIME          1500/50
-#define BETWEEN_LOCK_TIME       300/50
+#define TIMER_TICK_PERIOD       50
+#define LOCK_CTRL_PERIOD        100/TIMER_TICK_PERIOD
+#define SELF_LOCK_TIME          1500/TIMER_TICK_PERIOD
+#define BETWEEN_LOCK_TIME       300/TIMER_TICK_PERIOD
 void LockClass::lock_task(u32 tick)
 {
 //    if(true == this->is_to_my_turn())
@@ -136,8 +135,7 @@ void LockClass::lock_task(u32 tick)
                     break;
                 }      
             }                
-            
-            
+                       
         case LOCK_MACHINE_STATE_WAIT_SELF_LOCK:
             {
                 if(false == this->self_lock)
@@ -147,8 +145,7 @@ void LockClass::lock_task(u32 tick)
                 else
                 { 
                     break;
-                }
-                
+                }               
             }
         
         case LOCK_MACHINE_STATE_LOCK_ON:
@@ -169,6 +166,7 @@ void LockClass::lock_task(u32 tick)
                 if(tick - this->lock_period_start_tick >= LOCK_CTRL_PERIOD)
                 {
                     this->lock_off();
+                    this->self_lock = true;
                     this->lock_machine_state = LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY;
                     if(0 == this->between_lock_start_tick)
                     {
@@ -189,7 +187,7 @@ void LockClass::lock_task(u32 tick)
                     this->remove_first_unlock();
                     this->lock_period_start_tick = 0;
                     this->is_need_to_unlock = false;
-                    this->self_lock = true;
+                    
                     this->between_lock_start_tick = 0;
                     this->lock_machine_state = LOCK_MACHINE_STATE_WAIT_FOR_MY_TURN;
                 }

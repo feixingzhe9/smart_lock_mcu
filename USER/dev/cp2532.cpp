@@ -348,10 +348,10 @@ static u16 touch_key_proc(const u16 key_value)
     return  0;
 }
 
-#define TOUCH_KEY_PERIOD    80/SYSTICK_PERIOD
+#define TOUCH_KEY_PERIOD    30/SYSTICK_PERIOD
 void touch_key_task(void)
 {
-    uint32_t start_tick = 0;
+    static uint32_t start_tick = 0;
     if(get_tick() - start_tick >= TOUCH_KEY_PERIOD)
     {
         touch_key_value_raw = read_byte(0x31);

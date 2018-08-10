@@ -43,6 +43,7 @@ class LockClass
             between_lock_start_tick = 0;
             
             self_lock = false;
+            
             if(id > 0)
             {
                 my_id = id;

@@ -2,18 +2,6 @@
 #include "delay.h"
 #include "usart.h"
  
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK战舰STM32开发板
-//STM32 FLASH 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2012/9/13
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
-//////////////////////////////////////////////////////////////////////////////////
  
 //读取指定地址的半字(16位数据)
 //faddr:读地址(此地址必须为2的倍数!!)
@@ -114,7 +102,7 @@ void Test_Write(u32 WriteAddr,u16 WriteData)
 	flash_write(WriteAddr,&WriteData,1);//写入一个字 
 }
 
-#define SIZE sizeof(TEXT_Buffer)	 			  	//数组长度
+
 #define RFID_SIZE           4
 #define PASSWORD_SIZE       4
 #define FLASH_SAVE_ADDR     0X08070000 				//设置FLASH 保存地址(必须为偶数)

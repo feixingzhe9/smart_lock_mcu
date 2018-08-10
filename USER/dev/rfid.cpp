@@ -20,7 +20,7 @@ static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key);
 
 char rfid_in_flash[RFID_WORD_LENTH] = {0};
 
-static bool match_rfid(char *rfid_in_flash, char *rfid)
+static bool match_rfid(const char *rfid_in_flash, const char *rfid)
 {
     for(u8 i = 0; i < RFID_WORD_LENTH; i++)
     {
@@ -32,7 +32,7 @@ static bool match_rfid(char *rfid_in_flash, char *rfid)
     return true;
 }
 
-void super_rfid_unlock_proc(char *rfid_in_flash, char *rfid)
+static void super_rfid_unlock_proc(const char *rfid_in_flash, const char *rfid)
 {
     if(match_rfid(rfid_in_flash, rfid) == true)
     {
@@ -74,85 +74,97 @@ u32 rfid_start_tick = 0;
 void rfid_task()
 {	
 
-	mfrc522 = &mfrc522_A;
-		// Look for new cards
-		if (mfrc522->PICC_IsNewCardPresent()) {
-			// Select one of the cards
-			if (mfrc522->PICC_ReadCardSerial()) {
-				// Dump debug info about the card; PICC_HaltA() is automatically called
-				#if 0 //this is for original test
-				mfrc522->PICC_DumpToSerial(&(mfrc522->uid));
-				#else
-				MFRC522::StatusCode status;
-				MFRC522::MIFARE_Key key;
-				for (byte i = 0; i < 6; i++) {
-				  key.keyByte[i] = 0xFF;
-			  }
-				status = mfrc522->PCD_Authenticate(mfrc522->PICC_CMD_MF_AUTH_KEY_A, 0, &key, &mfrc522->uid);
-				if (status != mfrc522->STATUS_OK) {
-					printf("PCD_Authenticate() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
-					goto RFID_OUT;
-				}
-				
-				byte buffer_type[18];
-				byte buffer_key[18];
-				byte byteCount;
-				byte retryCount = 0;
-				// Read block
-				byteCount = sizeof(buffer_type);
-				do {
-					status = mfrc522->MIFARE_Read(1, buffer_type, &byteCount);
-					if (status != mfrc522->STATUS_OK) {
-						printf("MIFARE_Read() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
-						retryCount += 1;
-					}
-				} while (status != mfrc522->STATUS_OK && retryCount < 5);
-				if (retryCount >= 5)
-				{
-					goto RFID_OUT;
-				}
-				retryCount = 0;
-				
-				byteCount = sizeof(buffer_key);
-				do {
-					status = mfrc522->MIFARE_Read(2, buffer_key, &byteCount);
-					if (status != mfrc522->STATUS_OK) {
-						printf("MIFARE_Read() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
-						retryCount += 1;
-					}				
-				} while (status != mfrc522->STATUS_OK && retryCount < 5);
-				if (retryCount >= 5)
-				{
-					goto RFID_OUT;
-				}
-				
-				printf("uid: ");
-				for( int i = 0; i < mfrc522->uid.size; i++)
-				{
-					  printf("%02x", mfrc522->uid.uidByte[i]);
-				}
-				printf("\r\n");
-				uart_print_type_and_key(buffer_type, buffer_key);
-				
-				upload_rfid_data(&upload_msg, buffer_type, buffer_key);
-                u16 rfid_int = buffer_key[14];
-                rfid_int = rfid_int<<8;
-                rfid_int += buffer_key[15];
-                char rfid_str[10] = {0};
-                sprintf(rfid_str,"%d",rfid_int);     
-                super_rfid_unlock_proc(rfid_in_flash, rfid_str);
-                
-                rfid_start_tick = get_tick();
+    mfrc522 = &mfrc522_A;
+        
+    // Look for new cards
+    if (mfrc522->PICC_IsNewCardPresent()) 
+    {
+        // Select one of the cards
+        if (mfrc522->PICC_ReadCardSerial()) 
+        {
+            // Dump debug info about the card; PICC_HaltA() is automatically called
+#if 0 //this is for original test
+            mfrc522->PICC_DumpToSerial(&(mfrc522->uid));
+#else
+            MFRC522::StatusCode status;
+            MFRC522::MIFARE_Key key;
+            for (byte i = 0; i < 6; i++) 
+            {
+                key.keyByte[i] = 0xFF;
+            }
+            status = mfrc522->PCD_Authenticate(mfrc522->PICC_CMD_MF_AUTH_KEY_A, 0, &key, &mfrc522->uid);
+            if (status != mfrc522->STATUS_OK) 
+            {
+                printf("PCD_Authenticate() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
+                goto RFID_OUT;
+            }
 
-				#endif
-			}
-	  }
-RFID_OUT:
-		mfrc522->PICC_HaltA(); // Halt the PICC before stopping the encrypted session.
-		mfrc522->PCD_StopCrypto1();
-		mfrc522->PICC_HaltA();
-		
-	  return;
+            byte buffer_type[18];
+            byte buffer_key[18];
+            byte byteCount;
+            byte retryCount = 0;
+            // Read block
+            byteCount = sizeof(buffer_type);
+            
+            do 
+            {
+                status = mfrc522->MIFARE_Read(1, buffer_type, &byteCount);
+                if (status != mfrc522->STATUS_OK) 
+                {
+                    printf("MIFARE_Read() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
+                    retryCount += 1;
+                }
+            } while (status != mfrc522->STATUS_OK && retryCount < 5);
+            
+            if (retryCount >= 5)
+            {
+                goto RFID_OUT;
+            }
+            retryCount = 0;
+
+            byteCount = sizeof(buffer_key);
+            do 
+            {
+                status = mfrc522->MIFARE_Read(2, buffer_key, &byteCount);
+                if (status != mfrc522->STATUS_OK) 
+                {
+                    printf("MIFARE_Read() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
+                    retryCount += 1;
+                }				
+            } while (status != mfrc522->STATUS_OK && retryCount < 5);
+            
+            if (retryCount >= 5)
+            {
+                goto RFID_OUT;
+            }
+
+            printf("uid: ");
+            for( int i = 0; i < mfrc522->uid.size; i++)
+            {
+                printf("%02x", mfrc522->uid.uidByte[i]);
+            }
+            printf("\r\n");
+//            uart_print_type_and_key(buffer_type, buffer_key);
+
+            upload_rfid_data(&upload_msg, buffer_type, buffer_key);
+            u16 rfid_int = buffer_key[14];
+            rfid_int = rfid_int<<8;
+            rfid_int += buffer_key[15];
+            char rfid_str[10] = {0};
+            sprintf(rfid_str,"%d",rfid_int);     
+            super_rfid_unlock_proc(rfid_in_flash, rfid_str);
+
+            rfid_start_tick = get_tick();
+
+#endif
+        }
+    }
+    RFID_OUT:
+    mfrc522->PICC_HaltA(); // Halt the PICC before stopping the encrypted session.
+    mfrc522->PCD_StopCrypto1();
+    mfrc522->PICC_HaltA();
+
+    return;
 }
 
 static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, const byte *buffer_key)
@@ -226,26 +238,30 @@ static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, c
 
 static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key)
 {
-	  if (!buffer_type || !buffer_key) return;
-	
-	  printf("buffer_type:");
-		for (byte index = 0; index < 16; index++) {
-			printf(" %02x", *(buffer_type + index));
-			if ((index % 4) == 3) {
-				printf(" ");
-			}
-		}
-		printf("\r\n");
-		
-		printf("buffer_key:");
-		for (byte index = 0; index < 16; index++) {
-			printf(" %02x", *(buffer_type + index));
-			if ((index % 4) == 3) {
-				printf(" ");
-			}
-		}
-		printf("\r\n");
-		
-		return;
+    if (!buffer_type || !buffer_key) return;
+
+    printf("buffer_type:");
+    for (byte index = 0; index < 16; index++) 
+    {
+        printf(" %02x", *(buffer_type + index));
+        if ((index % 4) == 3) 
+        {
+            printf(" ");
+        }
+    }
+    printf("\r\n");
+
+    printf("buffer_key:");
+    for (byte index = 0; index < 16; index++) 
+    {
+        printf(" %02x", *(buffer_type + index));
+        if ((index % 4) == 3) 
+        {
+            printf(" ");
+        }
+    }
+    printf("\r\n");
+
+    return;
 }
 
