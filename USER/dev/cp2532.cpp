@@ -47,25 +47,26 @@ u16 quick_read(void)
 	return ((high_data<<8) + low_data);
 }
 
-static can_message_t touch_key_message_ram;
-static can_message_t *touch_key_message = &touch_key_message_ram;
+//static can_message_t touch_key_message_ram;
+//static can_message_t *touch_key_message = &touch_key_message_ram;
 
 
 //----  test code ----//
 static void upload_touch_key_data(u16 key_value)
 {
-    uint8_t key_value_low = key_value&0xff;
-    uint8_t key_value_high = key_value>>8;
-    touch_key_message->id = 0x1aa02188;
-    touch_key_message->data[0] = 0;
-
-    touch_key_message->data_len = 3;
-    touch_key_message->data[1] = key_value_high;
-    touch_key_message->data[2] = key_value_low;
+    can_message_t touch_key_test = {0};
+    can_id_union id; 
+    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+    id.can_id_struct.source_id = CAN_SOURCE_ID_KEY_TEST_UPLOAD;
+    id.can_id_struct.res = 0;
+    id.can_id_struct.ack = 0;
+    id.can_id_struct.func_id = 0;
     
-    can.can_send( touch_key_message );
-    
-    return;
+    touch_key_test.id = id.can_id;
+    touch_key_test.data[0] = 0x00;
+    *(u16 *)&(touch_key_test.data[1]) = key_value;
+    touch_key_test.data_len = 3;
+    can.can_send( &touch_key_test );
 }
 
 void set_key_value(u16 key_vlaue)
@@ -318,7 +319,7 @@ static u16 touch_key_proc(const u16 key_value)
     }
     
     key = key_value;
-    if(filter_cnt == 0)     //if need add button 
+    if(filter_cnt == 0)     //如果需要按键消抖 filter_cnt 应该大于 0
     {
         printf("get key \r\n");
         if(key)
@@ -370,7 +371,7 @@ void touch_key_task(void)
         }
         
         start_tick = get_tick();
-    }
+    } 
     
 }
 
