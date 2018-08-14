@@ -24,3 +24,29 @@ void LEDClass::led_off(void)
 {
     GPIO_ResetBits(LED_PORT,LED_PIN);
 }
+
+
+
+
+
+#define INDICATOR_LED_PERIOD    500/SYSTICK_PERIOD
+
+void sys_indicator(void)
+{
+    static u16 cnt = 0;
+    static u32 start_tick = 0;
+    if(get_tick() - start_tick >= INDICATOR_LED_PERIOD)
+    {
+        cnt++;
+        
+        if(cnt % 2 == 1)
+        {
+            LED.led_on();
+        }
+        else
+        {
+            LED.led_off();  
+        }
+        start_tick = get_tick();      
+    }    
+}

@@ -15,4 +15,6 @@ public:
 
 extern LEDClass LED;
 
+void sys_indicator(void);
+
 #endif
