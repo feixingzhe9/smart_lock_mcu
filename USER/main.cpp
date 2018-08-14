@@ -3,7 +3,6 @@
 #include "delay.h"
 #include "sys.h"
 #include "usart.h"
-#include "hall.h"
 #include "rfid.h"
 #include "can_interface.h"
 #include "stmflash.h"

@@ -96,16 +96,16 @@ void SysTick_Handler(void)
 /******************************************************************************/
 void EXTI4_IRQHandler(void)
 {
-	//printf("exti at pc4\r\n");
-	EXTI_ClearITPendingBit(EXTI_Line4);
-	NVIC_SystemReset();
+    //printf("exti at pc4\r\n");
+    EXTI_ClearITPendingBit(EXTI_Line4);
+    NVIC_SystemReset();
 }
 
 void EXTI9_5_IRQHandler(void)
 {
-	//printf("exti at pc6\r\n");
-	EXTI_ClearITPendingBit(EXTI_Line6);
-	NVIC_SystemReset();
+    //printf("exti at pc6\r\n");
+    EXTI_ClearITPendingBit(EXTI_Line6);
+    NVIC_SystemReset();
 }
 
 void EXTI15_10_IRQHandler(void)

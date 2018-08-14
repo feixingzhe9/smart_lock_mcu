@@ -26,9 +26,6 @@ void LEDClass::led_off(void)
 }
 
 
-
-
-
 #define INDICATOR_LED_PERIOD    500/SYSTICK_PERIOD
 
 void sys_indicator(void)
