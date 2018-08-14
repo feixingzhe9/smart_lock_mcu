@@ -27,7 +27,7 @@ static void init()
     LED.led_init();			     //LED¶Ë¿Ú³õÊ¼»¯
     rfid_init();
     init_exti();
-    i2c_init();    
+    cp2532_init();  
     beeper_init(200,50);    
     tim2_int_init(499,7199);    // timer to control locks
     

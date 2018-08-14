@@ -108,10 +108,6 @@ void EXTI9_5_IRQHandler(void)
 	NVIC_SystemReset();
 }
 
-void EXTI15_10_IRQHandler(void)
-{
-    EXTI_ClearITPendingBit(EXTI_Line11);
-}
 
 
 

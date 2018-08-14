@@ -9,7 +9,27 @@ uint8_t ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 uint8_t quick_read_ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 u16 touch_key_value_raw = 0;
 u16 touch_key_value = 0;
-u16 read_byte(u8 read_addr)
+
+#define KEY_FIFO_SIZE   2
+struct key_t
+{
+    u16 key;
+    u32 start_tick;
+};
+
+struct key_info_t
+{
+    key_t key[KEY_FIFO_SIZE];
+    u8 cnt;
+};
+
+key_info_t key_info_in_ram = {0};
+key_info_t  * key_info = &key_info_in_ram;
+
+
+cp2532_work_mode_e cp2532_work_mode = CP2532_INTERRUPT_DETECTION;
+
+static u16 read_byte(u8 read_addr)
 {
     u8 low_data = 0;
     u8 high_data = 0;
@@ -31,7 +51,51 @@ u16 read_byte(u8 read_addr)
 	return ((high_data<<8) + low_data);
 }
 
-u16 quick_read(void)
+//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+static u16 set_key_interrupt(void)
+{    
+    IIC_Start();  
+    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
+    ack_flag[0] = IIC_Wait_Ack();
+    
+    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_ADDR);//发送地址
+    ack_flag[1] = IIC_Wait_Ack();	
+    
+    IIC_Send_Byte(0x0f);//
+    ack_flag[2] = IIC_Wait_Ack();	
+    IIC_Send_Byte(0xff);//
+    ack_flag[3] = IIC_Wait_Ack();	
+    
+    IIC_Stop();    
+    
+    return 0;
+}
+//#endif
+
+static u16 get_key_interrupt(void)
+{
+    u8 low_data = 0;
+    u8 high_data = 0;
+    
+    IIC_Start();  
+    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
+    ack_flag[0] = IIC_Wait_Ack();
+    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_ADDR);//发送地址
+    ack_flag[1] = IIC_Wait_Ack();		
+    IIC_Stop();    
+    
+    IIC_Start();  
+	IIC_Send_Byte(I2C_CP2532_READ);	   //发送读命令
+	ack_flag[2] = IIC_Wait_Ack();	    	   
+    high_data=IIC_Read_Byte(1);	
+    low_data=IIC_Read_Byte(0);
+    
+    IIC_Stop();//产生一个停止条件	    
+	return ((high_data<<8) + low_data);
+}
+
+
+static u16 quick_read(void)
 {
     u8 low_data = 0;
     u8 high_data = 0;
@@ -69,7 +133,7 @@ static void upload_touch_key_data(u16 key_value)
     can.can_send( &touch_key_test );
 }
 
-void set_key_value(u16 key_vlaue)
+static void set_key_value(u16 key_vlaue)
 {
     touch_key_value = key_vlaue;
 }
@@ -202,8 +266,8 @@ struct pass_word_info_t
     u8 lenth;
 };
 
-pass_word_info_t pass_word_info_t_ram = {0};
-pass_word_info_t *pass_word_info = &pass_word_info_t_ram;
+struct pass_word_info_t pass_word_info_ram = {0};
+struct pass_word_info_t *pass_word_info = &pass_word_info_ram;
 
 
 static void shift_letf_pass_word(void)
@@ -349,33 +413,306 @@ static u16 touch_key_proc(const u16 key_value)
     return  0;
 }
 
-#define TOUCH_KEY_PERIOD    30/SYSTICK_PERIOD
-void touch_key_task(void)
+
+
+//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+static u16 touch_key_proc_int(const u16 key_value)
 {
-    static uint32_t start_tick = 0;
-    if(get_tick() - start_tick >= TOUCH_KEY_PERIOD)
+    static u16 key = 0;
+    static uint8_t filter_cnt = 0;
+    pass_word_t pass_word;
+    filter_cnt++;
+    if(key != key_value)
     {
-        touch_key_value_raw = read_byte(0x31);
-        if(is_key_valid(touch_key_value_raw) == true)
-        {
-            set_key_value( touch_key_proc(touch_key_value_raw) );
-        }
-        else
-        {
-            printf("key is invalid ! \r\n");
-        }
-        
-        if( get_key_value() )
-        {
-            upload_touch_key_data( get_key_value() );
-        }
-        
-        start_tick = get_tick();
-    } 
+        filter_cnt = 0;
+    }
     
+    key = key_value;
+    if(filter_cnt == 0)     //如果需要按键消抖 filter_cnt 应该大于 0
+    {
+//        printf("get key \r\n");
+        if(key)
+        {
+            u8 key_true_value = get_true_key_value(key);
+            if((key_true_value != 'a') && (key_true_value != 'b'))
+            {
+                if(key_true_value > 0)
+                {
+                    pass_word.start_tick = get_tick();
+                    pass_word.pass_word = key_true_value;
+                    insert_one_pass_word(&pass_word);
+                }
+                else
+                {
+//                    printf("key error ! \r\n");
+                }
+            }
+            else if(key_true_value == 'b')
+            {
+                pass_work_proc();
+            }   
+        }
+        
+        return key;
+    }   
+    return  0;
+}
+//#endif
+
+
+//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+static void cp2532_int_init(void)
+{
+    EXTI_InitTypeDef exit_init_structure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+    
+     //----  cp2532 touch key int  ----//
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);	//使能GPIOG时钟
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//浮空输入
+    GPIO_Init(GPIOG, &GPIO_InitStructure);  //初始化PG11
+    
+    
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOG,GPIO_PinSource11);
+
+  	exit_init_structure.EXTI_Line=EXTI_Line11;	//
+  	exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;	
+  	exit_init_structure.EXTI_Trigger = EXTI_Trigger_Falling;
+  	exit_init_structure.EXTI_LineCmd = ENABLE;
+  	EXTI_Init(&exit_init_structure);	 	//根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
+    
+    
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;			//
+  	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;	//抢占优先级2， 
+  	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;					//子优先级3
+  	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;								//使能外部中断通道
+  	NVIC_Init(&NVIC_InitStructure); 
+    
+  
+}
+//#endif
+
+
+//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+
+
+
+static void key_info_init(void)
+{
+    key_info->cnt = 0;
+    for(u8 i = 0; i < KEY_FIFO_SIZE; i++)
+    {
+        key_info->key[i].key = 0;
+        key_info->key[i].start_tick = 0;
+    }  
+}
+
+static void shift_left_key(void)
+{
+    if(key_info->cnt > 0)
+    {
+        for(u8 i = 1; i <  key_info->cnt; i++)
+        {
+            memcpy( &(key_info->key[i - 1]), &(key_info->key[i]), sizeof(key_t));
+        }
+        key_info->cnt--;
+    }    
+}
+
+static void insert_one_key(u16 key)
+{
+    if(key_info->cnt < KEY_FIFO_SIZE)
+    {
+        key_info->key[key_info->cnt].key = key;
+        key_info->key[key_info->cnt].start_tick = get_tick();
+        key_info->cnt++;
+    }
+    else
+    {
+        shift_left_key();
+        key_info->key[key_info->cnt].key = key;
+        key_info->key[key_info->cnt].start_tick = get_tick();
+        key_info->cnt++;      
+    }
+}
+
+static void clear_key(void)
+{
+    key_info_init();
+}
+
+#define KEY_FILTER_VALID_PERIOD     10/SYSTICK_PERIOD
+static u16 key_filter(void)
+{
+//    u32 key_sum;
+    if(key_info->cnt == KEY_FIFO_SIZE)
+    {
+        for(u8 i = 1; i < KEY_FIFO_SIZE; i++)
+        {
+            if(key_info->key[i].key ^ key_info->key[i - 1].key)
+            {
+                key_info->cnt = 0;
+                return 0;
+            }
+        }
+        if(get_tick() - key_info->key[KEY_FIFO_SIZE - 1].start_tick >= KEY_FILTER_VALID_PERIOD)
+        {
+            u16 key = key_info->key[0].key;
+            key_info->cnt = 0;
+            return key;
+        }
+    }
+    
+    return 0;
+}
+
+u16 get_key(void)
+{
+    u16 key = 0;
+    __disable_irq();    //停止响应中断 ：仅仅是停止响应中断，中断还是会进来，在 __enable_irq(); 后 立即响应中断
+    key = key_filter();    
+    __enable_irq();     //恢复响应中断
+    return key;
+}
+//#endif
+
+u16 interrupt_value = 0;
+
+void cp2532_init(void)
+{
+//    u16 test = 0;
+    u8 retry_cnt = 0;
+    i2c_init();
+    
+//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)   
+    
+    do
+    {
+        set_key_interrupt();
+        delay_ms(10);
+        retry_cnt++;
+    }while((0x0fff != get_key_interrupt()) || (retry_cnt >= 20));
+    
+    if(retry_cnt >= 10)
+    {
+//        cp2532_work_mode = CP2532_POLLING_DETECTION;
+        printf("fatal: set key interrupt failed ! ! !");
+    }
+    else
+    {
+//        cp2532_work_mode = CP2532_INTERRUPT_DETECTION;
+    }
+    
+    
+    key_info_init();
+    cp2532_int_init();
+    
+    touch_key_value_raw = read_byte(0x31);
+    
+    interrupt_value = read_byte(0x33);
+//#endif
+//    test = get_key_interrupt();
+    return;
 }
 
 
 
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif  
+
+void EXTI15_10_IRQHandler(void)
+{
+    EXTI_ClearITPendingBit(EXTI_Line11);
+
+//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+    
+//    if(cp2532_work_mode == CP2532_POLLING_DETECTION)
+//    {
+//        return ;
+//    }
+    
+//    touch_key_value_raw = read_byte(0x31);
+//    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
+      touch_key_value_raw = read_byte(0x33) & 0x0fff;
+    if(touch_key_value_raw > 0)
+    {
+        if(is_key_valid(touch_key_value_raw) == true)
+        {
+            
+            insert_one_key(touch_key_value_raw);
+    //        set_key_value( touch_key_proc_int(touch_key_value_raw) );
+        }
+        else
+        {
+    //        printf("key is invalid ! \r\n");
+        }
+    }
+    
+    
+  
+//    
+//    if( get_key_value() )
+//    {
+//        upload_touch_key_data( get_key_value() );
+//    }
+    
+//#endif
+    
+    
+    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
+
+}
+
+#ifdef __cplusplus
+  }
+#endif
+
+
+
+#define TOUCH_KEY_PERIOD    30/SYSTICK_PERIOD
+void touch_key_task(void)
+{
+    
+//    if(cp2532_work_mode == CP2532_INTERRUPT_DETECTION)
+//    {
+//        return ;
+//    }
+//    
+
+//#if (TOUCH_KEY_WORK_MODE == CP2532_POLLING_DETECTION)
+//    static uint32_t start_tick = 0;
+//    if(get_tick() - start_tick >= TOUCH_KEY_PERIOD)
+//    {
+//        touch_key_value_raw = read_byte(0x31);
+//        
+////        interrupt_value = read_byte(0x33);
+//        
+//        if(is_key_valid(touch_key_value_raw) == true)
+//        {
+//            set_key_value( touch_key_proc(touch_key_value_raw) );
+//        }
+//        else
+//        {
+//            printf("key is invalid ! \r\n");
+//        }
+//        
+//        if( get_key_value() )
+//        {
+//            upload_touch_key_data( get_key_value() );
+//        }
+//        
+//        start_tick = get_tick();
+//    } 
+//#endif
+    
+    u16 key = get_key();
+    set_key_value( touch_key_proc(key) );
+      
+}
 
