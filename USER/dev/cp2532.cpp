@@ -52,6 +52,48 @@ static u16 read_byte(u8 read_addr)
 }
 
 //#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+
+static u16 set_key_interrupt_trigger(void)
+{    
+    IIC_Start();  
+    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
+    ack_flag[0] = IIC_Wait_Ack();
+    
+    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR);//发送地址
+    ack_flag[1] = IIC_Wait_Ack();	
+    
+    IIC_Send_Byte(0x0f);//
+    ack_flag[2] = IIC_Wait_Ack();	
+    IIC_Send_Byte(0xff);//
+    ack_flag[3] = IIC_Wait_Ack();	
+    
+    IIC_Stop();    
+    
+    return 0;
+}
+
+static u16 get_key_interrupt_trigger(void)
+{
+    u8 low_data = 0;
+    u8 high_data = 0;
+    
+    IIC_Start();  
+    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
+    ack_flag[0] = IIC_Wait_Ack();
+    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR);//发送地址
+    ack_flag[1] = IIC_Wait_Ack();		
+    IIC_Stop();    
+    
+    IIC_Start();  
+	IIC_Send_Byte(I2C_CP2532_READ);	   //发送读命令
+	ack_flag[2] = IIC_Wait_Ack();	    	   
+    high_data=IIC_Read_Byte(1);	
+    low_data=IIC_Read_Byte(0);
+    
+    IIC_Stop();//产生一个停止条件	    
+	return ((high_data<<8) + low_data);
+}
+
 static u16 set_key_interrupt(void)
 {    
     IIC_Start();  
@@ -539,10 +581,7 @@ static void insert_one_key(u16 key)
     }
 }
 
-static void clear_key(void)
-{
-    key_info_init();
-}
+
 
 #define KEY_FILTER_VALID_PERIOD     10/SYSTICK_PERIOD
 static u16 key_filter(void)
@@ -588,6 +627,24 @@ void cp2532_init(void)
     i2c_init();
     
 //#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)   
+    
+    do
+    {
+        set_key_interrupt_trigger();
+        delay_ms(10);
+        retry_cnt++;
+    }while((0x0fff != get_key_interrupt_trigger()) || (retry_cnt >= 20));
+    
+    if(retry_cnt >= 10)
+    {
+//        cp2532_work_mode = CP2532_POLLING_DETECTION;
+        printf("fatal: set key interrupt trigger failed ! ! !");
+    }
+    else
+    {
+//        cp2532_work_mode = CP2532_INTERRUPT_DETECTION;
+    }
+    retry_cnt = 0;
     
     do
     {
@@ -637,35 +694,38 @@ void EXTI15_10_IRQHandler(void)
 //        return ;
 //    }
     
-//    touch_key_value_raw = read_byte(0x31);
-//    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
-      touch_key_value_raw = read_byte(0x33) & 0x0fff;
-    if(touch_key_value_raw > 0)
+    touch_key_value_raw = read_byte(0x31);
+    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
+//      touch_key_value_raw = read_byte(0x33) & 0x0fff;
+//    if(touch_key_value_raw > 0)
     {
         if(is_key_valid(touch_key_value_raw) == true)
         {
             
-            insert_one_key(touch_key_value_raw);
-    //        set_key_value( touch_key_proc_int(touch_key_value_raw) );
+//            insert_one_key(touch_key_value_raw);
+            set_key_value( touch_key_proc(touch_key_value_raw) );
         }
         else
         {
     //        printf("key is invalid ! \r\n");
         }
     }
-    
+    if(touch_key_value_raw == 0)
+    {
+        printf("get key value 0 from interrupt");
+    }
     
   
 //    
-//    if( get_key_value() )
-//    {
-//        upload_touch_key_data( get_key_value() );
-//    }
+    if( get_key_value() )
+    {
+        upload_touch_key_data( get_key_value() );
+    }
     
 //#endif
     
     
-    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
+//    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
 
 }
 
@@ -711,8 +771,8 @@ void touch_key_task(void)
 //    } 
 //#endif
     
-    u16 key = get_key();
-    set_key_value( touch_key_proc(key) );
+//    u16 key = get_key();
+//    set_key_value( touch_key_proc(key) );
       
 }
 
