@@ -5,23 +5,23 @@
  * Rewritten by Søren Thing Andersen (access.thing.dk), fall of 2013 (Translation to English, refactored, comments, anti collision, cascade levels.)
  * Extended by Tom Clement with functionality to write to sector 0 of UID changeable Mifare cards.
  * Released into the public domain.
- * 
+ *
  * Please read this file for an overview and then MFRC522.cpp for comments on the specific functions.
- * Search for "mf-rc522" on ebay.com to purchase the MF-RC522 board. 
- * 
+ * Search for "mf-rc522" on ebay.com to purchase the MF-RC522 board.
+ *
  * There are three hardware components involved:
  * 1) The micro controller: An Arduino
  * 2) The PCD (short for Proximity Coupling Device): NXP MFRC522 Contactless Reader IC
  * 3) The PICC (short for Proximity Integrated Circuit Card): A card or tag using the ISO 14443A interface, eg Mifare or NTAG203.
- * 
+ *
  * The microcontroller and card reader uses SPI for communication.
  * The protocol is described in the MFRC522 datasheet: http://www.nxp.com/documents/data_sheet/MFRC522.pdf
- * 
+ *
  * The card reader and the tags communicate using a 13.56MHz electromagnetic field.
  * The protocol is defined in ISO/IEC 14443-3 Identification cards -- Contactless integrated circuit cards -- Proximity cards -- Part 3: Initialization and anticollision".
  * A free version of the final draft can be found at http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf
  * Details are found in chapter 6, Type A – Initialization and anticollision.
- * 
+ *
  * If only the PICC UID is wanted, the above documents has all the needed information.
  * To read and write from MIFARE PICCs, the MIFARE protocol is used after the PICC has been selected.
  * The MIFARE Classic chips and protocol is described in the datasheets:
@@ -31,7 +31,7 @@
  * The MIFARE Ultralight chip and protocol is described in the datasheets:
  *		Ultralight:   http://www.nxp.com/documents/data_sheet/MF0ICU1.pdf
  * 		Ultralight C: http://www.nxp.com/documents/short_data_sheet/MF0ICU2_SDS.pdf
- * 
+ *
  * MIFARE Classic 1K (MF1S503x):
  * 		Has 16 sectors * 4 blocks/sector * 16 bytes/block = 1024 bytes.
  * 		The blocks are numbered 0-63.
@@ -54,23 +54,23 @@
  * 		Has 5 sectors * 4 blocks/sector * 16 bytes/block = 320 bytes.
  * 		The blocks are numbered 0-19.
  * 		The last block in each sector is the Sector Trailer like above.
- * 
+ *
  * MIFARE Ultralight (MF0ICU1):
  * 		Has 16 pages of 4 bytes = 64 bytes.
  * 		Pages 0 + 1 is used for the 7-byte UID.
  * 		Page 2 contains the last check digit for the UID, one byte manufacturer internal data, and the lock bytes (see http://www.nxp.com/documents/data_sheet/MF0ICU1.pdf section 8.5.2)
  * 		Page 3 is OTP, One Time Programmable bits. Once set to 1 they cannot revert to 0.
- * 		Pages 4-15 are read/write unless blocked by the lock bytes in page 2. 
+ * 		Pages 4-15 are read/write unless blocked by the lock bytes in page 2.
  * MIFARE Ultralight C (MF0ICU2):
  * 		Has 48 pages of 4 bytes = 192 bytes.
  * 		Pages 0 + 1 is used for the 7-byte UID.
  * 		Page 2 contains the last check digit for the UID, one byte manufacturer internal data, and the lock bytes (see http://www.nxp.com/documents/data_sheet/MF0ICU1.pdf section 8.5.2)
  * 		Page 3 is OTP, One Time Programmable bits. Once set to 1 they cannot revert to 0.
- * 		Pages 4-39 are read/write unless blocked by the lock bytes in page 2. 
+ * 		Pages 4-39 are read/write unless blocked by the lock bytes in page 2.
  * 		Page 40 Lock bytes
  * 		Page 41 16 bit one way counter
  * 		Pages 42-43 Authentication configuration
- * 		Pages 44-47 Authentication key 
+ * 		Pages 44-47 Authentication key
  */
 #ifndef MFRC522_h
 #define MFRC522_h
@@ -155,7 +155,7 @@ public:
 		DivIEnReg				= 0x03 << 1,	// enable and disable interrupt request control bits
 		ComIrqReg				= 0x04 << 1,	// interrupt request bits
 		DivIrqReg				= 0x05 << 1,	// interrupt request bits
-		ErrorReg				= 0x06 << 1,	// error bits showing the error status of the last command executed 
+		ErrorReg				= 0x06 << 1,	// error bits showing the error status of the last command executed
 		Status1Reg				= 0x07 << 1,	// communication status bits
 		Status2Reg				= 0x08 << 1,	// receiver and transmitter status bits
 		FIFODataReg				= 0x09 << 1,	// input and output of 64 byte FIFO buffer
@@ -168,7 +168,7 @@ public:
 		
 		// Page 1: Command
 		// 						  0x10			// reserved for future use
-		ModeReg					= 0x11 << 1,	// defines general modes for transmitting and receiving 
+		ModeReg					= 0x11 << 1,	// defines general modes for transmitting and receiving
 		TxModeReg				= 0x12 << 1,	// defines transmission data rate and framing
 		RxModeReg				= 0x13 << 1,	// defines reception data rate and framing
 		TxControlReg			= 0x14 << 1,	// controls the logical behavior of the antenna driver pins TX1 and TX2
@@ -192,7 +192,7 @@ public:
 		ModWidthReg				= 0x24 << 1,	// controls the ModWidth setting?
 		// 						  0x25			// reserved for future use
 		RFCfgReg				= 0x26 << 1,	// configures the receiver gain
-		GsNReg					= 0x27 << 1,	// selects the conductance of the antenna driver pins TX1 and TX2 for modulation 
+		GsNReg					= 0x27 << 1,	// selects the conductance of the antenna driver pins TX1 and TX2 for modulation
 		CWGsPReg				= 0x28 << 1,	// defines the conductance of the p-driver output during periods of no modulation
 		ModGsPReg				= 0x29 << 1,	// defines the conductance of the p-driver output during periods of modulation
 		TModeReg				= 0x2A << 1,	// defines settings for the internal timer
@@ -288,7 +288,7 @@ public:
 	// last value set to 0xff, then compiler uses less ram, it seems some optimisations are triggered
 	enum PICC_Type : byte {
 		PICC_TYPE_UNKNOWN		,
-		PICC_TYPE_ISO_14443_4	,	// PICC compliant with ISO/IEC 14443-4 
+		PICC_TYPE_ISO_14443_4	,	// PICC compliant with ISO/IEC 14443-4
 		PICC_TYPE_ISO_18092		, 	// PICC compliant with ISO/IEC 18092 (NFC)
 		PICC_TYPE_MIFARE_MINI	,	// MIFARE Classic protocol, 320 bytes
 		PICC_TYPE_MIFARE_1K		,	// MIFARE Classic protocol, 1KB

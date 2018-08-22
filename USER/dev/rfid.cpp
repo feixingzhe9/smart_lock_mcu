@@ -27,7 +27,7 @@ static bool match_rfid(const char *rfid_in_flash, const char *rfid)
         if(rfid_in_flash[i] != rfid[i])
         {
             return false;
-        }          
+        }
     }
     return true;
 }
@@ -36,51 +36,66 @@ static void super_rfid_unlock_proc(const char *rfid_in_flash, const char *rfid)
 {
     if(match_rfid(rfid_in_flash, rfid) == true)
     {
-        start_to_unlock_all(); 
+        start_to_unlock_all();
     }
 }
 
+
+static void init_exti(void)
+{
+    EXTI_InitTypeDef exit_init_structure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource4);
+    exit_init_structure.EXTI_Line = EXTI_Line4;
+    exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;
+    exit_init_structure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    exit_init_structure.EXTI_LineCmd = ENABLE;
+    EXTI_Init(&exit_init_structure);
+
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource6);
+    exit_init_structure.EXTI_Line = EXTI_Line6;
+    EXTI_Init(&exit_init_structure);
+
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI4_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+}
+
 void rfid_init()
-{		
-//		GPIO_InitTypeDef  GPIO_InitStructure;
-
-//		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;				 //PC.4 端口配置
-//		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;    //上拉
-//		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//IO口速度为50MHz
-//		GPIO_Init(GPIOC, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.4
-//		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;				 //PC.6 端口配置
-//		GPIO_Init(GPIOC, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.6
-
-//		SPI_2.begin();
-
-//	  mfrc522 = &mfrc522_B;
-//		mfrc522->PCD_Init();
-//		mfrc522->PCD_SetAntennaGain(0x50);
-//		printf("RFID_B DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
-//		mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
-
+{
     SPI_1.begin();
     mfrc522 = &mfrc522_A;
     mfrc522->PCD_Init();
     mfrc522->PCD_SetAntennaGain(0x50);
     printf("RFID_A DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
     mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
-
+    init_exti();
     return;
 }
 
 
 u32 rfid_start_tick = 0;
 void rfid_task()
-{	
+{
 
     mfrc522 = &mfrc522_A;
-        
+
     // Look for new cards
-    if (mfrc522->PICC_IsNewCardPresent()) 
+    if (mfrc522->PICC_IsNewCardPresent())
     {
         // Select one of the cards
-        if (mfrc522->PICC_ReadCardSerial()) 
+        if (mfrc522->PICC_ReadCardSerial())
         {
             // Dump debug info about the card; PICC_HaltA() is automatically called
 #if 0 //this is for original test
@@ -88,12 +103,12 @@ void rfid_task()
 #else
             MFRC522::StatusCode status;
             MFRC522::MIFARE_Key key;
-            for (byte i = 0; i < 6; i++) 
+            for (byte i = 0; i < 6; i++)
             {
                 key.keyByte[i] = 0xFF;
             }
             status = mfrc522->PCD_Authenticate(mfrc522->PICC_CMD_MF_AUTH_KEY_A, 0, &key, &mfrc522->uid);
-            if (status != mfrc522->STATUS_OK) 
+            if (status != mfrc522->STATUS_OK)
             {
                 printf("PCD_Authenticate() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
                 goto RFID_OUT;
@@ -105,17 +120,17 @@ void rfid_task()
             byte retryCount = 0;
             // Read block
             byteCount = sizeof(buffer_type);
-            
-            do 
+
+            do
             {
                 status = mfrc522->MIFARE_Read(1, buffer_type, &byteCount);
-                if (status != mfrc522->STATUS_OK) 
+                if (status != mfrc522->STATUS_OK)
                 {
                     printf("MIFARE_Read() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
                     retryCount += 1;
                 }
             } while (status != mfrc522->STATUS_OK && retryCount < 5);
-            
+
             if (retryCount >= 5)
             {
                 goto RFID_OUT;
@@ -123,16 +138,16 @@ void rfid_task()
             retryCount = 0;
 
             byteCount = sizeof(buffer_key);
-            do 
+            do
             {
                 status = mfrc522->MIFARE_Read(2, buffer_key, &byteCount);
-                if (status != mfrc522->STATUS_OK) 
+                if (status != mfrc522->STATUS_OK)
                 {
                     printf("MIFARE_Read() failed: %s\r\n", mfrc522->GetStatusCodeName(status));
                     retryCount += 1;
-                }				
+                }
             } while (status != mfrc522->STATUS_OK && retryCount < 5);
-            
+
             if (retryCount >= 5)
             {
                 goto RFID_OUT;
@@ -151,7 +166,7 @@ void rfid_task()
             rfid_int = rfid_int<<8;
             rfid_int += buffer_key[15];
             char rfid_str[10] = {0};
-            sprintf(rfid_str,"%d",rfid_int);     
+            sprintf(rfid_str,"%d",rfid_int);
             super_rfid_unlock_proc(rfid_in_flash, rfid_str);
 
             rfid_start_tick = get_tick();
@@ -171,68 +186,19 @@ static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, c
 {
     if (!rfid_msg || !buffer_type || !buffer_key) return;
 
-    can_id_union id; 
+    can_id_union id;
     id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
     id.can_id_struct.source_id = CAN_SOURCE_ID_RFID_UPLOAD;
     id.can_id_struct.res = 0;
     id.can_id_struct.ack = 0;
     id.can_id_struct.func_id = 0;
-    
+
     rfid_msg->id = id.can_id;
     rfid_msg->data[0] = 0x00;
     memcpy( (void *)&rfid_msg->data[1], buffer_key + 12, 4 );
     rfid_msg->data_len = 5;
     can.can_send( rfid_msg );
-    
-//    u8 test_buf[18] = {0};
-//    memcpy( test_buf, buffer_key, 18 );
-    
-    
-    /*uid*/
-//    rfid_msg->id = 0x1aa02181;
-//    rfid_msg->data[0] = 0;
-//    memcpy( (void *)&rfid_msg->data[1], mfrc522->uid.uidByte, 4 );
-//    rfid_msg->data_len = 5;
-//    can.can_send( rfid_msg );
-//    delay_ms(10);
-//    /*type*/
-//    rfid_msg->id = 0x1aa02182;
-//    rfid_msg->data[0] = 0x40;
-//    memcpy( (void *)&rfid_msg->data[1], buffer_type, 7 );
-//    rfid_msg->data_len = 8;
-//    can.can_send( rfid_msg );
-//    delay_ms(10);
-//    rfid_msg->id = 0x1aa02182;
-//    rfid_msg->data[0] = 0x81;
-//    memcpy( (void *)&rfid_msg->data[1], buffer_type + 7, 7 );
-//    rfid_msg->data_len = 8;
-//    can.can_send( rfid_msg );
-//    delay_ms(10);
-//    rfid_msg->id = 0x1aa02182;
-//    rfid_msg->data[0] = 0xC2;
-//    memcpy( (void *)&rfid_msg->data[1], buffer_type + 14, 2 );
-//    rfid_msg->data_len = 3;
-//    can.can_send( rfid_msg );
-//    delay_ms(10);
-//    /*key*/
-//    rfid_msg->id = 0x1aa02183;
-//    rfid_msg->data[0] = 0x40;
-//    memcpy( (void *)&rfid_msg->data[1], buffer_key, 7 );
-//    rfid_msg->data_len = 8;
-//    can.can_send( rfid_msg );
-//    delay_ms(10);
-//    rfid_msg->id = 0x1aa02183;
-//    rfid_msg->data[0] = 0x81;
-//    memcpy( (void *)&rfid_msg->data[1], buffer_key + 7, 7 );
-//    rfid_msg->data_len = 8;
-//    can.can_send( rfid_msg );
-//    delay_ms(10);
-//    rfid_msg->id = 0x1aa02183;
-//    rfid_msg->data[0] = 0xC2;
-//    memcpy( (void *)&rfid_msg->data[1], buffer_key + 14, 2 );
-//    rfid_msg->data_len = 3;
-//    can.can_send( rfid_msg );
-    
+
     return;
 }
 
@@ -241,10 +207,10 @@ static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key)
     if (!buffer_type || !buffer_key) return;
 
     printf("buffer_type:");
-    for (byte index = 0; index < 16; index++) 
+    for (byte index = 0; index < 16; index++)
     {
         printf(" %02x", *(buffer_type + index));
-        if ((index % 4) == 3) 
+        if ((index % 4) == 3)
         {
             printf(" ");
         }
@@ -252,10 +218,10 @@ static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key)
     printf("\r\n");
 
     printf("buffer_key:");
-    for (byte index = 0; index < 16; index++) 
+    for (byte index = 0; index < 16; index++)
     {
         printf(" %02x", *(buffer_type + index));
-        if ((index % 4) == 3) 
+        if ((index % 4) == 3)
         {
             printf(" ");
         }

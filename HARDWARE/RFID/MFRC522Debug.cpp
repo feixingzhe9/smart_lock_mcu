@@ -2,7 +2,7 @@
 
 /**
  * Returns a __FlashStringHelper pointer to the PICC type name.
- * 
+ *
  * @return const __FlashStringHelper *
  */
 const uint8_t *MFRC522Debug::PICC_GetTypeName(MFRC522::PICC_Type piccType	///< One of the PICC_Type enums.
@@ -25,7 +25,7 @@ const uint8_t *MFRC522Debug::PICC_GetTypeName(MFRC522::PICC_Type piccType	///< O
 
 /**
  * Returns a __FlashStringHelper pointer to a status code name.
- * 
+ *
  * @return const __FlashStringHelper *
  */
 const uint8_t *MFRC522Debug::GetStatusCodeName(MFRC522::StatusCode code	///< One of the StatusCode enums.

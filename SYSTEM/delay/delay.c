@@ -8,7 +8,7 @@ void delay_ms(uint16_t xms)
     tickstart = get_tick();
     while((get_tick() - tickstart) < xms)
     {
-        
+
     }
 }
 

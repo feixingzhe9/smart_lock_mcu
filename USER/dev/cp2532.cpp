@@ -10,149 +10,99 @@ uint8_t quick_read_ack_flag[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 u16 touch_key_value_raw = 0;
 u16 touch_key_value = 0;
 
-
-
-cp2532_work_mode_e cp2532_work_mode = CP2532_INTERRUPT_DETECTION;
-
 static u16 read_byte(u8 read_addr)
 {
     u8 low_data = 0;
     u8 high_data = 0;
-    
-    IIC_Start();  
-    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
+
+    IIC_Start();
+    IIC_Send_Byte(I2C_CP2532_WRITE);  //发送写命令
     ack_flag[0] = IIC_Wait_Ack();
-    IIC_Send_Byte(read_addr);//发送地址
-    ack_flag[1] = IIC_Wait_Ack();		
-    IIC_Stop();    
-    
-    IIC_Start();  
-	IIC_Send_Byte(I2C_CP2532_READ);	   //发送读命令
-	ack_flag[2] = IIC_Wait_Ack();	    	   
-    high_data=IIC_Read_Byte(1);	
+    IIC_Send_Byte(read_addr);   //发送地址
+    ack_flag[1] = IIC_Wait_Ack();
+    IIC_Stop();
+
+    IIC_Start();
+    IIC_Send_Byte(I2C_CP2532_READ); //发送读命令
+    ack_flag[2] = IIC_Wait_Ack();
+    high_data=IIC_Read_Byte(1);
     low_data=IIC_Read_Byte(0);
-    
-    IIC_Stop();//产生一个停止条件	    
-	return ((high_data<<8) + low_data);
+
+    IIC_Stop();    //产生一个停止条件
+    return ((high_data<<8) + low_data);
 }
 
-//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
-
-static u16 set_key_interrupt_trigger(void)
-{    
-    IIC_Start();  
-    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
+static u16 write_byte(u8 addr, u16 data)
+{
+    u8 data_high = data >> 8;
+    u8 data_low = data & 0xff;
+    IIC_Start();
+    IIC_Send_Byte(I2C_CP2532_WRITE);    //write command
     ack_flag[0] = IIC_Wait_Ack();
-    
-    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR);//发送地址
-    ack_flag[1] = IIC_Wait_Ack();	
-    
-    IIC_Send_Byte(0x0f);//
-    ack_flag[2] = IIC_Wait_Ack();	
-    IIC_Send_Byte(0xff);//
-    ack_flag[3] = IIC_Wait_Ack();	
-    
-    IIC_Stop();    
-    
+
+    IIC_Send_Byte(addr);//register address
+    ack_flag[1] = IIC_Wait_Ack();
+
+    IIC_Send_Byte(data_high);// write data_high first
+    ack_flag[2] = IIC_Wait_Ack();
+    IIC_Send_Byte(data_low);// write data_low
+    ack_flag[3] = IIC_Wait_Ack();
+
+    IIC_Stop();
     return 0;
+}
+
+
+#ifdef CP2532_INT_ENABLE
+static u16 set_key_interrupt_trigger(void)
+{
+    return write_byte(I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR, 0x0fff);
 }
 
 static u16 get_key_interrupt_trigger(void)
 {
-    u8 low_data = 0;
-    u8 high_data = 0;
-    
-    IIC_Start();  
-    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
-    ack_flag[0] = IIC_Wait_Ack();
-    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR);//发送地址
-    ack_flag[1] = IIC_Wait_Ack();		
-    IIC_Stop();    
-    
-    IIC_Start();  
-	IIC_Send_Byte(I2C_CP2532_READ);	   //发送读命令
-	ack_flag[2] = IIC_Wait_Ack();	    	   
-    high_data=IIC_Read_Byte(1);	
-    low_data=IIC_Read_Byte(0);
-    
-    IIC_Stop();//产生一个停止条件	    
-	return ((high_data<<8) + low_data);
+    return read_byte(I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR);
 }
 
 static u16 set_key_interrupt(void)
-{    
-    IIC_Start();  
-    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
-    ack_flag[0] = IIC_Wait_Ack();
-    
-    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_ADDR);//发送地址
-    ack_flag[1] = IIC_Wait_Ack();	
-    
-    IIC_Send_Byte(0x0f);//
-    ack_flag[2] = IIC_Wait_Ack();	
-    IIC_Send_Byte(0xff);//
-    ack_flag[3] = IIC_Wait_Ack();	
-    
-    IIC_Stop();    
-    
-    return 0;
+{
+    return write_byte(I2C_CP2532_SET_KEY_INTERRUPT_ADDR, 0x0fff);
 }
-//#endif
 
 static u16 get_key_interrupt(void)
 {
-    u8 low_data = 0;
-    u8 high_data = 0;
-    
-    IIC_Start();  
-    IIC_Send_Byte(I2C_CP2532_WRITE);	   //发送写命令
-    ack_flag[0] = IIC_Wait_Ack();
-    IIC_Send_Byte(I2C_CP2532_SET_KEY_INTERRUPT_ADDR);//发送地址
-    ack_flag[1] = IIC_Wait_Ack();		
-    IIC_Stop();    
-    
-    IIC_Start();  
-	IIC_Send_Byte(I2C_CP2532_READ);	   //发送读命令
-	ack_flag[2] = IIC_Wait_Ack();	    	   
-    high_data=IIC_Read_Byte(1);	
-    low_data=IIC_Read_Byte(0);
-    
-    IIC_Stop();//产生一个停止条件	    
-	return ((high_data<<8) + low_data);
+    return read_byte(I2C_CP2532_SET_KEY_INTERRUPT_ADDR);
 }
+#endif
 
 
-static u16 quick_read(void)
+u16 quick_read(void)
 {
     u8 low_data = 0;
     u8 high_data = 0;
-    
-    IIC_Start();  
-    IIC_Send_Byte(I2C_CP2532_QUICK_READ_ADDR);	   //发送写命令
+
+    IIC_Start();
+    IIC_Send_Byte(I2C_CP2532_QUICK_READ_ADDR); //发送写命令
     quick_read_ack_flag[0] = IIC_Wait_Ack();
-    
+
     high_data=IIC_Read_Byte(1);
     low_data=IIC_Read_Byte(0);
-    IIC_Stop();//产生一个停止条件	  
-    
-	return ((high_data<<8) + low_data);
+    IIC_Stop(); //产生一个停止条件
+
+    return ((high_data<<8) + low_data);
 }
-
-//static can_message_t touch_key_message_ram;
-//static can_message_t *touch_key_message = &touch_key_message_ram;
-
 
 //----  test code ----//
 static void upload_touch_key_data(u16 key_value)
 {
     can_message_t touch_key_test = {0};
-    can_id_union id; 
+    can_id_union id;
     id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
     id.can_id_struct.source_id = CAN_SOURCE_ID_KEY_TEST_UPLOAD;
     id.can_id_struct.res = 0;
     id.can_id_struct.ack = 0;
     id.can_id_struct.func_id = 0;
-    
+
     touch_key_test.id = id.can_id;
     touch_key_test.data[0] = 0x00;
     *(u16 *)&(touch_key_test.data[1]) = key_value;
@@ -160,7 +110,7 @@ static void upload_touch_key_data(u16 key_value)
     can.can_send( &touch_key_test );
 }
 
-static void set_key_value(u16 key_vlaue)
+void set_key_value(u16 key_vlaue)
 {
     touch_key_value = key_vlaue;
 }
@@ -185,7 +135,7 @@ u16 get_key_value(void)
 #define KEY_VALUE_B     (1<<0)
 
 
-/* 判断一次只有一个按键按下，若有多个按键同时按下 返回false， 只有一个按键按下 返回 true 
+/* 判断一次只有一个按键按下，若有多个按键同时按下 返回false， 只有一个按键按下 返回 true
 u16 key_value: 按键值
 */
 static bool is_key_valid(u16 key_value)
@@ -196,34 +146,28 @@ static bool is_key_valid(u16 key_value)
     }
     else
     {
-        u8 key_0 = ((key_value & KEY_VALUE_0) ^ KEY_VALUE_0) ? 1 : 0;
-        u8 key_1 = ((key_value & KEY_VALUE_1) ^ KEY_VALUE_1) ? 1 : 0;
-        u8 key_2 = ((key_value & KEY_VALUE_2) ^ KEY_VALUE_2) ? 1 : 0;
-        u8 key_3 = ((key_value & KEY_VALUE_3) ^ KEY_VALUE_3) ? 1 : 0;
-        u8 key_4 = ((key_value & KEY_VALUE_4) ^ KEY_VALUE_4) ? 1 : 0;
-        u8 key_5 = ((key_value & KEY_VALUE_5) ^ KEY_VALUE_5) ? 1 : 0;
-        u8 key_6 = ((key_value & KEY_VALUE_6) ^ KEY_VALUE_6) ? 1 : 0;
-        u8 key_7 = ((key_value & KEY_VALUE_7) ^ KEY_VALUE_7) ? 1 : 0;
-        u8 key_8 = ((key_value & KEY_VALUE_8) ^ KEY_VALUE_8) ? 1 : 0;
-        u8 key_9 = ((key_value & KEY_VALUE_9) ^ KEY_VALUE_9) ? 1 : 0;
-        u8 key_a = ((key_value & KEY_VALUE_A) ^ KEY_VALUE_A) ? 1 : 0;
-        u8 key_b = ((key_value & KEY_VALUE_B) ^ KEY_VALUE_B) ? 1 : 0;
-               
-        u8 check = key_0 + key_1 + key_2 + key_3 + key_4 + key_5 + key_6 + key_7 + key_8 + key_9 + key_a + key_b;
-        
-        if(check <= 10)
+        u16 key_value_tmp = key_value;
+        u8 count = 0;
+        while ( key_value_tmp )
         {
-            return false;
+            key_value_tmp &= (key_value_tmp - 1) ;
+            ++count;
+        }
+
+        if(count > 1)   //count 表示 key_value 中 bit 1 的数量
+        {
+             return false;
         }
         return true;
-    }   
+
+    }
 }
 
 
-static u8 get_true_key_value(u16 key_value)
+static u8 map_key_value(u16 key_value)
 {
     u8 key_true_value = 0;
-    
+
     if(key_value & KEY_VALUE_0)
     {
         key_true_value = '0';
@@ -276,7 +220,7 @@ static u8 get_true_key_value(u16 key_value)
     {
         return 0;
     }
-    
+
     return key_true_value;
 }
 
@@ -293,8 +237,8 @@ struct pass_word_info_t
     u8 lenth;
 };
 
-struct pass_word_info_t pass_word_info_ram = {0};
-struct pass_word_info_t *pass_word_info = &pass_word_info_ram;
+pass_word_info_t pass_word_info_t_ram = {0};
+pass_word_info_t *pass_word_info = &pass_word_info_t_ram;
 
 
 static void shift_letf_pass_word(void)
@@ -306,7 +250,7 @@ static void shift_letf_pass_word(void)
             memcpy( &(pass_word_info->pass_word_buf[i - 1]), &(pass_word_info->pass_word_buf[i]), sizeof(pass_word_t));
         }
         pass_word_info->lenth--;
-    }    
+    }
 }
 
 static void clear_pass_word(void)
@@ -314,7 +258,7 @@ static void clear_pass_word(void)
     pass_word_t pass_word;
     pass_word.pass_word = 0;
     pass_word.start_tick = 0;
-    
+
     for(u8 i = 1; i <  pass_word_info->lenth; i++)
     {
         memcpy( &(pass_word_info->pass_word_buf[i]), &pass_word, sizeof(pass_word_t));
@@ -340,14 +284,14 @@ static void insert_one_pass_word(pass_word_t *key_info)
 
 static void upload_password(const char *password)
 {
-    can_message_t password_msg;    
-    can_id_union id; 
+    can_message_t password_msg;
+    can_id_union id;
     id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
     id.can_id_struct.source_id = CAN_SOURCE_ID_PW_UPLOAD;
     id.can_id_struct.res = 0;
     id.can_id_struct.ack = 0;
     id.can_id_struct.func_id = 0;
-    
+
     password_msg.id = id.can_id;
     password_msg.data[0] = 0x00;
     memcpy( (void *)&password_msg.data[1], password, 4 );
@@ -360,17 +304,17 @@ char psss_word_in_flash[PASS_WORD_LENTH] = {0};
 static void pass_work_proc(void)
 {
     char password[PASS_WORD_LENTH];
-    
+
     for(u8 i = 0; i < pass_word_info->lenth; i++)
     {
         if(get_tick() - pass_word_info->pass_word_buf[i].start_tick >= PASSWORD_EXIST_TIME)
         {
             shift_letf_pass_word();
         }
-    }   
-    
+    }
+
     if(pass_word_info->lenth == PASS_WORD_LENTH)
-    {   
+    {
         for(u8 i = 0; i < pass_word_info->lenth; i++)
         {
             password[i] = pass_word_info->pass_word_buf[i].pass_word;
@@ -380,17 +324,17 @@ static void pass_work_proc(void)
     {
         return ;
     }
-    
+
     upload_password(password);  //upload password whether it is super password
-    
+
     for(u8 i = 0; i < PASS_WORD_LENTH; i++)
     {
         if(password[i] != psss_word_in_flash[i])
         {
             return ;
-        }            
+        }
     }
-       
+
     // ----   get right password here  ----//
     printf("get right password");
     clear_pass_word();
@@ -398,24 +342,24 @@ static void pass_work_proc(void)
 
 }
 
-static u16 touch_key_proc(const u16 key_value)
+static u16 proc_touch_key(const u16 key_value)
 {
     static u16 key = 0;
-    static uint8_t filter_cnt = 0;
+    static u32 filter_cnt = 0;
     pass_word_t pass_word;
     filter_cnt++;
     if(key != key_value)
     {
         filter_cnt = 0;
     }
-    
+
     key = key_value;
     if(filter_cnt == 0)     //如果需要按键消抖 filter_cnt 应该大于 0
     {
         printf("get key \r\n");
         if(key)
         {
-            u8 key_true_value = get_true_key_value(key);
+            u8 key_true_value = map_key_value(key);
             if((key_true_value != 'a') && (key_true_value != 'b'))
             {
                 if(key_true_value > 0)
@@ -432,183 +376,151 @@ static u16 touch_key_proc(const u16 key_value)
             else if(key_true_value == 'b')
             {
                 pass_work_proc();
-            }   
+            }
         }
-        
+
         return key;
-    }   
+    }
     return  0;
 }
 
-
-//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
+#ifdef CP2532_INT_ENABLE
 static void cp2532_int_init(void)
 {
     EXTI_InitTypeDef exit_init_structure;
     NVIC_InitTypeDef NVIC_InitStructure;
-    
-     //----  cp2532 touch key int  ----//
+
+    //----  cp2532 touch key int  ----//
     GPIO_InitTypeDef GPIO_InitStructure;
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);	//使能GPIOG时钟
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//浮空输入
     GPIO_Init(GPIOG, &GPIO_InitStructure);  //初始化PG11
-    
-    
+
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-    
+
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOG,GPIO_PinSource11);
 
-  	exit_init_structure.EXTI_Line=EXTI_Line11;	//
-  	exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;	
-  	exit_init_structure.EXTI_Trigger = EXTI_Trigger_Falling;
-  	exit_init_structure.EXTI_LineCmd = ENABLE;
-  	EXTI_Init(&exit_init_structure);	 	//根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
-    
-    
-    NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;			//
-  	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;	//抢占优先级2， 
-  	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;					//子优先级3
-  	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;								//使能外部中断通道
-  	NVIC_Init(&NVIC_InitStructure); 
-    
-  
-}
-//#endif
+    exit_init_structure.EXTI_Line=EXTI_Line11;
+    exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;
+    exit_init_structure.EXTI_Trigger = EXTI_Trigger_Falling;
+    exit_init_structure.EXTI_LineCmd = ENABLE;
+    EXTI_Init(&exit_init_structure);	 	//根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
 
+    NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;	//抢占优先级2
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;					//子优先级3
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+}
 
 u16 interrupt_value = 0;
 
-void cp2532_init(void)
-{
-//    u16 test = 0;
-    u8 retry_cnt = 0;
-    i2c_init();
-    
-//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)   
-    
-    do
-    {
-        set_key_interrupt_trigger();
-        delay_ms(10);
-        retry_cnt++;
-    }while((0x0fff != get_key_interrupt_trigger()) || (retry_cnt >= 20));
-    
-    if(retry_cnt >= 10)
-    {
-//        cp2532_work_mode = CP2532_POLLING_DETECTION;
-        printf("fatal: set key interrupt trigger failed ! ! !");
-    }
-    else
-    {
-//        cp2532_work_mode = CP2532_INTERRUPT_DETECTION;
-    }
-    retry_cnt = 0;
-    
-    do
-    {
-        set_key_interrupt();
-        delay_ms(10);
-        retry_cnt++;
-    }while((0x0fff != get_key_interrupt()) || (retry_cnt >= 20));
-    
-    if(retry_cnt >= 10)
-    {
-//        cp2532_work_mode = CP2532_POLLING_DETECTION;
-        printf("fatal: set key interrupt failed ! ! !");
-    }
-    else
-    {
-//        cp2532_work_mode = CP2532_INTERRUPT_DETECTION;
-    }
-    
-   
-    cp2532_int_init();
-    
-    touch_key_value_raw = read_byte(0x31);
-    
-    interrupt_value = read_byte(0x33);
-//#endif
-//    test = get_key_interrupt();
-    return;
-}
-
-
 #ifdef __cplusplus
 extern "C" {
-#endif  
-
+#endif
 void EXTI15_10_IRQHandler(void)
 {
     EXTI_ClearITPendingBit(EXTI_Line11);
 
-//#if (TOUCH_KEY_WORK_MODE == CP2532_INTERRUPT_DETECTION)
-    
-    
     touch_key_value_raw = read_byte(0x31);
-    interrupt_value = read_byte(0x33);  // read interrupt value in register to clear cp2532 interrupt
-//      touch_key_value_raw = read_byte(0x33) & 0x0fff;
+    interrupt_value = read_byte(0x33) & 0x0fff;  // read interrupt value in register to clear cp2532 interrupt
 
- 
     if(is_key_valid(touch_key_value_raw) == true)
     {
-        set_key_value( touch_key_proc(touch_key_value_raw) );
-    }
-    else
-    {
-//        printf("key is invalid ! \r\n");
+        set_key_value( proc_touch_key(touch_key_value_raw) );
     }
 
     if(touch_key_value_raw == 0)
     {
-        printf("get key value 0 from interrupt");
+//        printf("get key value 0 from interrupt"); //test code
     }
-    
-  
+
     if( get_key_value() )
     {
         upload_touch_key_data( get_key_value() );
     }
-    
-//#endif
-
 }
 
 #ifdef __cplusplus
   }
 #endif
 
+void cp2532_init(void)
+{
+    u8 retry_cnt = 0;
+    i2c_init();
 
+    do
+    {
+        set_key_interrupt_trigger();
+        delay_ms(10);
+        retry_cnt++;
+        if(retry_cnt >= 20)
+        {
+            break;
+        }
+    }while( 0x0fff != get_key_interrupt_trigger() );
 
+    if(retry_cnt >= 20)
+    {
+        printf("fatal: set key interrupt trigger failed ! ! !");
+    }
+
+    retry_cnt = 0;
+
+    do
+    {
+        set_key_interrupt();
+        delay_ms(10);
+        retry_cnt++;
+        if(retry_cnt >= 20)
+        {
+            break;
+        }
+    }while( 0x0fff != get_key_interrupt() );
+
+    if(retry_cnt >= 20)
+    {
+        printf("fatal: set key interrupt failed ! ! !");
+    }
+
+    cp2532_int_init();
+
+    touch_key_value_raw = read_byte(0x31);
+
+    interrupt_value = read_byte(0x33);
+
+//    test = get_key_interrupt();
+    return;
+}
+#endif
+
+#ifndef CP2532_INT_ENABLE
 #define TOUCH_KEY_PERIOD    30/SYSTICK_PERIOD
 void touch_key_task(void)
 {
+    static uint32_t start_tick = 0;
+    if(get_tick() - start_tick >= TOUCH_KEY_PERIOD)
+    {
+        touch_key_value_raw = read_byte(0x31);
+        if(is_key_valid(touch_key_value_raw))
+        {
+            set_key_value( proc_touch_key(touch_key_value_raw) );
+        }
+        else
+        {
+            printf("key is invalid ! \r\n");
+        }
 
-//#if (TOUCH_KEY_WORK_MODE == CP2532_POLLING_DETECTION)
-//    static uint32_t start_tick = 0;
-//    if(get_tick() - start_tick >= TOUCH_KEY_PERIOD)
-//    {
-//        touch_key_value_raw = read_byte(0x31);
-//        
-////        interrupt_value = read_byte(0x33);
-//        
-//        if(is_key_valid(touch_key_value_raw) == true)
-//        {
-//            set_key_value( touch_key_proc(touch_key_value_raw) );
-//        }
-//        else
-//        {
-//            printf("key is invalid ! \r\n");
-//        }
-//        
-//        if( get_key_value() )
-//        {
-//            upload_touch_key_data( get_key_value() );
-//        }
-//        
-//        start_tick = get_tick();
-//    } 
-//#endif
-          
+        if( get_key_value() )
+        {
+            upload_touch_key_data( get_key_value() );
+        }
+
+        start_tick = get_tick();
+    }
+
 }
+#endif
 

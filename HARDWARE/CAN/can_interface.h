@@ -2,7 +2,7 @@
 #define CAN_INTERFACE_H
 
 #include "sys.h"
-#include <stdio.h>	
+#include <stdio.h>
 
 #define CAN_USED    CAN1
 
@@ -18,7 +18,7 @@
 
 
 //////  source id define  //////
-#define CAN_SOURCE_ID_READ_VERSION      0x01    
+#define CAN_SOURCE_ID_READ_VERSION      0x01
 
 #define CAN_SOURCE_ID_CAN_TEST              0x03
 
@@ -40,7 +40,7 @@
 
 
 #define CAN_LONG_FRAME_TIME_OUT     5000/SYSTICK_PERIOD
-    
+
 #define CAN_ONE_FRAME_DATA_LENTH    7
 #define CAN_SEG_NUM_MAX             64
 #define CAN_LONG_FRAME_LENTH_MAX    (CAN_ONE_FRAME_DATA_LENTH*CAN_SEG_NUM_MAX)
@@ -49,71 +49,71 @@
 #if 0
 typedef union
 {
-	struct
-	{
-		uint32_t SourceID  : 8;
-		uint32_t FUNC_ID   : 4;
-		uint32_t ACK       : 1;
-		uint32_t DestMACID : 8;
-		uint32_t SrcMACID  : 8;
-		uint32_t res       : 3;
-	} __attribute__ ((packed)) CanID_Struct;
-	uint32_t  CANx_ID;
+    struct
+    {
+        uint32_t SourceID  : 8;
+        uint32_t FUNC_ID   : 4;
+        uint32_t ACK       : 1;
+        uint32_t DestMACID : 8;
+        uint32_t SrcMACID  : 8;
+        uint32_t res       : 3;
+    } __attribute__ ((packed)) CanID_Struct;
+    uint32_t  CANx_ID;
 } __attribute__ ((packed)) CAN_ID_UNION;
 
 
 typedef union
 {
-	struct
-	{
-				uint8_t SegNum  : 6;
-				uint8_t SegPolo : 2;
-		uint8_t Data[7];
-	} __attribute__ ((packed)) CanData_Struct;
-	uint8_t CanData[8];
+    struct
+    {
+        uint8_t SegNum  : 6;
+        uint8_t SegPolo : 2;
+        uint8_t Data[7];
+    } __attribute__ ((packed)) CanData_Struct;
+    uint8_t CanData[8];
 } __attribute__ ((packed)) CAN_DATA_UNION;
 
 #else
 
 typedef union
 {
-	struct
-	{
-		uint32_t source_id  : 8;
-		uint32_t func_id   : 4;
-		uint32_t ack       : 1;
-		uint32_t dest_mac_id : 8;
-		uint32_t src_mac_id  : 8;
-		uint32_t res       : 3;
-	}__attribute__ ((packed)) can_id_struct;
-	uint32_t  can_id;
+    struct
+    {
+        uint32_t source_id  : 8;
+        uint32_t func_id   : 4;
+        uint32_t ack       : 1;
+        uint32_t dest_mac_id : 8;
+        uint32_t src_mac_id  : 8;
+        uint32_t res       : 3;
+    }__attribute__ ((packed)) can_id_struct;
+    uint32_t  can_id;
 } __attribute__ ((packed)) can_id_union;
 
 //typedef union
 //{
-//	struct
-//	{
-//		uint32_t SourceID  : 8;
-//		uint32_t FUNC_ID   : 4;
-//		uint32_t ACK       : 1;
-//		uint32_t DestMACID : 8;
-//		uint32_t SrcMACID  : 8;
-//		uint32_t res       : 3;
-//	} __attribute__ ((packed)) CanID_Struct;
-//	uint32_t  CANx_ID;
+//    struct
+//    {
+//        uint32_t SourceID  : 8;
+//        uint32_t FUNC_ID   : 4;
+//        uint32_t ACK       : 1;
+//        uint32_t DestMACID : 8;
+//        uint32_t SrcMACID  : 8;
+//        uint32_t res       : 3;
+//    } __attribute__ ((packed)) CanID_Struct;
+//    uint32_t  CANx_ID;
 //} __attribute__ ((packed)) CAN_ID_UNION;
 
 
 typedef union
 {
-	struct
-	{
+    struct
+    {
         uint8_t SegNum  : 6;
-		uint8_t SegPolo : 2;
-		
+        uint8_t SegPolo : 2;
+
         uint8_t Data[7];
-	} __attribute__ ((packed)) CanData_Struct;
-	uint8_t CanData[8];
+    } __attribute__ ((packed)) CanData_Struct;
+    uint8_t CanData[8];
 } __attribute__ ((packed)) CAN_DATA_UNION;
 #endif
 
@@ -121,10 +121,10 @@ typedef union
 typedef struct
 {
     can_id_union can_id;
-    
-    uint32_t start_time; 
+
+    uint32_t start_time;
     uint16_t used_len;
-    uint8_t rcv_buf[CAN_LONG_FRAME_LENTH_MAX];   
+    uint8_t rcv_buf[CAN_LONG_FRAME_LENTH_MAX];
 }CAN_RCV_BUFFER_T;
 
 typedef uint8_t (*GetOneFreeBufFn)(void);
@@ -135,7 +135,7 @@ typedef void (*FreeBufFn)(uint8_t);
 typedef struct
 {
     CAN_RCV_BUFFER_T can_rcv_buf[CAN_LONG_BUF_NUM];
-    GetOneFreeBufFn GetOneFreeBuf; 
+    GetOneFreeBufFn GetOneFreeBuf;
     GetTheBufByIdFn GetTheBufById;
     FreeBufFn FreeBuf;
 }CAN_LONG_BUF_T;
@@ -148,11 +148,10 @@ typedef struct
 
 
 
-
 struct can_timing_t {
-	const char *baud;
-	uint16_t brp; // brp[0:9]
-	uint16_t ts; // res[15] lbkm[14] res[13:10] swj[9:8] res[7] ts2[6:4] ts1[3:0]
+    const char *baud;
+    uint16_t brp; // brp[0:9]
+    uint16_t ts; // res[15] lbkm[14] res[13:10] swj[9:8] res[7] ts2[6:4] ts1[3:0]
 } __attribute__ ((packed));
 
 #define CAN_MSG_SIZE  0x0F // DLC[0:3]
@@ -161,40 +160,40 @@ struct can_timing_t {
 #define CAN_MSG_INV   0x40 // is message in-valid
 
 struct can_message_t {
-	uint32_t id;
-	uint8_t data_len;
-	uint8_t data[8];
+    uint32_t id;
+    uint8_t data_len;
+    uint8_t data[8];
 } __attribute__ ((packed));
 
 class loop_buffer {
 public:
-	#define RBUF_SIZE 10
-	struct can_message_t rbuf[RBUF_SIZE];
-  uint8_t  rbuf_head;
-	uint8_t  rbuf_tail;
-  inline void rbuf_enqueue(struct can_message_t *msg);
-  inline struct can_message_t rbuf_dequeue(void);
-  inline bool is_rbuf_has_data(void);
-  inline void rbuf_clear(void);
-  loop_buffer();
+    #define RBUF_SIZE 10
+    struct can_message_t rbuf[RBUF_SIZE];
+    uint8_t  rbuf_head;
+    uint8_t  rbuf_tail;
+    inline void rbuf_enqueue(struct can_message_t *msg);
+    inline struct can_message_t rbuf_dequeue(void);
+    inline bool is_rbuf_has_data(void);
+    inline void rbuf_clear(void);
+    loop_buffer();
 };
 
 class can_interface {
-private:
-	struct can_timing_t *CAN_Timing;
-  uint8_t 						changeBaudRate(const char* baud);
-  NVIC_InitTypeDef 		CAN_Int;
-public:
-  loop_buffer 				rx_buf;
-	can_interface(const uint8_t id, const char* baud);
-  //~can_interface();
-  void canHWReinit();
-  void can_filter_apply();
-  void can_filter_addmask(uint16_t cobid, uint16_t cobid_mask, uint8_t prio);
-	uint8_t can_send(struct can_message_t *m);
-  bool is_can_has_data(void);
-  struct can_message_t can_read(void);
-  void canAckBack(uint32_t CANx_ID, const uint8_t * const pdata, uint16_t len);
+    private:
+        struct can_timing_t *CAN_Timing;
+        uint8_t changeBaudRate(const char* baud);
+        NVIC_InitTypeDef    CAN_Int;
+    public:
+        loop_buffer rx_buf;
+        can_interface(const uint8_t id, const char* baud);
+        //~can_interface();
+        void canHWReinit();
+        void can_filter_apply();
+        void can_filter_addmask(uint16_t cobid, uint16_t cobid_mask, uint8_t prio);
+        uint8_t can_send(struct can_message_t *m);
+        bool is_can_has_data(void);
+        struct can_message_t can_read(void);
+        void canAckBack(uint32_t CANx_ID, const uint8_t * const pdata, uint16_t len);
 };
 
 uint8_t can_receive();

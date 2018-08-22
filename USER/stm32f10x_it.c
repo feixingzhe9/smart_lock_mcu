@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    GPIO/IOToggle/stm32f10x_it.c 
+  * @file    GPIO/IOToggle/stm32f10x_it.c
   * @author  MCD Application Team
   * @version V3.5.0
   * @date    08-April-2011
@@ -22,16 +22,16 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x_it.h" 
+#include "stm32f10x_it.h"
 #include "sys.h"
 #include "usart.h"
 #include "stm32f10x.h"
 
- 
+
 void NMI_Handler(void)
 {
 }
- 
+
 void HardFault_Handler(void)
 {
   /* Go to infinite loop when Hard Fault exception occurs */
@@ -39,7 +39,7 @@ void HardFault_Handler(void)
   {
   }
 }
- 
+
 void MemManage_Handler(void)
 {
   /* Go to infinite loop when Memory Manage exception occurs */
@@ -48,7 +48,7 @@ void MemManage_Handler(void)
   }
 }
 
- 
+
 void BusFault_Handler(void)
 {
   /* Go to infinite loop when Bus Fault exception occurs */
@@ -56,7 +56,7 @@ void BusFault_Handler(void)
   {
   }
 }
- 
+
 void UsageFault_Handler(void)
 {
   /* Go to infinite loop when Usage Fault exception occurs */
@@ -64,19 +64,19 @@ void UsageFault_Handler(void)
   {
   }
 }
- 
+
 void SVC_Handler(void)
 {
 }
- 
+
 void DebugMon_Handler(void)
 {
 }
- 
+
 void PendSV_Handler(void)
 {
 }
- 
+
 extern uint32_t sys_tick_cnt;
 /**
   * @brief  This function handles SysTick Handler.
@@ -96,17 +96,18 @@ void SysTick_Handler(void)
 /******************************************************************************/
 void EXTI4_IRQHandler(void)
 {
-	//printf("exti at pc4\r\n");
-	EXTI_ClearITPendingBit(EXTI_Line4);
-	NVIC_SystemReset();
+    //printf("exti at pc4\r\n");
+    EXTI_ClearITPendingBit(EXTI_Line4);
+    NVIC_SystemReset();
 }
 
 void EXTI9_5_IRQHandler(void)
 {
-	//printf("exti at pc6\r\n");
-	EXTI_ClearITPendingBit(EXTI_Line6);
-	NVIC_SystemReset();
+    //printf("exti at pc6\r\n");
+    EXTI_ClearITPendingBit(EXTI_Line6);
+    NVIC_SystemReset();
 }
+
 
 
 
