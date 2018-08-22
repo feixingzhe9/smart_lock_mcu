@@ -524,6 +524,11 @@
               <FileType>8</FileType>
               <FilePath>.\dev\qr_code.cpp</FilePath>
             </File>
+            <File>
+              <FileName>motor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\dev\motor.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

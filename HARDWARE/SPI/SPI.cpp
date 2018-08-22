@@ -14,7 +14,7 @@
 #include "SPI.h"
 
 
-SPIClass SPI_2(SPI2);
+//SPIClass SPI_2(SPI2);
 SPIClass SPI_1(SPI1);
 
 uint8_t SPIClass::initialized = 0;

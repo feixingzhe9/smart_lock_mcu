@@ -12,6 +12,7 @@
 #include "beeper.h"
 #include "lock.h"
 #include "qr_code.h"
+#include "motor.h"
 
 static void init()
 {
@@ -27,6 +28,8 @@ static void init()
 #ifdef CP2532_INT_ENABLE
     cp2532_init();
 #endif
+
+    motor_init();
 
     get_rfid_in_flash(rfid_in_flash);
     get_password_in_flash(psss_word_in_flash);
@@ -48,6 +51,7 @@ int main(void)
         all_qr_data_task();
         can_protocol();
         beeper_task();
+        motor_task();
         sys_indicator();
     }
 }

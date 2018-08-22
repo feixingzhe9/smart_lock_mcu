@@ -323,7 +323,7 @@ class SPIClass {
 #endif
 };
 
-extern SPIClass SPI_2;
+//extern SPIClass SPI_2;
 extern SPIClass SPI_1;
 
 #endif
