@@ -9,7 +9,7 @@ class MotorClass
         MotorClass();
         void init(void);
         void start(void);
-        void stop(void);       
+        void stop(void);
 };
 
 

@@ -1,8 +1,6 @@
 #include "beeper.h"
 #include "timer.h"
 #include "cp2532.h"
-#include "motor.h"
-
 extern u32 rfid_start_tick;
 
 
@@ -63,7 +61,6 @@ void beeper_on(u16 hz)
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM3 OC3
 
     TIM_SetCompare3(TIM3,50);/////test code, frequecy is not right
-
 }
 
 
@@ -80,7 +77,6 @@ void beeper_off(void)
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM3 OC3
 
     TIM_SetCompare3(TIM3,50);/////test code, frequecy is not right
-
 }
 
 

@@ -337,14 +337,6 @@ static void pass_work_proc(void)
 {
     char password[PASS_WORD_LENTH];
 
-//    for(u8 i = 0; i < pass_word_info->lenth; i++)
-//    {
-//        if(get_tick() - pass_word_info->pass_word_buf[i].start_tick >= PASSWORD_EXIST_TIME)
-//        {
-//            shift_letf_pass_word();
-//        }
-//    }
-
     if(pass_word_info->lenth == PASS_WORD_LENTH)
     {
         if(get_tick() - pass_word_info->pass_word_buf[pass_word_info->lenth - 1].start_tick >= PASSWORD_EXIST_TIME)
@@ -522,7 +514,7 @@ void cp2532_init(void)
         printf("fatal: set key interrupt failed ! ! !");
     }
     retry_cnt = 0;
-     
+
     do
     {
         set_gcr_register(0x0fff);
@@ -533,13 +525,13 @@ void cp2532_init(void)
             break;
         }
     }while( 0x0fff != get_gcr_register() );
-    
+
     if(retry_cnt >= 20)
     {
         printf("fatal: set gcr value failed ! ! !");
     }
     retry_cnt = 0;
-     
+
     do
     {
         set_idle_cfg_register(0x0132);      //change touch key backlight mode: in document/ds_cp2532_R32_ch.pdf page24 and page36
@@ -550,13 +542,13 @@ void cp2532_init(void)
             break;
         }
     }while( 0x0132 != get_idle_cfg_register() );
-    
+
     if(retry_cnt >= 20)
     {
         printf("fatal: set gcr value failed ! ! !");
     }
     retry_cnt = 0;
-    
+
     cp2532_int_init();
 
     touch_key_value_raw = read_byte(0x31);
