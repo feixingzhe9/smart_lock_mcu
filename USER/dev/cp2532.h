@@ -15,6 +15,9 @@
 #define I2C_CP2532_SET_KEY_INTERRUPT_MODE_ADDR      0x05
 #define I2C_CP2532_SET_KEY_INTERRUPT_ADDR           0x06
 
+#define I2C_CP2532_GCR_ADDR                         0x02
+#define I2C_CP2532_IDLE_CFG_ADDR                    0x27
+
 #define PASS_WORD_LENTH     4
 
 extern u16 touch_key_value_raw;

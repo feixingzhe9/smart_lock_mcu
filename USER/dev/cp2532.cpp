@@ -76,6 +76,26 @@ static u16 get_key_interrupt(void)
 #endif
 
 
+static uint16_t set_gcr_register(uint16_t value)
+{
+    return write_byte(I2C_CP2532_GCR_ADDR, value);
+}
+
+static uint16_t get_gcr_register(void)
+{
+    return read_byte(I2C_CP2532_GCR_ADDR);
+}
+
+static uint16_t set_idle_cfg_register(uint16_t value)
+{
+    return write_byte(I2C_CP2532_IDLE_CFG_ADDR, value);
+}
+
+static uint16_t get_idle_cfg_register(void)
+{
+    return read_byte(I2C_CP2532_IDLE_CFG_ADDR);
+}
+
 u16 quick_read(void)
 {
     u8 low_data = 0;
@@ -484,7 +504,42 @@ void cp2532_init(void)
     {
         printf("fatal: set key interrupt failed ! ! !");
     }
-
+    retry_cnt = 0;
+     
+    do
+    {
+        set_gcr_register(0x0fff);
+        delay_ms(10);
+        retry_cnt++;
+        if(retry_cnt >= 20)
+        {
+            break;
+        }
+    }while( 0x0fff != get_gcr_register() );
+    
+    if(retry_cnt >= 20)
+    {
+        printf("fatal: set gcr value failed ! ! !");
+    }
+    retry_cnt = 0;
+     
+    do
+    {
+        set_idle_cfg_register(0x0132);      //change touch key backlight mode: in document/ds_cp2532_R32_ch.pdf page24 and page36
+        delay_ms(10);
+        retry_cnt++;
+        if(retry_cnt >= 20)
+        {
+            break;
+        }
+    }while( 0x0132 != get_idle_cfg_register() );
+    
+    if(retry_cnt >= 20)
+    {
+        printf("fatal: set gcr value failed ! ! !");
+    }
+    retry_cnt = 0;
+    
     cp2532_int_init();
 
     touch_key_value_raw = read_byte(0x31);
