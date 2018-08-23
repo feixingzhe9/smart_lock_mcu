@@ -1,6 +1,7 @@
 #include "stmflash.h"
 #include "delay.h"
 #include "usart.h"
+#include "string.h"
 
 
 //读取指定地址的半字(16位数据)
@@ -103,6 +104,8 @@ void Test_Write(u32 WriteAddr,u16 WriteData)
 }
 
 
+#define SUPER_RFID_DEFAULT_VALUE        "6666"
+#define SUPER_PASSWORD_DEFAULT_VALUE    "6666"
 #define RFID_SIZE           4
 #define PASSWORD_SIZE       4
 #define FLASH_SAVE_ADDR     0X08070000 				//设置FLASH 保存地址(必须为偶数)
@@ -112,12 +115,36 @@ void Test_Write(u32 WriteAddr,u16 WriteData)
 
 void get_rfid_in_flash(char *rfid)
 {
-    flash_read(FLASH_RFID_ADDR, (u16*)rfid, RFID_SIZE);
+    char rfid_tmp[4] = {0};
+
+    flash_read(FLASH_RFID_ADDR, (u16*)rfid_tmp, RFID_SIZE);
+    for(uint8_t i = 0; i < RFID_SIZE; i++)
+    {
+        if( (rfid_tmp[i] > '9') || (rfid_tmp[i] < '0') )
+        {
+            // value invalid !
+            memcpy( rfid, SUPER_RFID_DEFAULT_VALUE, RFID_SIZE);
+            return ;
+        }
+    }
+    memcpy( rfid, rfid_tmp, RFID_SIZE);
 }
 
 void get_password_in_flash(char *password)
 {
-    flash_read(FLASH_PASSWORD_ADDR, (u16*)password, PASSWORD_SIZE);
+    char password_tmp[4] = {0};
+
+    flash_read(FLASH_PASSWORD_ADDR, (u16*)password_tmp, PASSWORD_SIZE);
+    for(uint8_t i = 0; i < RFID_SIZE; i++)
+    {
+        if( (password_tmp[i] > '9') || (password_tmp[i] < '0') )
+        {
+            // value invalid !
+            memcpy( password, SUPER_PASSWORD_DEFAULT_VALUE, RFID_SIZE);
+            return ;
+        }
+    }
+    memcpy( password, password_tmp, RFID_SIZE);
 }
 
 void save_rfid_to_flash(char *rfid)

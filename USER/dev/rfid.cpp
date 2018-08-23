@@ -20,6 +20,26 @@ static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key);
 
 char rfid_in_flash[RFID_WORD_LENTH] = {0};
 
+static void build_rfid(uint16_t rfid_int, char *rfid_str)
+{
+    if(rfid_int >= 1000)
+    {
+        sprintf(rfid_str,"%d",rfid_int);
+    }
+    else if(rfid_int >= 100)
+    {
+        sprintf(rfid_str,"0%d",rfid_int);
+    }
+    else if(rfid_int >= 10)
+    {
+        sprintf(rfid_str,"00%d",rfid_int);
+    }
+    else
+    {
+        sprintf(rfid_str,"000%d",rfid_int);
+    }
+}
+
 static bool match_rfid(const char *rfid_in_flash, const char *rfid)
 {
     for(u8 i = 0; i < RFID_WORD_LENTH; i++)
@@ -166,7 +186,7 @@ void rfid_task()
             rfid_int = rfid_int<<8;
             rfid_int += buffer_key[15];
             char rfid_str[10] = {0};
-            sprintf(rfid_str,"%d",rfid_int);
+            build_rfid(rfid_int, rfid_str);
             super_rfid_unlock_proc(rfid_in_flash, rfid_str);
 
             rfid_start_tick = get_tick();
