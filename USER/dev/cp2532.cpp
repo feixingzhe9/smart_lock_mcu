@@ -286,8 +286,20 @@ static void clear_pass_word(void)
     pass_word_info->lenth = 0;
 }
 
+#define PASSWORD_EXIST_TIME     4000/SYSTICK_PERIOD
 static void insert_one_pass_word(pass_word_t *key_info)
 {
+    if(pass_word_info->lenth > 0)
+    {
+        if(key_info->start_tick - pass_word_info->pass_word_buf[pass_word_info->lenth - 1].start_tick >= PASSWORD_EXIST_TIME)
+        {
+            clear_pass_word();
+            memcpy( &(pass_word_info->pass_word_buf[0]), key_info, sizeof(pass_word_t));
+            pass_word_info->lenth++;
+            return ;
+        }
+    }
+
     if(pass_word_info->lenth < PASS_WORD_LENTH)
     {
         memcpy( &(pass_word_info->pass_word_buf[pass_word_info->lenth]), key_info, sizeof(pass_word_t));
@@ -319,22 +331,27 @@ static void upload_password(const char *password)
     can.can_send( &password_msg );
 }
 
-#define PASSWORD_EXIST_TIME     4000/SYSTICK_PERIOD
+
 char psss_word_in_flash[PASS_WORD_LENTH] = {0};
 static void pass_work_proc(void)
 {
     char password[PASS_WORD_LENTH];
 
-    for(u8 i = 0; i < pass_word_info->lenth; i++)
-    {
-        if(get_tick() - pass_word_info->pass_word_buf[i].start_tick >= PASSWORD_EXIST_TIME)
-        {
-            shift_letf_pass_word();
-        }
-    }
+//    for(u8 i = 0; i < pass_word_info->lenth; i++)
+//    {
+//        if(get_tick() - pass_word_info->pass_word_buf[i].start_tick >= PASSWORD_EXIST_TIME)
+//        {
+//            shift_letf_pass_word();
+//        }
+//    }
 
     if(pass_word_info->lenth == PASS_WORD_LENTH)
     {
+        if(get_tick() - pass_word_info->pass_word_buf[pass_word_info->lenth - 1].start_tick >= PASSWORD_EXIST_TIME)
+        {
+            clear_pass_word();
+            return ;
+        }
         for(u8 i = 0; i < pass_word_info->lenth; i++)
         {
             password[i] = pass_word_info->pass_word_buf[i].pass_word;
