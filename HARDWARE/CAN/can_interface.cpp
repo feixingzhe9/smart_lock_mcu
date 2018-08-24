@@ -476,6 +476,14 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                         {
                             lock_1.start_to_unlock();
                         }
+                        else if(to_unlock & (1<<1))
+                        {
+                            lock_2.start_to_unlock();
+                        }
+                        else if(to_unlock & (1<<2))
+                        {
+                            lock_3.start_to_unlock();
+                        }
                         return 0;
                     }
 
