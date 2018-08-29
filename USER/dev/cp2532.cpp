@@ -494,6 +494,7 @@ void cp2532_init(void)
     if(retry_cnt >= 20)
     {
         printf("fatal: set key interrupt trigger failed ! ! !");
+        sys_err |= SYS_CP2532_INIT_ERR;
     }
 
     retry_cnt = 0;
@@ -512,6 +513,7 @@ void cp2532_init(void)
     if(retry_cnt >= 20)
     {
         printf("fatal: set key interrupt failed ! ! !");
+        sys_err |= SYS_CP2532_INIT_ERR;
     }
     retry_cnt = 0;
 
@@ -529,6 +531,7 @@ void cp2532_init(void)
     if(retry_cnt >= 20)
     {
         printf("fatal: set gcr value failed ! ! !");
+        sys_err |= SYS_CP2532_INIT_ERR;
     }
     retry_cnt = 0;
 
@@ -546,6 +549,7 @@ void cp2532_init(void)
     if(retry_cnt >= 20)
     {
         printf("fatal: set gcr value failed ! ! !");
+        sys_err |= SYS_CP2532_INIT_ERR;
     }
     retry_cnt = 0;
 

@@ -60,14 +60,18 @@
 #define PGin(n)    BIT_ADDR(GPIOG_IDR_Addr,n)  // ‰»Î
 
 
-
 #define SYSTICK_PERIOD       1      //1ms
+
+#define SYS_CP2532_INIT_ERR     (0x00000001)
+
 
 void platform_mcu_reset(void);
 extern void sys_tick_init(void);
 uint32_t get_tick(void);
 void NVIC_Configuration(void);
 void sys_tick_init(void);
+
+extern uint32_t sys_err;
 
 #ifdef __cplusplus
 }
