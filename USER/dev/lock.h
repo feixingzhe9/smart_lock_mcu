@@ -27,6 +27,7 @@ class LockClass
         void lock_task(u32 tick);
         void start_to_unlock(void);
         void init(void);
+        uint8_t get_lock_status(void);
 
         volatile bool lock_status;
 
@@ -69,17 +70,19 @@ class LockClass
         bool is_to_my_turn(void);
         bool search_unlock_array(u8 id);
 
-        uint8_t get_lock_status(void);
 };
 
 
 void all_lock_task(u32 tick);
 void start_to_unlock_all(void);
 void lock_init(void);
+void lock_in_status_task(void);
 
 extern LockClass lock_1;
 extern LockClass lock_2;
 extern LockClass lock_3;
+
+
 
 
 

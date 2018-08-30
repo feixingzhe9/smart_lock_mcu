@@ -26,6 +26,8 @@
 #include "sys.h"
 #include "usart.h"
 #include "stm32f10x.h"
+#include "lock_param.h"
+#include <stdio.h>
 
 
 void NMI_Handler(void)
@@ -107,6 +109,8 @@ void EXTI9_5_IRQHandler(void)
     if(EXTI_GetITStatus(EXTI_Line9) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line9);
+        lock_status_change_start_tick = get_tick();
+        is_lock_status_changed = 1;
     }
 
     //printf("exti at pc6\r\n");
@@ -117,21 +121,6 @@ void EXTI9_5_IRQHandler(void)
     }
 
 }
-
-
-////void EXTI15_10_IRQHandler(void)
-////{
-////    if(EXTI_GetITStatus(EXTI_Line10) != RESET)
-////    {
-////        EXTI_ClearITPendingBit(EXTI_Line10);
-////    }
-
-////    if(EXTI_GetITStatus(EXTI_Line11) != RESET)
-////    {
-////        EXTI_ClearITPendingBit(EXTI_Line11);
-////    }
-
-////}
 
 
 

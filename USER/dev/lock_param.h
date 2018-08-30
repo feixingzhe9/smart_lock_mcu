@@ -43,6 +43,8 @@ struct gpio_in_int_param_t
 
 
 extern const struct gpio_in_int_param_t gpio_in_int_param[LOCK_NUM_MAX];
+extern uint32_t lock_status_change_start_tick;
+extern uint8_t is_lock_status_changed;
 
 
 #endif

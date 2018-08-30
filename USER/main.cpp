@@ -58,6 +58,7 @@ int main(void)
         can_protocol();
         beeper_task();
         motor_task();
+        lock_in_status_task();
         sys_indicator();
 
 #ifdef CAN_LOAD_TEST

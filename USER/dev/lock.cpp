@@ -41,7 +41,7 @@ void LockClass::init(void)
     GPIO_Init(gpio_in_int_param[my_id - 1].out_port, &GPIO_InitStructure);
     GPIO_ResetBits(gpio_in_int_param[my_id - 1].out_port,gpio_in_int_param[my_id].out_pin);     // default value: reset
 
-    //---- input GPIO init ----//
+    //---- input GPIO config ----//
     if(gpio_in_int_param[my_id - 1].in_port == GPIOD)
     {
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
@@ -55,14 +55,13 @@ void LockClass::init(void)
     EXTI_InitTypeDef exit_init_structure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
-
     if(gpio_in_int_param[my_id - 1].in_port == GPIOD)
     {
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);	//使能时钟
     }
 
     GPIO_InitStructure.GPIO_Pin = gpio_in_int_param[my_id - 1].in_pin;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//浮空输入
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//
     GPIO_Init(gpio_in_int_param[my_id - 1].in_port, &GPIO_InitStructure);  //
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
@@ -261,7 +260,32 @@ void LockClass::lock_task(u32 tick)
     }
 }
 
+uint32_t lock_status_change_start_tick = 0;
+uint8_t is_lock_status_changed = 0;
+#define LOCK_IN_STATUS_STABLE_DELAY_TICK    100/SYSTICK_PERIOD
 
+uint8_t test_lock_status_1 = 0;
+uint8_t test_lock_status_2 = 0;
+uint8_t test_lock_status_3 = 0;
+void lock_in_status_task(void)
+{
+    if(lock_lock_ctrl.to_unlock_cnt == 0)
+    {
+        if(is_lock_status_changed)
+        {
+            if(get_tick() - lock_status_change_start_tick >= LOCK_IN_STATUS_STABLE_DELAY_TICK)
+            {
+                is_lock_status_changed = 0;
+                test_lock_status_1 = lock_1.get_lock_status();
+                test_lock_status_2 = lock_2.get_lock_status();
+                test_lock_status_3 = lock_3.get_lock_status();
+            }
+        }
+    }
+}
+
+
+//Execution in timer interruption
 void all_lock_task(u32 tick)
 {
     lock_1.lock_task(tick);

@@ -475,6 +475,8 @@ void EXTI15_10_IRQHandler(void)
     if(EXTI_GetITStatus(EXTI_Line10) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line10);
+        lock_status_change_start_tick = get_tick();
+        is_lock_status_changed = 1;
     }
 
 }
