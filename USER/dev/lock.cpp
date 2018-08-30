@@ -1,51 +1,16 @@
 #include "lock.h"
+#include "lock_param.h"
 
 struct lock_lock_ctrl_t lock_lock_ctrl;
 
-//gpio_t lock_1_gpio_out;
-//gpio_t lock_1_gpio_in;
 
-//gpio_t lock_2_gpio_out;
-//gpio_t lock_2_gpio_in;
-
-//gpio_t lock_3_gpio_out;
-//gpio_t lock_3_gpio_in;
-
-//void lock_gpio_parameter_init(void)
-//{
-//    lock_1_gpio_out.port = LOCK_1_OUT_PORT;
-//    lock_1_gpio_out.pin = LOCK_1_OUT_PIN;
-
-//    lock_2_gpio_out.port = LOCK_2_OUT_PORT;
-//    lock_2_gpio_out.pin = LOCK_2_OUT_PIN;
-
-//    lock_3_gpio_out.port = LOCK_3_OUT_PORT;
-//    lock_3_gpio_out.pin = LOCK_3_OUT_PIN;
-
-//    lock_1_gpio_in.port = LOCK_1_IN_PORT;
-//    lock_1_gpio_in.pin = LOCK_1_IN_PIN;
-
-//    lock_2_gpio_in.port = LOCK_2_IN_PORT;
-//    lock_2_gpio_in.pin = LOCK_2_IN_PIN;
-
-//    lock_3_gpio_in.port = LOCK_3_IN_PORT;
-//    lock_3_gpio_in.pin = LOCK_3_IN_PIN;
-
-//}
+LockClass lock_1(1, &lock_lock_ctrl);
+LockClass lock_2(2, &lock_lock_ctrl);
+LockClass lock_3(3, &lock_lock_ctrl);
 
 
-LockClass lock_1(LOCK_1_OUT_PORT, LOCK_1_OUT_PIN, LOCK_1_IN_PORT, LOCK_1_IN_PIN, 1, &lock_lock_ctrl);
-LockClass lock_2(LOCK_2_OUT_PORT, LOCK_2_OUT_PIN, LOCK_2_IN_PORT, LOCK_2_IN_PIN, 2, &lock_lock_ctrl);
-LockClass lock_3(LOCK_3_OUT_PORT, LOCK_3_OUT_PIN, LOCK_3_IN_PORT, LOCK_3_IN_PIN, 3, &lock_lock_ctrl);
-
-
-LockClass::LockClass(GPIO_TypeDef*  out_port, uint16_t out_pin, GPIO_TypeDef* in_port, uint16_t in_pin, u8 id, struct lock_lock_ctrl_t * lock_ctrl)
+LockClass::LockClass(uint8_t id, struct lock_lock_ctrl_t * lock_ctrl)
 {
-    lock_out_port = out_port;
-    lock_out_pin = out_pin;
-
-    lock_in_port = in_port;
-    lock_in_pin = in_pin;
 
     lock_lock_ctrl = lock_ctrl;
 
@@ -65,26 +30,57 @@ void LockClass::init(void)
     GPIO_InitTypeDef  GPIO_InitStructure;
 
     //---- output GPIO init ----//
-    if(lock_out_port == GPIOG)
+    if(gpio_in_int_param[my_id - 1].out_port == GPIOG)
     {
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);
     }
 
-    GPIO_InitStructure.GPIO_Pin = lock_out_pin;
+    GPIO_InitStructure.GPIO_Pin = gpio_in_int_param[my_id - 1].out_pin;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(lock_out_port, &GPIO_InitStructure);
-    GPIO_ResetBits(lock_out_port,lock_out_pin);     // default value: reset
+    GPIO_Init(gpio_in_int_param[my_id - 1].out_port, &GPIO_InitStructure);
+    GPIO_ResetBits(gpio_in_int_param[my_id - 1].out_port,gpio_in_int_param[my_id].out_pin);     // default value: reset
 
     //---- input GPIO init ----//
-    if(lock_out_port == GPIOD)
+    if(gpio_in_int_param[my_id - 1].in_port == GPIOD)
     {
         RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
     }
 
-    GPIO_InitStructure.GPIO_Pin = lock_in_pin;
+    GPIO_InitStructure.GPIO_Pin = gpio_in_int_param[my_id - 1].in_pin;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(lock_in_port, &GPIO_InitStructure);
+    GPIO_Init(gpio_in_int_param[my_id - 1].in_port, &GPIO_InitStructure);
+
+    //---- lock input interrupt config ----//
+    EXTI_InitTypeDef exit_init_structure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+
+
+    if(gpio_in_int_param[my_id - 1].in_port == GPIOD)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);	//使能时钟
+    }
+
+    GPIO_InitStructure.GPIO_Pin = gpio_in_int_param[my_id - 1].in_pin;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//浮空输入
+    GPIO_Init(gpio_in_int_param[my_id - 1].in_port, &GPIO_InitStructure);  //
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
+    GPIO_EXTILineConfig(gpio_in_int_param[my_id - 1].gpio_port_int_source,gpio_in_int_param[my_id - 1].gpio_pin_int_source);
+
+    exit_init_structure.EXTI_Line=gpio_in_int_param[my_id - 1].exit_line;
+    exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;
+    exit_init_structure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+    exit_init_structure.EXTI_LineCmd = ENABLE;
+    EXTI_Init(&exit_init_structure);	 	//根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
+
+    NVIC_InitStructure.NVIC_IRQChannel = gpio_in_int_param[my_id - 1].nvic_irq_channel;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;	//抢占优先级3
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;					//子优先级3
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
 
     is_need_to_unlock = false;
     lock_status = false;
@@ -100,19 +96,20 @@ void LockClass::init(void)
     lock_lock_ctrl->to_unlock_cnt = 0;
 }
 
+
 void LockClass::lock_on(void)
 {
-   GPIO_SetBits(this->lock_out_port, this->lock_out_pin);
+   GPIO_SetBits(gpio_in_int_param[my_id - 1].out_port, gpio_in_int_param[my_id - 1].out_pin);
 }
 
 void LockClass::lock_off(void)
 {
-   GPIO_ResetBits(this->lock_out_port, this->lock_out_pin);
+   GPIO_ResetBits(gpio_in_int_param[my_id - 1].out_port, gpio_in_int_param[my_id - 1].out_pin);
 }
 
 uint8_t LockClass::get_lock_status(void)
 {
-    return GPIO_ReadInputDataBit(lock_in_port, lock_in_pin);
+    return GPIO_ReadInputDataBit(gpio_in_int_param[my_id - 1].in_port, gpio_in_int_param[my_id - 1].in_pin);
 }
 
 bool LockClass::search_unlock_array(u8 id)

@@ -430,7 +430,7 @@ static void cp2532_int_init(void)
 
     GPIO_EXTILineConfig(GPIO_PortSourceGPIOG,GPIO_PinSource11);
 
-    exit_init_structure.EXTI_Line=EXTI_Line11;
+    exit_init_structure.EXTI_Line = EXTI_Line11;
     exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;
     exit_init_structure.EXTI_Trigger = EXTI_Trigger_Falling;
     exit_init_structure.EXTI_LineCmd = ENABLE;
@@ -450,25 +450,33 @@ extern "C" {
 #endif
 void EXTI15_10_IRQHandler(void)
 {
-    EXTI_ClearITPendingBit(EXTI_Line11);
-
-    touch_key_value_raw = read_byte(0x31);
-    interrupt_value = read_byte(0x33) & 0x0fff;  // read interrupt value in register to clear cp2532 interrupt
-
-    if(is_key_valid(touch_key_value_raw) == true)
+    if(EXTI_GetITStatus(EXTI_Line11) != RESET)
     {
-        set_key_value( proc_touch_key(touch_key_value_raw) );
+        EXTI_ClearITPendingBit(EXTI_Line11);
+        touch_key_value_raw = read_byte(0x31);
+        interrupt_value = read_byte(0x33) & 0x0fff;  // read interrupt value in register to clear cp2532 interrupt
+
+        if(is_key_valid(touch_key_value_raw) == true)
+        {
+            set_key_value( proc_touch_key(touch_key_value_raw) );
+        }
+
+        if(touch_key_value_raw == 0)
+        {
+//          printf("get key value 0 from interrupt"); //test code
+        }
+
+        if( get_key_value() )
+        {
+            upload_touch_key_data( get_key_value() );
+        }
     }
 
-    if(touch_key_value_raw == 0)
+    if(EXTI_GetITStatus(EXTI_Line10) != RESET)
     {
-//        printf("get key value 0 from interrupt"); //test code
+        EXTI_ClearITPendingBit(EXTI_Line10);
     }
 
-    if( get_key_value() )
-    {
-        upload_touch_key_data( get_key_value() );
-    }
 }
 
 #ifdef __cplusplus

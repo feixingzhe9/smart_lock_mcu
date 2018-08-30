@@ -103,11 +103,35 @@ void EXTI4_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
+
+    if(EXTI_GetITStatus(EXTI_Line9) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line9);
+    }
+
     //printf("exti at pc6\r\n");
-    EXTI_ClearITPendingBit(EXTI_Line6);
-    NVIC_SystemReset();
+    if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line6);
+        NVIC_SystemReset();
+    }
+
 }
 
+
+////void EXTI15_10_IRQHandler(void)
+////{
+////    if(EXTI_GetITStatus(EXTI_Line10) != RESET)
+////    {
+////        EXTI_ClearITPendingBit(EXTI_Line10);
+////    }
+
+////    if(EXTI_GetITStatus(EXTI_Line11) != RESET)
+////    {
+////        EXTI_ClearITPendingBit(EXTI_Line11);
+////    }
+
+////}
 
 
 

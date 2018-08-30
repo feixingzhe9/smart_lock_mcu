@@ -31,3 +31,5 @@ void platform_mcu_reset(void)
 {
     NVIC_SystemReset();
 }
+
+
