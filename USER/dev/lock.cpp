@@ -1,5 +1,6 @@
 #include "lock.h"
 #include "lock_param.h"
+#include "can_interface.h"
 
 struct lock_lock_ctrl_t lock_lock_ctrl;
 
@@ -260,13 +261,30 @@ void LockClass::lock_task(u32 tick)
     }
 }
 
+
+static void upload_lock_status(void)
+{
+    can_id_union id;
+    uint8_t lock_status[LOCK_NUM_MAX] = {0};
+    lock_status[0] = lock_1.get_lock_status();
+    lock_status[1] = lock_2.get_lock_status();
+    lock_status[2] = lock_3.get_lock_status();
+
+    id.can_id_struct.source_id = CAN_SOURCE_ID_LOCK_STATUS_UPLOAD;
+
+    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+
+    id.can_id_struct.res = 0;
+    id.can_id_struct.ack = 0;
+    id.can_id_struct.func_id = 0;
+
+    Can1_TX(id.can_id,lock_status, LOCK_NUM_MAX);
+}
+
 uint32_t lock_status_change_start_tick = 0;
 uint8_t is_lock_status_changed = 0;
 #define LOCK_IN_STATUS_STABLE_DELAY_TICK    100/SYSTICK_PERIOD
 
-uint8_t test_lock_status_1 = 0;
-uint8_t test_lock_status_2 = 0;
-uint8_t test_lock_status_3 = 0;
 void lock_in_status_task(void)
 {
     if(lock_lock_ctrl.to_unlock_cnt == 0)
@@ -276,9 +294,7 @@ void lock_in_status_task(void)
             if(get_tick() - lock_status_change_start_tick >= LOCK_IN_STATUS_STABLE_DELAY_TICK)
             {
                 is_lock_status_changed = 0;
-                test_lock_status_1 = lock_1.get_lock_status();
-                test_lock_status_2 = lock_2.get_lock_status();
-                test_lock_status_3 = lock_3.get_lock_status();
+                upload_lock_status();
             }
         }
     }

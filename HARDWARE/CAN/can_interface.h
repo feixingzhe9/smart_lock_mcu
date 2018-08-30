@@ -23,19 +23,21 @@
 #define CAN_SOURCE_ID_CAN_TEST              0x03
 
 
-#define CAN_SOURCE_ID_UNLOCK            0x80
-#define CAN_SOURCE_ID_LOCK_STATUS       0x81
-#define CAN_SOURCE_ID_PW_UPLOAD         0x82
-#define CAN_SOURCE_ID_RFID_UPLOAD       0x83
+#define CAN_SOURCE_ID_UNLOCK                    0x80
+#define CAN_SOURCE_ID_LOCK_STATUS               0x81
+#define CAN_SOURCE_ID_PW_UPLOAD                 0x82
+#define CAN_SOURCE_ID_RFID_UPLOAD               0x83
 
-#define CAN_SOURCE_ID_SET_SUPER_PW      0x84
-#define CAN_SOURCE_ID_SET_SUPER_RFID    0x85
+#define CAN_SOURCE_ID_SET_SUPER_PW              0x84
+#define CAN_SOURCE_ID_SET_SUPER_RFID            0x85
 
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD_1  0x90
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD_2  0x91
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD_3  0x92
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD_1          0x90
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD_2          0x91
+#define CAN_SOURCE_ID_QR_CODE_UPLOAD_3          0x92
 
-#define CAN_SOURCE_ID_KEY_TEST_UPLOAD   0xa0
+#define CAN_SOURCE_ID_KEY_TEST_UPLOAD           0xa0
+
+#define CAN_SOURCE_ID_LOCK_STATUS_UPLOAD        0xa1
 
 #define CAN_SOURCE_ID_CAN_LOAD_TEST     0xff
 
