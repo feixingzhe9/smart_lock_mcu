@@ -5,6 +5,32 @@
 #include <stdio.h>
 
 #define LOCK_NUM_MAX        3
+
+#define LOCK_1_OUT_PORT     GPIOG
+#define LOCK_1_OUT_PIN      GPIO_Pin_5
+
+#define LOCK_2_OUT_PORT     GPIOG
+#define LOCK_2_OUT_PIN      GPIO_Pin_4
+
+#define LOCK_3_OUT_PORT     GPIOG
+#define LOCK_3_OUT_PIN      GPIO_Pin_3
+
+
+#define LOCK_1_IN_PORT     GPIOD
+#define LOCK_1_IN_PIN      GPIO_Pin_9
+
+#define LOCK_2_IN_PORT     GPIOD
+#define LOCK_2_IN_PIN      GPIO_Pin_10
+
+#define LOCK_3_IN_PORT     GPIOD
+#define LOCK_3_IN_PIN      GPIO_Pin_11
+
+struct gpio_t
+{
+    GPIO_TypeDef* port;
+    uint16_t pin;
+};
+
 struct lock_lock_ctrl_t
 {
     volatile u8 lock_array[LOCK_NUM_MAX];
@@ -18,14 +44,22 @@ class LockClass
     public:
         void lock_task(u32 tick);
         void start_to_unlock(void);
+        void init(void);
 
         volatile bool lock_status;
 
-        LockClass(GPIO_TypeDef* port, uint16_t pin, u8 id, struct lock_lock_ctrl_t * lock_ctrl);
+//        LockClass(gpio_t gpio_out, gpio_t gpio_in, u8 id, struct lock_lock_ctrl_t * lock_ctrl);
+        LockClass(GPIO_TypeDef*  out_port, uint16_t out_pin, GPIO_TypeDef* in_port, uint16_t in_pin, u8 id, struct lock_lock_ctrl_t * lock_ctrl);
 
     private:
-        GPIO_TypeDef*  lock_port;
-        uint16_t lock_pin;
+        GPIO_TypeDef*  lock_out_port;
+        uint16_t lock_out_pin;
+
+        GPIO_TypeDef*  lock_in_port;
+        uint16_t lock_in_pin;
+
+        gpio_t lock_out_gpio;
+        gpio_t lock_in_gpio;
 
         volatile bool is_need_to_unlock;
         volatile u32 lock_period_start_tick;
@@ -52,12 +86,14 @@ class LockClass
         void remove_first_unlock(void);
         bool is_to_my_turn(void);
         bool search_unlock_array(u8 id);
+
+        uint8_t get_lock_status(void);
 };
 
 
 void all_lock_task(u32 tick);
 void start_to_unlock_all(void);
-
+void lock_init(void);
 
 extern LockClass lock_1;
 extern LockClass lock_2;

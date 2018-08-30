@@ -28,6 +28,7 @@ static void init()
 
     i2c_init();
     beeper_init(200,50);
+    lock_init();
     tim2_int_init(499,7199);    // timer to control locks
 
 #ifdef CP2532_INT_ENABLE
