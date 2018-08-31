@@ -5,7 +5,7 @@ uint32_t sys_err = 0;
 
 void NVIC_Configuration(void)
 {
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//设置NVIC中断分组2:2位抢占优先级，2位响应优先级
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
 }
 
 void sys_tick_init(void)

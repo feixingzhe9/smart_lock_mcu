@@ -421,7 +421,7 @@ static void cp2532_int_init(void)
 
     //----  cp2532 touch key int  ----//
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);	//使能GPIOG时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOG, ENABLE);   //使能GPIOG时钟
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//浮空输入
     GPIO_Init(GPIOG, &GPIO_InitStructure);  //初始化PG11
@@ -434,11 +434,11 @@ static void cp2532_int_init(void)
     exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;
     exit_init_structure.EXTI_Trigger = EXTI_Trigger_Falling;
     exit_init_structure.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&exit_init_structure);	 	//根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
+    EXTI_Init(&exit_init_structure);        //根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
 
     NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;	//抢占优先级2
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;					//子优先级3
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;    //抢占优先级2
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;           //子优先级3
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }

@@ -34,12 +34,12 @@ void sys_indicator(void)
 {
     static u16 cnt = 0;
     static u32 start_tick = 0;
-    
+
     if(sys_err & SYS_CP2532_INIT_ERR)
     {
         indicator_period = INDICATOR_LED_PERIOD_ERR;
     }
-    
+
     if(get_tick() - start_tick >= indicator_period)
     {
         cnt++;

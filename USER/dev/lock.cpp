@@ -58,7 +58,7 @@ void LockClass::init(void)
 
     if(gpio_in_int_param[my_id - 1].in_port == GPIOD)
     {
-        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);	//使能时钟
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);   //使能时钟
     }
 
     GPIO_InitStructure.GPIO_Pin = gpio_in_int_param[my_id - 1].in_pin;
@@ -73,11 +73,11 @@ void LockClass::init(void)
     exit_init_structure.EXTI_Mode = EXTI_Mode_Interrupt;
     exit_init_structure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
     exit_init_structure.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&exit_init_structure);	 	//根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
+    EXTI_Init(&exit_init_structure);        //根据EXTI_InitStruct中指定的参数初始化外设EXTI寄存器
 
     NVIC_InitStructure.NVIC_IRQChannel = gpio_in_int_param[my_id - 1].nvic_irq_channel;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;	//抢占优先级3
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;					//子优先级3
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x03;    //抢占优先级3
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;           //子优先级3
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
