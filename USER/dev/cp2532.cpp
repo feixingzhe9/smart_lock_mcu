@@ -355,6 +355,7 @@ static void pass_work_proc(void)
     }
 
     upload_password(password);  //upload password whether it is super password
+    clear_pass_word();
 
     for(u8 i = 0; i < PASS_WORD_LENTH; i++)
     {
@@ -367,7 +368,6 @@ static void pass_work_proc(void)
 
     // ----   get right password here  ----//
     printf("get right password");
-    clear_pass_word();
     start_to_unlock_all();
 
 }
