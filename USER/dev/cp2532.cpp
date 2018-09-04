@@ -362,6 +362,7 @@ static void pass_work_proc(void)
         {
             return ;
         }
+
     }
 
     // ----   get right password here  ----//
@@ -527,6 +528,8 @@ void cp2532_init(void)
     }
     retry_cnt = 0;
 
+    //---- change backlight effect to full backlight ----//
+#if 0
     do
     {
         set_gcr_register(0x0fff);
@@ -562,6 +565,8 @@ void cp2532_init(void)
         sys_err |= SYS_CP2532_INIT_ERR;
     }
     retry_cnt = 0;
+#endif
+    //---- ------------------------ ----//
 
     cp2532_int_init();
 

@@ -26,7 +26,7 @@ static void init()
     qr_code_init();
     rfid_init();
 
-    i2c_init();
+//    i2c_init();
     beeper_init(200,50);
     lock_init();
     tim2_int_init(499,7199);    // timer to control locks
