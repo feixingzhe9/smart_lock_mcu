@@ -494,7 +494,7 @@ void cp2532_init(void)
     do
     {
         set_key_interrupt_trigger();
-        delay_ms(10);
+        delay_ms(20);
         retry_cnt++;
         if(retry_cnt >= 20)
         {
@@ -513,7 +513,7 @@ void cp2532_init(void)
     do
     {
         set_key_interrupt();
-        delay_ms(10);
+        delay_ms(20);
         retry_cnt++;
         if(retry_cnt >= 20)
         {
@@ -533,7 +533,7 @@ void cp2532_init(void)
     do
     {
         set_gcr_register(0x0fff);
-        delay_ms(10);
+        delay_ms(20);
         retry_cnt++;
         if(retry_cnt >= 20)
         {
@@ -551,7 +551,7 @@ void cp2532_init(void)
     do
     {
         set_idle_cfg_register(0x0132);      //change touch key backlight mode: in document/ds_cp2532_R32_ch.pdf page24 and page36
-        delay_ms(10);
+        delay_ms(20);
         retry_cnt++;
         if(retry_cnt >= 20)
         {
