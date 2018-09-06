@@ -310,12 +310,35 @@ void all_lock_task(u32 tick)
 }
 
 
-void start_to_unlock_all(void)
+uint32_t unlock_start_tick = 0;
+void start_to_unlock(uint32_t lock)
 {
-    lock_1.start_to_unlock();
-    lock_2.start_to_unlock();
-    lock_3.start_to_unlock();
+    if(0 == lock)
+    {
+        return ;
+    }
+
+//    if(lock > (1 << LOCK_NUM_MAX) - 1)
+//    {
+//        return ;
+//    }
+
+    unlock_start_tick = get_tick();
+    if(lock & (1<<0))
+    {
+        lock_1.start_to_unlock();
+    }
+    if(lock & (1<<1))
+    {
+        lock_2.start_to_unlock();
+    }
+    if(lock & (1<<2))
+    {
+        lock_3.start_to_unlock();
+    }
+
 }
+
 
 void lock_init(void)
 {

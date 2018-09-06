@@ -472,18 +472,7 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                 case CAN_SOURCE_ID_UNLOCK:
                     {
                         u32 to_unlock = *(u32 *)&data_in[0];
-                        if(to_unlock & (1<<0))
-                        {
-                            lock_1.start_to_unlock();
-                        }
-                        if(to_unlock & (1<<1))
-                        {
-                            lock_2.start_to_unlock();
-                        }
-                        if(to_unlock & (1<<2))
-                        {
-                            lock_3.start_to_unlock();
-                        }
+                        start_to_unlock(to_unlock);
                         return 0;
                     }
 

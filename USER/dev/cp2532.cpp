@@ -368,7 +368,7 @@ static void pass_work_proc(void)
 
     // ----   get right password here  ----//
     printf("get right password");
-    start_to_unlock_all();
+    start_to_unlock(0xffffffff);
 
 }
 

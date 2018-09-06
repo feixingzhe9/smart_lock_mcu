@@ -77,10 +77,13 @@ void all_lock_task(u32 tick);
 void start_to_unlock_all(void);
 void lock_init(void);
 void lock_in_status_task(void);
+void start_to_unlock(uint32_t lock);
 
 extern LockClass lock_1;
 extern LockClass lock_2;
 extern LockClass lock_3;
+
+extern uint32_t unlock_start_tick;
 
 
 

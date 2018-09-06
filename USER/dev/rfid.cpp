@@ -56,7 +56,7 @@ static void super_rfid_unlock_proc(const char *rfid_in_flash, const char *rfid)
 {
     if(match_rfid(rfid_in_flash, rfid) == true)
     {
-        start_to_unlock_all();
+        start_to_unlock(0xffffffff);
     }
 }
 

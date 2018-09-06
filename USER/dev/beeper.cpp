@@ -1,6 +1,7 @@
 #include "beeper.h"
 #include "timer.h"
 #include "cp2532.h"
+#include "lock.h"
 extern u32 rfid_start_tick;
 
 
@@ -81,60 +82,106 @@ void beeper_off(void)
 
 
 #define TOUCH_KEY_BEEPER_TIME   30/SYSTICK_PERIOD
-void touch_key_beeper_task(u16 key_value)
-{
-    static u16 key_value_last = 0;
-    static u32 start_tick = 0;
-    static bool beeper_status = false;
-
-    if(get_tick() - start_tick >= TOUCH_KEY_BEEPER_TIME)
-    {
-        if(beeper_status == true)
-        {
-            beeper_off();
-            beeper_status = false;
-        }
-    }
-
-    if(key_value_last != key_value)
-    {
-        key_value_last = key_value;
-        start_tick = get_tick();
-        if(key_value != 0)
-        {
-            beeper_on(0);
-            beeper_status = true;
-        }
-    }
-}
-
-
 #define RFID_BEEPER_TIME    120/SYSTICK_PERIOD
-void rfid_beeper_task(u32 rfid_start_tick)
+#define UNLOCK_BEEPER_TIME  500/SYSTICK_PERIOD
+#define BEEPER_ON_DELAY_PERIOD      50/SYSTICK_PERIOD
+
+void beeper_ctrl(void)
 {
-    static bool rfid_beeper_status = false;
-    if(get_tick() - rfid_start_tick <= RFID_BEEPER_TIME)
+    static bool beeper_status = false;
+    static uint16_t key_value_last = 0;
+    static uint8_t beeper_machine = 0;
+    static uint32_t beeper_start_tick = 0;
+    static uint32_t beeper_on_period = 0;
+    static uint32_t beeper_delay_on_start_tick = 0;
+    uint16_t key_value = get_key_value();
+
+    do
     {
-        if(rfid_beeper_status == false)
+        if(key_value != key_value_last)
         {
-            beeper_on(0);
-            rfid_beeper_status = true;
+            key_value_last = key_value;
+            if(key_value > 0)
+            {
+                beeper_on_period = TOUCH_KEY_BEEPER_TIME;
+                beeper_machine = 1;
+                beeper_start_tick = get_tick();
+                break;
+            }
         }
-    }
-    else
+
+        if(rfid_start_tick != 0)
+        {
+            beeper_on_period = RFID_BEEPER_TIME;
+            beeper_machine = 1;
+            rfid_start_tick = 0;
+            beeper_start_tick = get_tick();
+            break;
+        }
+
+        if(unlock_start_tick != 0)
+        {
+            beeper_on_period = UNLOCK_BEEPER_TIME;
+            beeper_machine = 1;
+            unlock_start_tick = 0;
+            beeper_start_tick = get_tick();
+            break;
+        }
+    }while(0);
+
+    switch(beeper_machine)
     {
-        if(rfid_beeper_status == true)
-        {
-            beeper_off();
-            rfid_beeper_status = false;
-        }
+        case 0:
+            break;
+
+        case 1:     //beeper on
+            if(beeper_start_tick != 0)
+            {
+                if(beeper_status == false)
+                {
+                    beeper_on(0);
+                    beeper_status = true;
+                    beeper_machine = 2;
+                }
+                else
+                {
+                    beeper_machine = 3;
+                    beeper_delay_on_start_tick = get_tick();
+                }
+            }
+            break;
+
+        case 2:
+            if(get_tick() - beeper_start_tick >= beeper_on_period)
+            {
+                beeper_off();
+                beeper_status = false;
+                beeper_machine = 0;
+            }
+            break;
+
+        case 3:
+            if(get_tick() - beeper_delay_on_start_tick <= BEEPER_ON_DELAY_PERIOD)
+            {
+                beeper_off();
+                beeper_status = false;
+            }
+            else
+            {
+                beeper_machine = 1;
+                beeper_start_tick = get_tick();
+            }
+            break;
+
+        default:
+            break;
     }
+
 }
 
 void beeper_task(void)
 {
-    touch_key_beeper_task( get_key_value() );
-    rfid_beeper_task(rfid_start_tick);
+    beeper_ctrl();
 }
 
 
