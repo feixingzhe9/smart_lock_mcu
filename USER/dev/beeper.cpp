@@ -84,7 +84,7 @@ void beeper_off(void)
 #define TOUCH_KEY_BEEPER_TIME   30/SYSTICK_PERIOD
 #define RFID_BEEPER_TIME    120/SYSTICK_PERIOD
 #define UNLOCK_BEEPER_TIME  500/SYSTICK_PERIOD
-#define BEEPER_ON_DELAY_PERIOD      50/SYSTICK_PERIOD
+#define BEEPER_ON_DELAY_PERIOD      20/SYSTICK_PERIOD
 
 void beeper_ctrl(void)
 {
@@ -151,7 +151,7 @@ void beeper_ctrl(void)
             }
             break;
 
-        case 2:
+        case 2:     //beeper off
             if(get_tick() - beeper_start_tick >= beeper_on_period)
             {
                 beeper_off();
@@ -160,7 +160,7 @@ void beeper_ctrl(void)
             }
             break;
 
-        case 3:
+        case 3:     //delay before beeper on
             if(get_tick() - beeper_delay_on_start_tick <= BEEPER_ON_DELAY_PERIOD)
             {
                 beeper_off();
@@ -168,8 +168,10 @@ void beeper_ctrl(void)
             }
             else
             {
-                beeper_machine = 1;
                 beeper_start_tick = get_tick();
+                beeper_on(0);
+                beeper_status = true;
+                beeper_machine = 2;
             }
             break;
 
