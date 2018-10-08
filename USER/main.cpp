@@ -33,7 +33,7 @@ static void init()
 #ifdef CP2532_INT_ENABLE
     cp2532_init();
 #else
-      i2c_init();
+    i2c_init();
 #endif
 
     motor_init();

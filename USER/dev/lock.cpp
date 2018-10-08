@@ -324,15 +324,15 @@ void start_to_unlock(uint32_t lock)
 //    }
 
     unlock_start_tick = get_tick();
-    if(lock & (1<<0))
+    if(lock & (1 << 0))
     {
         lock_1.start_to_unlock();
     }
-    if(lock & (1<<1))
+    if(lock & (1 << 1))
     {
         lock_2.start_to_unlock();
     }
-    if(lock & (1<<2))
+    if(lock & (1 << 2))
     {
         lock_3.start_to_unlock();
     }
