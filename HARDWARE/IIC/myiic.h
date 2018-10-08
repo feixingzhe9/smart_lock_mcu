@@ -18,10 +18,10 @@
 //#define SDA_IN()  {GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=8<<12;}
 //#define SDA_OUT() {GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=3<<12;}
 
-#define SDA_IN()    do{GPIOB->CRL &= 0X0FFFFFFF; GPIOB->CRL|= (uint32_t)8 << 28;}\
+#define SDA_IN()    do{GPIOB->CRL &= 0X8FFFFFFF; GPIOB->CRL|= (uint32_t)8 << 28;}\
                     while(0)
 
-#define SDA_OUT()   do{GPIOB->CRL &= 0X0FFFFFFF; GPIOB->CRL|= (uint32_t)3 << 28;}\
+#define SDA_OUT()   do{GPIOB->CRL &= 0X3FFFFFFF; GPIOB->CRL|= (uint32_t)3 << 28;}\
                     while(0)
 
 //IO²Ù×÷º¯Êý

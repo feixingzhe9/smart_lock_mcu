@@ -41,7 +41,6 @@ uint8_t get_i2c_sda_in(void)
     return GPIO_ReadInputDataBit(I2C_SDA_PORT, I2C_SDA_PIN);
 }
 
-
 inline void set_i2c_sda_out_1(void)
 {
     //GPIO_SetBits(I2C_SDA_PORT, I2C_SDA_PIN);
@@ -53,7 +52,6 @@ inline void set_i2c_sda_out_0(void)
     //GPIO_ResetBits(I2C_SDA_PORT, I2C_SDA_PIN);
     I2C_SDA_PORT->BRR = I2C_SDA_PIN;
 }
-
 
 inline void set_i2c_scl_out_1(void)
 {
@@ -178,11 +176,15 @@ void IIC_Send_Byte(u8 txd)
     i2c_sda_out();
     //IIC_SCL=0;//拉低时钟开始数据传输
     set_i2c_scl_out_0();//set_i2c_scl_out(0);
-    delay_us(2);
+    delay_us(1);
     for(t=0;t<8;t++)
     {
+        delay_us(1);
+
         //IIC_SDA=(txd&0x80)>>7;
-        if((txd&0x80)>>7)
+
+        //if((txd & 0x80) >> 7)
+        if((txd & 0x80)/* >> 7*/)
         //IIC_SDA=1;
             set_i2c_sda_out_1();//set_i2c_sda_out(1);
         else
@@ -195,8 +197,12 @@ void IIC_Send_Byte(u8 txd)
         delay_us(2);
         //IIC_SCL=0;
         set_i2c_scl_out_0();//set_i2c_scl_out(0);
-        delay_us(2);
+        //delay_us(1);
     }
+
+
+    i2c_sda_in(); // touch chip would ack immediately after sending one byte, \
+                  // so we need to change sda to input mode quickly to preventing the step level voltage.
 }
 
 //读1个字节，ack=1时，发送ACK，ack=0，发送nACK

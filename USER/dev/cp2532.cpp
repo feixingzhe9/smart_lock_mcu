@@ -18,6 +18,7 @@ static u16 read_byte(u8 read_addr)
     IIC_Start();
     IIC_Send_Byte(I2C_CP2532_WRITE);  //·¢ËÍĞ´ÃüÁî
     ack_flag[0] = IIC_Wait_Ack();
+
     IIC_Send_Byte(read_addr);   //·¢ËÍµØÖ·
     ack_flag[1] = IIC_Wait_Ack();
     IIC_Stop();
@@ -25,6 +26,7 @@ static u16 read_byte(u8 read_addr)
     IIC_Start();
     IIC_Send_Byte(I2C_CP2532_READ); //·¢ËÍ¶ÁÃüÁî
     ack_flag[2] = IIC_Wait_Ack();
+
     high_data=IIC_Read_Byte(1);
     low_data=IIC_Read_Byte(0);
 
