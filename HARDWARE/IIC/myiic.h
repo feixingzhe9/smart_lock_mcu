@@ -18,8 +18,11 @@
 //#define SDA_IN()  {GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=8<<12;}
 //#define SDA_OUT() {GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=3<<12;}
 
-#define SDA_IN()  {GPIOB->CRL&=0X0FFFFFFF;GPIOB->CRL|=8<<28;}
-#define SDA_OUT() {GPIOB->CRL&=0X0FFFFFFF;GPIOB->CRL|=3<<28;}
+#define SDA_IN()    do{GPIOB->CRL &= 0X0FFFFFFF; GPIOB->CRL|= (uint32_t)8 << 28;}\
+                    while(0)
+
+#define SDA_OUT()   do{GPIOB->CRL &= 0X0FFFFFFF; GPIOB->CRL|= (uint32_t)3 << 28;}\
+                    while(0)
 
 //IO操作函数
 //#define IIC_SCL    PBout(10) //SCL
@@ -28,6 +31,16 @@
 #define IIC_SCL    PBout(6) //SCL
 #define IIC_SDA    PBout(7) //SDA
 #define READ_SDA   PBin(7)  //输入SDA
+
+
+
+#define I2C_SDA_PIN         GPIO_Pin_7
+#define I2C_SDA_PORT        GPIOB
+
+#define I2C_SCL_PIN         GPIO_Pin_6
+#define I2C_SCL_PORT        GPIOB
+
+#define RCC_APB2Periph_I2C_PORT     RCC_APB2Periph_GPIOB
 
 //IIC所有操作函数
 void i2c_init(void);                //初始化IIC的IO口
