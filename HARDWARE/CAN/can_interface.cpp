@@ -4,6 +4,7 @@
 #include "delay.h"
 #include "rfid.h"
 #include "cp2532.h"
+#include "beeper.h"
 #include "stmflash.h"
 
 #define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
@@ -510,6 +511,17 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                         return 0;
                     }
 
+                case CAN_SOURCE_ID_BEEPER_TIMES_CTRL:
+                    {
+                        if(data_in_len == 4)
+                        {
+                            beeper_times.times = data_in[0];
+                            beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
+                            beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
+                            beeper_times.frequency = data_in[3];
+                        }
+                    }
+                    break;
 
                 default :
                     break;

@@ -181,9 +181,76 @@ void beeper_ctrl(void)
 
 }
 
+struct beeper_times_t beeper_times = {0};
+void start_beeper(beeper_times_t data)
+{
+    beeper_times = data;
+}
+
+void beeper_times_exe(void)
+{
+//    static uint32_t start_tick = 0;
+    static uint8_t state = 0;
+
+    if(beeper_times.times > 0)
+    {
+        switch(state)
+        {
+            case 0:
+                if(beeper_times.start_tick == 0)
+                {
+                    beeper_on(0);
+                    beeper_times.start_tick = get_tick();
+                    state = 1;
+                }
+                else
+                {
+                    break;
+                }
+
+            case 1:
+                if(get_tick() - beeper_times.start_tick >= beeper_times.durantion / SYSTICK_PERIOD)
+                {
+                    beeper_times.start_tick = get_tick();
+                    beeper_off();
+                    state = 2;
+                }
+                else
+                {
+                    break;
+                }
+
+            case 2:
+                if(get_tick() - beeper_times.start_tick >= beeper_times.period / SYSTICK_PERIOD)
+                {
+                    beeper_times.start_tick = 0;
+                    if(beeper_times.times > 0)
+                    {
+                        beeper_times.times--;
+                    }
+                    state = 0;
+                }
+                else
+                {
+                    break;
+                }
+
+            default :
+                break;
+
+        }
+
+    }
+    else
+    {
+        state = 0;
+    }
+}
+
 void beeper_task(void)
 {
     beeper_ctrl();
+    beeper_times_exe();
 }
 
 
