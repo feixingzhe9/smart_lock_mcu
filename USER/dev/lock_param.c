@@ -4,12 +4,6 @@
 extern "C" {
 #endif
 
-enum LOCK
-{
-    LOCK_1 = 0,
-    LOCK_2,
-    LOCK_3
-};
 
 const struct gpio_in_int_param_t gpio_in_int_param[LOCK_NUM_MAX] =
 {

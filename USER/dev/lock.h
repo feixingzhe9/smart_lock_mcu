@@ -18,7 +18,7 @@ struct lock_lock_ctrl_t
     volatile u8 lock_array[LOCK_NUM_MAX];
     volatile u8 lock_cnt;
     volatile u8 to_unlock_cnt;
-    u32 start_tick;
+    volatile u32 start_tick;
 };
 
 class LockClass
@@ -28,8 +28,10 @@ class LockClass
         void start_to_unlock(void);
         void init(void);
         uint8_t get_lock_status(void);
+        uint8_t get_lock_status_debounce(void);
+        uint8_t is_lock_input_status_changed(void);
 
-        volatile bool lock_status;
+        volatile uint8_t current_lock_input_status;
 
 //        LockClass(gpio_t gpio_out, gpio_t gpio_in, u8 id, struct lock_lock_ctrl_t * lock_ctrl);
         LockClass(uint8_t id, struct lock_lock_ctrl_t * lock_ctrl);
@@ -49,6 +51,8 @@ class LockClass
         volatile u32 self_lock_start_tick;
         volatile u32 between_lock_start_tick;
 
+        uint8_t pre_lock_status;
+
         volatile bool self_lock;
 
         struct lock_lock_ctrl_t *lock_lock_ctrl;
@@ -63,6 +67,9 @@ class LockClass
     #define LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY   5
 
         u8 lock_machine_state;
+    #define LOCK_IN_STATE_DEBOUNCE_CNT              10
+        uint8_t debounce_cnt;
+        uint8_t previous_state;
 
         void lock_on(void);
         void lock_off(void);
@@ -76,7 +83,7 @@ class LockClass
 void all_lock_task(u32 tick);
 void start_to_unlock_all(void);
 void lock_init(void);
-void lock_in_status_task(void);
+void lock_input_status_task(void);
 void start_to_unlock(uint32_t lock);
 
 extern LockClass lock_1;

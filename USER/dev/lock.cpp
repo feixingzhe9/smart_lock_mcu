@@ -23,6 +23,9 @@ LockClass::LockClass(uint8_t id, struct lock_lock_ctrl_t * lock_ctrl)
     {
         printf("fatal: lock id CAN NOT be 0 ! ! !");
     }
+
+    debounce_cnt = 0;
+    pre_lock_status = 0;
 }
 
 void LockClass::init(void)
@@ -42,6 +45,7 @@ void LockClass::init(void)
     GPIO_Init(gpio_in_int_param[my_id - 1].out_port, &GPIO_InitStructure);
     GPIO_ResetBits(gpio_in_int_param[my_id - 1].out_port,gpio_in_int_param[my_id].out_pin);     // default value: reset
 
+
     //---- input GPIO config ----//
     if(gpio_in_int_param[my_id - 1].in_port == GPIOD)
     {
@@ -52,6 +56,7 @@ void LockClass::init(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(gpio_in_int_param[my_id - 1].in_port, &GPIO_InitStructure);
 
+#if 0
     //---- lock input interrupt config ----//
     EXTI_InitTypeDef exit_init_structure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -80,10 +85,11 @@ void LockClass::init(void)
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;           //子优先级3
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
+#endif
 
 
     is_need_to_unlock = false;
-    lock_status = false;
+    current_lock_input_status = 0;
     lock_machine_state = 0;
     lock_period_start_tick = 0;
     self_lock_start_tick = 0;
@@ -110,6 +116,52 @@ void LockClass::lock_off(void)
 uint8_t LockClass::get_lock_status(void)
 {
     return GPIO_ReadInputDataBit(gpio_in_int_param[my_id - 1].in_port, gpio_in_int_param[my_id - 1].in_pin);
+}
+
+uint8_t LockClass::get_lock_status_debounce(void)
+{
+    if(previous_state != this->get_lock_status())
+    {
+        this->debounce_cnt = 0;
+    }
+    else
+    {
+        debounce_cnt++;
+    }
+
+    previous_state = this->get_lock_status();
+
+    if(debounce_cnt >= LOCK_IN_STATE_DEBOUNCE_CNT)
+    {
+        debounce_cnt = LOCK_IN_STATE_DEBOUNCE_CNT;
+        return this->get_lock_status();
+    }
+
+    return 0xff;        //unstable state
+}
+
+uint8_t LockClass::is_lock_input_status_changed(void)
+{
+    uint8_t lock_status = 0;
+    uint8_t lock_status_tmp = 0;
+    uint8_t ret = 0xff;
+
+    if(lock_lock_ctrl->to_unlock_cnt == 0)
+    {
+        lock_status_tmp = this->get_lock_status_debounce();
+
+        if(lock_status_tmp != 0xff)  //normal status
+        {
+            lock_status = lock_status_tmp;
+            if(lock_status != pre_lock_status)
+            {
+                ret = lock_status;
+                current_lock_input_status = lock_status;
+            }
+            pre_lock_status = lock_status;
+        }
+    }
+    return ret;
 }
 
 bool LockClass::search_unlock_array(u8 id)
@@ -197,7 +249,7 @@ void LockClass::lock_task(u32 tick)
             {
                 this->lock_on();
                 this->lock_period_start_tick = tick;
-                this->lock_status = true;
+                //this->current_lock_input_status = true;
                 if(0 == this->between_lock_start_tick)
                 {
                     this->between_lock_start_tick = tick;
@@ -262,13 +314,9 @@ void LockClass::lock_task(u32 tick)
 }
 
 
-static void upload_lock_status(void)
+static void upload_lock_status(uint8_t *lock_status)
 {
     can_id_union id;
-    uint8_t lock_status[LOCK_NUM_MAX] = {0};
-    lock_status[0] = lock_1.get_lock_status();
-    lock_status[1] = lock_2.get_lock_status();
-    lock_status[2] = lock_3.get_lock_status();
 
     id.can_id_struct.source_id = CAN_SOURCE_ID_LOCK_STATUS_UPLOAD;
 
@@ -278,24 +326,43 @@ static void upload_lock_status(void)
     id.can_id_struct.ack = 0;
     id.can_id_struct.func_id = 0;
 
-    Can1_TX(id.can_id,lock_status, LOCK_NUM_MAX);
+    Can1_TX(id.can_id, lock_status, LOCK_NUM_MAX);
 }
 
-uint32_t lock_status_change_start_tick = 0;
-uint8_t is_lock_status_changed = 0;
-#define LOCK_IN_STATUS_STABLE_DELAY_TICK    100/SYSTICK_PERIOD
+//uint32_t lock_status_change_start_tick = 0;
+//uint8_t is_lock_status_changed = 0;
+//#define LOCK_IN_STATUS_STABLE_DELAY_TICK    100/SYSTICK_PERIOD
 
-void lock_in_status_task(void)
+#define LOCK_INPUT_DETECTION_PERIOD     10/SYSTICK_PERIOD
+void lock_input_status_task(void)
 {
-    if(lock_lock_ctrl.to_unlock_cnt == 0)
+    uint8_t lock_status[LOCK_NUM_MAX] = {0};
+    uint8_t lock_status_tmp[LOCK_NUM_MAX] = {0};
+    bool lock_status_changed_flag = false;
+    static uint32_t start_tick = 0;
+
+    if(get_tick() - start_tick >= LOCK_INPUT_DETECTION_PERIOD)
     {
-        if(is_lock_status_changed)
+        start_tick = get_tick();
+        lock_status_tmp[LOCK_1] = lock_1.is_lock_input_status_changed();
+        lock_status_tmp[LOCK_2] = lock_2.is_lock_input_status_changed();
+        lock_status_tmp[LOCK_3] = lock_3.is_lock_input_status_changed();
+
+        for(uint8_t i = LOCK_1; i < LOCK_NONE; i++)
         {
-            if(get_tick() - lock_status_change_start_tick >= LOCK_IN_STATUS_STABLE_DELAY_TICK)
+            if(lock_status_tmp[i] != 0xff)
             {
-                is_lock_status_changed = 0;
-                upload_lock_status();
+                lock_status_changed_flag = true;
+                break;
             }
+        }
+
+        if(true == lock_status_changed_flag)
+        {
+            lock_status[LOCK_1] = lock_1.current_lock_input_status;
+            lock_status[LOCK_2] = lock_2.current_lock_input_status;
+            lock_status[LOCK_3] = lock_3.current_lock_input_status;
+            upload_lock_status(lock_status);
         }
     }
 }

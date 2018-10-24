@@ -26,6 +26,13 @@
 #define LOCK_3_IN_PORT     GPIOD
 #define LOCK_3_IN_PIN      GPIO_Pin_11
 
+enum LOCK
+{
+    LOCK_1 = 0,
+    LOCK_2,
+    LOCK_3,
+    LOCK_NONE
+};
 
 struct gpio_in_int_param_t
 {

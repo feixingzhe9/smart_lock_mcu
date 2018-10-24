@@ -196,7 +196,7 @@ void beeper_times_exe(void)
     {
         switch(state)
         {
-            case 0:
+            case 0:     //开始蜂鸣
                 if(beeper_times.start_tick == 0)
                 {
                     beeper_on(0);
@@ -208,7 +208,7 @@ void beeper_times_exe(void)
                     break;
                 }
 
-            case 1:
+            case 1: //蜂鸣特定时间后，停止蜂鸣
                 if(get_tick() - beeper_times.start_tick >= beeper_times.durantion / SYSTICK_PERIOD)
                 {
                     beeper_times.start_tick = get_tick();
@@ -220,7 +220,7 @@ void beeper_times_exe(void)
                     break;
                 }
 
-            case 2:
+            case 2: //停止蜂鸣特定时间后，开始下一个周期
                 if(get_tick() - beeper_times.start_tick >= beeper_times.period / SYSTICK_PERIOD)
                 {
                     beeper_times.start_tick = 0;

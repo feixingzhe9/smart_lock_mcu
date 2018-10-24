@@ -439,7 +439,7 @@ void CanLongBufInit(void)
 
 
 
-char sw_version[] = "MCU_Smart_Lock_002";
+char sw_version[] = "MCU_Smart_Lock_003";
 #define CMD_NOT_FOUND   0
 uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t data_in_len, uint8_t *data_out)
 {
@@ -519,6 +519,10 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                             beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
                             beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
                             beeper_times.frequency = data_in[3];
+                        }
+                        else
+                        {
+                            printf("CAN_SOURCE_ID_BEEPER_TIMES_CTRL  param length error: %d", data_in_len);
                         }
                     }
                     break;

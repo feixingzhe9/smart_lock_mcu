@@ -105,14 +105,14 @@ void EXTI4_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-
+#if 0
     if(EXTI_GetITStatus(EXTI_Line9) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line9);
         lock_status_change_start_tick = get_tick();
         is_lock_status_changed = 1;
     }
-
+#endif
     //printf("exti at pc6\r\n");
     if(EXTI_GetITStatus(EXTI_Line6) != RESET)
     {
