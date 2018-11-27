@@ -527,6 +527,12 @@ uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t 
                     }
                     break;
 
+                case CAN_SOURCE_ID_GET_DOORS_STATE:
+                    data_out[0] = lock_1.current_lock_input_status;
+                    data_out[1] = lock_2.current_lock_input_status;
+                    data_out[2] = lock_3.current_lock_input_status;
+                    return 3;
+
                 default :
                     break;
             }

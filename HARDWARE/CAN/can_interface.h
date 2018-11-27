@@ -40,8 +40,8 @@
 #define CAN_SOURCE_ID_LOCK_STATUS_UPLOAD        0xa1
 
 #define CAN_SOURCE_ID_BEEPER_TIMES_CTRL         0xb0
+#define CAN_SOURCE_ID_GET_DOORS_STATE           0xb1
 
-#define CAN_SOURCE_ID_CAN_LOAD_TEST     0xff
 
 
 

@@ -77,7 +77,7 @@ static u16 get_key_interrupt(void)
 }
 #endif
 
-
+#if 0
 static uint16_t set_gcr_register(uint16_t value)
 {
     return write_byte(I2C_CP2532_GCR_ADDR, value);
@@ -97,6 +97,7 @@ static uint16_t get_idle_cfg_register(void)
 {
     return read_byte(I2C_CP2532_IDLE_CFG_ADDR);
 }
+#endif
 
 u16 quick_read(void)
 {

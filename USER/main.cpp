@@ -14,11 +14,9 @@
 #include "qr_code.h"
 #include "motor.h"
 
-//#define CAN_LOAD_TEST
 
-#ifdef CAN_LOAD_TEST
-void can_bus_load_test(void);
-#endif
+
+
 static void init()
 {
     sys_tick_init();
@@ -61,45 +59,6 @@ int main(void)
         motor_task();
         lock_input_status_task();
         sys_indicator();
-
-#ifdef CAN_LOAD_TEST
-        can_bus_load_test();
-#endif
     }
 }
 
-
-
-#ifdef CAN_LOAD_TEST
-void can_bus_load_test(void)
-{
-    static uint32_t test_cnt = 0;
-    uint8_t data_1[] = "0000abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890! test 2";
-    uint8_t data_2[] = "00001234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz!test 1";
-
-    can_id_union id;
-    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
-    id.can_id_struct.source_id = CAN_SOURCE_ID_CAN_LOAD_TEST;
-    id.can_id_struct.res = 0;
-    id.can_id_struct.ack = 0;
-    id.can_id_struct.func_id = 0;
-
-    while(1)
-    {
-        if(test_cnt % 2)
-        {
-            memset(&data_1[0], 0, 4);
-            *(uint32_t *)&(data_1[0]) = test_cnt;
-            Can1_TX( id.can_id, data_1, sizeof(data_1));
-        }
-        else
-        {
-            memset(&data_2[0], 0, 4);
-            *(uint32_t *)&(data_2[0]) = test_cnt;
-            Can1_TX( id.can_id, data_2, sizeof(data_2));
-        }
-//        delay_ms(2);
-        test_cnt++;
-    }
-}
-#endif
