@@ -439,7 +439,7 @@ void CanLongBufInit(void)
 
 
 
-char sw_version[] = "MCU_Smart_Lock_003";
+char sw_version[] = "MCU_Smart_Lock_004";
 #define CMD_NOT_FOUND   0
 uint16_t cmd_procesing(can_id_union *id, const uint8_t *data_in, const uint16_t data_in_len, uint8_t *data_out)
 {

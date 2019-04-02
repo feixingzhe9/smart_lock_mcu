@@ -146,7 +146,7 @@ uint8_t LockClass::is_lock_input_status_changed(void)
     uint8_t lock_status_tmp = 0;
     uint8_t ret = 0xff;
 
-    if(lock_lock_ctrl->to_unlock_cnt == 0)
+//    if(lock_lock_ctrl->to_unlock_cnt == 0)
     {
         lock_status_tmp = this->get_lock_status_debounce();
 

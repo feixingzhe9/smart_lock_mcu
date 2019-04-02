@@ -67,7 +67,7 @@ class LockClass
     #define LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY   5
 
         u8 lock_machine_state;
-    #define LOCK_IN_STATE_DEBOUNCE_CNT              10
+    #define LOCK_IN_STATE_DEBOUNCE_CNT              3
         uint8_t debounce_cnt;
         uint8_t previous_state;
 
