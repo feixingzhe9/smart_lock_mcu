@@ -8,6 +8,7 @@ struct lock_lock_ctrl_t lock_lock_ctrl;
 LockClass lock_1(1, &lock_lock_ctrl);
 LockClass lock_2(2, &lock_lock_ctrl);
 LockClass lock_3(3, &lock_lock_ctrl);
+LockClass lock_4(4, &lock_lock_ctrl);
 
 
 LockClass::LockClass(uint8_t id, struct lock_lock_ctrl_t * lock_ctrl)
@@ -347,8 +348,9 @@ void lock_input_status_task(void)
         lock_status_tmp[LOCK_1] = lock_1.is_lock_input_status_changed();
         lock_status_tmp[LOCK_2] = lock_2.is_lock_input_status_changed();
         lock_status_tmp[LOCK_3] = lock_3.is_lock_input_status_changed();
+        lock_status_tmp[LOCK_4] = lock_3.is_lock_input_status_changed();
 
-        for(uint8_t i = LOCK_1; i < LOCK_NONE; i++)
+        for(uint8_t i = LOCK_1; i < LOCK_NUM_MAX; i++)
         {
             if(lock_status_tmp[i] != 0xff)
             {
@@ -362,6 +364,7 @@ void lock_input_status_task(void)
             lock_status[LOCK_1] = lock_1.current_lock_input_status;
             lock_status[LOCK_2] = lock_2.current_lock_input_status;
             lock_status[LOCK_3] = lock_3.current_lock_input_status;
+            lock_status[LOCK_4] = lock_3.current_lock_input_status;
             upload_lock_status(lock_status);
         }
     }
@@ -374,6 +377,7 @@ void all_lock_task(u32 tick)
     lock_1.lock_task(tick);
     lock_2.lock_task(tick);
     lock_3.lock_task(tick);
+    lock_4.lock_task(tick);
 }
 
 
@@ -403,6 +407,10 @@ void start_to_unlock(uint32_t lock)
     {
         lock_3.start_to_unlock();
     }
+    if(lock & (1 << 3))
+    {
+        lock_4.start_to_unlock();
+    }
 
 }
 
@@ -412,4 +420,5 @@ void lock_init(void)
     lock_1.init();
     lock_2.init();
     lock_3.init();
+    lock_4.init();
 }

@@ -1,6 +1,6 @@
 #include "led.h"
 
-LEDClass LED;
+//LEDClass LED;
 
 LEDClass::LEDClass(void)
 {
@@ -26,32 +26,32 @@ void LEDClass::led_off(void)
 }
 
 
-#define INDICATOR_LED_PERIOD        500/SYSTICK_PERIOD
-#define INDICATOR_LED_PERIOD_ERR    200/SYSTICK_PERIOD
+//#define INDICATOR_LED_PERIOD        500/SYSTICK_PERIOD
+//#define INDICATOR_LED_PERIOD_ERR    200/SYSTICK_PERIOD
 
-static uint32_t indicator_period = INDICATOR_LED_PERIOD;
-void sys_indicator(void)
-{
-    static u16 cnt = 0;
-    static u32 start_tick = 0;
+//static uint32_t indicator_period = INDICATOR_LED_PERIOD;
+//void sys_indicator(void)
+//{
+//static u16 cnt = 0;
+//static u32 start_tick = 0;
 
-    if(sys_err & SYS_CP2532_INIT_ERR)
-    {
-        indicator_period = INDICATOR_LED_PERIOD_ERR;
-    }
+//if(sys_err & SYS_CP2532_INIT_ERR)
+//{
+//    indicator_period = INDICATOR_LED_PERIOD_ERR;
+//}
 
-    if(get_tick() - start_tick >= indicator_period)
-    {
-        cnt++;
+//if(get_tick() - start_tick >= indicator_period)
+//{
+//    cnt++;
 
-        if(cnt % 2 == 1)
-        {
-            LED.led_on();
-        }
-        else
-        {
-            LED.led_off();
-        }
-        start_tick = get_tick();
-    }
-}
+//    if(cnt % 2 == 1)
+//    {
+//        LED.led_on();
+//    }
+//    else
+//    {
+//        LED.led_off();
+//    }
+//    start_tick = get_tick();
+//}
+//}

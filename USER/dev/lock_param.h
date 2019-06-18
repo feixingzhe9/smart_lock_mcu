@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 
-#define LOCK_NUM_MAX        3
+//#define LOCK_NUM_MAX        4
 
 #define LOCK_1_OUT_PORT     GPIOG
 #define LOCK_1_OUT_PIN      GPIO_Pin_5
@@ -16,6 +16,8 @@
 #define LOCK_3_OUT_PORT     GPIOG
 #define LOCK_3_OUT_PIN      GPIO_Pin_3
 
+#define LOCK_4_OUT_PORT     GPIOG
+#define LOCK_4_OUT_PIN      GPIO_Pin_2
 
 #define LOCK_1_IN_PORT     GPIOD
 #define LOCK_1_IN_PIN      GPIO_Pin_9
@@ -26,12 +28,16 @@
 #define LOCK_3_IN_PORT     GPIOD
 #define LOCK_3_IN_PIN      GPIO_Pin_11
 
+#define LOCK_4_IN_PORT     GPIOD
+#define LOCK_4_IN_PIN      GPIO_Pin_12
+
 enum LOCK
 {
     LOCK_1 = 0,
     LOCK_2,
     LOCK_3,
-    LOCK_NONE
+    LOCK_4,
+    LOCK_NUM_MAX
 };
 
 struct gpio_in_int_param_t

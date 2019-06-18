@@ -46,6 +46,18 @@ const struct gpio_in_int_param_t gpio_in_int_param[LOCK_NUM_MAX] =
         .gpio_port_int_source = GPIO_PortSourceGPIOD,
         .gpio_pin_int_source = GPIO_PinSource11,
     },
+    [LOCK_4] =
+    {
+        .out_port = LOCK_4_OUT_PORT,
+        .out_pin = LOCK_4_OUT_PIN,
+        .in_port = LOCK_4_IN_PORT,
+        .in_pin = LOCK_4_IN_PIN,
+
+        .nvic_irq_channel = EXTI15_10_IRQn,
+        .exit_line = EXTI_Line12,
+        .gpio_port_int_source = GPIO_PortSourceGPIOD,
+        .gpio_pin_int_source = GPIO_PinSource12,
+    },
 
 };
 

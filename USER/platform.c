@@ -8,7 +8,7 @@
 #include "can.h"
 #include "sys.h"
 #include "delay.h"
-#include "sanwei_rfid.h"
+//#include "sanwei_rfid.h"
 
 sys_status_t sys_status_ram = {0};
 sys_status_t *sys_status = &sys_status_ram;
