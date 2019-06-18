@@ -10,7 +10,7 @@
 
 //0,不支持ucos
 //1,支持ucos
-#define SYSTEM_SUPPORT_UCOS     0   //定义系统文件夹是否支持UCOS
+#define SYSTEM_SUPPORT_UCOS     1   //定义系统文件夹是否支持UCOS
 
 
 //位带操作,实现51类似的GPIO控制功能
@@ -64,6 +64,7 @@
 
 #define SYS_CP2532_INIT_ERR     (0x00000001)
 
+typedef enum {FALSE = 0, TRUE = !FALSE} _bool;
 
 void platform_mcu_reset(void);
 extern void sys_tick_init(void);

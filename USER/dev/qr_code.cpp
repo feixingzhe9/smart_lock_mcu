@@ -1,5 +1,5 @@
 #include "qr_code.h"
-#include "can_interface.h"
+//#include "can_interface.h"
 #include "usart.h"
 
 QRCodeClass qr_code_1(1);
@@ -52,31 +52,31 @@ u8 qr_test_data_2[QR_DATA_LENTH] = {0};
 u8 qr_test_data_3[QR_DATA_LENTH] = {0};
 void QRCodeClass::upload_qr_data(void)  //upload data through CAN bus
 {
-    can_id_union id;
-    switch(this->my_id)
-    {
-        case 1:
-            memcpy(qr_test_data_1, this->qr_data, sizeof(this->qr_data));
-            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_1;
-            break;
-        case 2:
-            memcpy(qr_test_data_2, this->qr_data, sizeof(this->qr_data));
-            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_2;
-            break;
-        case 3:
-            memcpy(qr_test_data_3, this->qr_data, sizeof(this->qr_data));
-            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_3;
-            break;
-        default : break;
-    }
+//    can_id_union id;
+//    switch(this->my_id)
+//    {
+//        case 1:
+//            memcpy(qr_test_data_1, this->qr_data, sizeof(this->qr_data));
+//            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_1;
+//            break;
+//        case 2:
+//            memcpy(qr_test_data_2, this->qr_data, sizeof(this->qr_data));
+//            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_2;
+//            break;
+//        case 3:
+//            memcpy(qr_test_data_3, this->qr_data, sizeof(this->qr_data));
+//            id.can_id_struct.source_id = CAN_SOURCE_ID_QR_CODE_UPLOAD_3;
+//            break;
+//        default : break;
+//    }
 
-    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+//    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
 
-    id.can_id_struct.res = 0;
-    id.can_id_struct.ack = 0;
-    id.can_id_struct.func_id = 0;
+//    id.can_id_struct.res = 0;
+//    id.can_id_struct.ack = 0;
+//    id.can_id_struct.func_id = 0;
 
-    Can1_TX(id.can_id,this->qr_data, this->data_cnt);
+//    Can1_TX(id.can_id,this->qr_data, this->data_cnt);
 
 }
 

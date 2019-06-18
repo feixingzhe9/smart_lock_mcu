@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER,CP2532_INT_ENABLE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\LED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\RTC;..\HARDWARE\RTC;..\HARDWARE\WKUP;..\HARDWARE\ADC;..\HARDWARE\DAC;..\HARDWARE\DMA;..\HARDWARE\IIC;..\HARDWARE\24CXX;..\HARDWARE\SPI;..\HARDWARE\FLASH;..\HARDWARE\RFID;..\HARDWARE\CAN;.\dev;..\SYSTEM;..\HARDWARE\STMFLASH;..\HARDWARE\TIMER</IncludePath>
+              <IncludePath>..\HARDWARE\LED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\RTC;..\HARDWARE\RTC;..\HARDWARE\WKUP;..\HARDWARE\ADC;..\HARDWARE\DAC;..\HARDWARE\DMA;..\HARDWARE\IIC;..\HARDWARE\24CXX;..\HARDWARE\SPI;..\HARDWARE\FLASH;..\HARDWARE\RFID;..\HARDWARE\CAN;.\dev;..\SYSTEM;..\HARDWARE\STMFLASH;..\HARDWARE\TIMER;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\task;..\module</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -443,6 +443,76 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\common.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>TASK</GroupName>
+          <Files>
+            <File>
+              <FileName>can_protocol_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\task\can_protocol_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>charge_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\task\charge_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>conveyor_belt_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\task\conveyor_belt_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>led_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\task\led_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>sanwei_rfid_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\task\sanwei_rfid_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>switch_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\task\switch_task.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>MODULE</GroupName>
+          <Files>
+            <File>
+              <FileName>can_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\can_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>conveyor_belt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\conveyor_belt.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\motor_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>photoelectric_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\photoelectric_switch.c</FilePath>
+            </File>
+            <File>
+              <FileName>sanwei_rfid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\module\sanwei_rfid.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -868,6 +938,96 @@
               <FileName>stm32f10x_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\STM32F10x_FWLib\src\stm32f10x_flash.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UCOSII-CORE</GroupName>
+          <Files>
+            <File>
+              <FileName>os_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_flag.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_flag.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_mbox.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_mbox.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_mem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_mutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_mutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_q.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_q.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_sem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_sem.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_time.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_time.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_tmr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\CORE\os_tmr.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UCOSII-PORT</GroupName>
+          <Files>
+            <File>
+              <FileName>os_cpu_c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\PORT\os_cpu_c.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_dbg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UCOSII\PORT\os_dbg.c</FilePath>
+            </File>
+            <File>
+              <FileName>os_cpu_a.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\UCOSII\PORT\os_cpu_a.asm</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>UCOSII-CONFIG</GroupName>
+          <Files>
+            <File>
+              <FileName>includes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\UCOSII\CONFIG\includes.h</FilePath>
+            </File>
+            <File>
+              <FileName>os_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\UCOSII\CONFIG\os_cfg.h</FilePath>
             </File>
           </Files>
         </Group>

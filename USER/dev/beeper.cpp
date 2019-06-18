@@ -89,26 +89,26 @@ void beeper_off(void)
 void beeper_ctrl(void)
 {
     static bool beeper_status = false;
-    static uint16_t key_value_last = 0;
+    //static uint16_t key_value_last = 0;
     static uint8_t beeper_machine = 0;
     static uint32_t beeper_start_tick = 0;
     static uint32_t beeper_on_period = 0;
     static uint32_t beeper_delay_on_start_tick = 0;
-    uint16_t key_value = get_key_value();
+//    uint16_t key_value = get_key_value();
 
     do
     {
-        if(key_value != key_value_last)
-        {
-            key_value_last = key_value;
-            if(key_value > 0)
-            {
-                beeper_on_period = TOUCH_KEY_BEEPER_TIME;
-                beeper_machine = 1;
-                beeper_start_tick = get_tick();
-                break;
-            }
-        }
+//        if(key_value != key_value_last)
+//        {
+//            key_value_last = key_value;
+//            if(key_value > 0)
+//            {
+//                beeper_on_period = TOUCH_KEY_BEEPER_TIME;
+//                beeper_machine = 1;
+//                beeper_start_tick = get_tick();
+//                break;
+//            }
+//        }
 
         if(rfid_start_tick != 0)
         {

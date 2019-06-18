@@ -1,6 +1,6 @@
 #include "lock.h"
 #include "lock_param.h"
-#include "can_interface.h"
+//#include "can_interface.h"
 
 struct lock_lock_ctrl_t lock_lock_ctrl;
 
@@ -316,17 +316,17 @@ void LockClass::lock_task(u32 tick)
 
 static void upload_lock_status(uint8_t *lock_status)
 {
-    can_id_union id;
+//    can_id_union id;
 
-    id.can_id_struct.source_id = CAN_SOURCE_ID_LOCK_STATUS_UPLOAD;
+//    id.can_id_struct.source_id = CAN_SOURCE_ID_LOCK_STATUS_UPLOAD;
 
-    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+//    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
 
-    id.can_id_struct.res = 0;
-    id.can_id_struct.ack = 0;
-    id.can_id_struct.func_id = 0;
+//    id.can_id_struct.res = 0;
+//    id.can_id_struct.ack = 0;
+//    id.can_id_struct.func_id = 0;
 
-    Can1_TX(id.can_id, lock_status, LOCK_NUM_MAX);
+//    Can1_TX(id.can_id, lock_status, LOCK_NUM_MAX);
 }
 
 //uint32_t lock_status_change_start_tick = 0;

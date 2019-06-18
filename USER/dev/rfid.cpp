@@ -5,16 +5,16 @@
 #include "rfid.h"
 #include "usart.h"
 #include "delay.h"
-#include "can_interface.h"
+//#include "can_interface.h"
 #include "lock.h"
 
 //MFRC522 mfrc522_B(chipSelectPinRfid2, resetPowerDownPinRfid2, &SPI_2, SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0, SPI2));
 MFRC522 mfrc522_A(chipSelectPinRfid1, resetPowerDownPinRfid1, &SPI_1, SPISettings(SPI_CLOCK_DIV8, MSBFIRST, SPI_MODE0, SPI1));
 static MFRC522 *mfrc522 = &mfrc522_A;
 
-static can_message_t upload_msg;
+//static can_message_t upload_msg;
 
-static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, const byte *buffer_key);
+//static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, const byte *buffer_key);
 
 
 
@@ -181,7 +181,7 @@ void rfid_task()
             printf("\r\n");
 //            uart_print_type_and_key(buffer_type, buffer_key);
 
-            upload_rfid_data(&upload_msg, buffer_type, buffer_key);
+            //upload_rfid_data(&upload_msg, buffer_type, buffer_key);
             u16 rfid_int = buffer_key[14];
             rfid_int = rfid_int<<8;
             rfid_int += buffer_key[15];
@@ -202,25 +202,25 @@ void rfid_task()
     return;
 }
 
-static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, const byte *buffer_key)
-{
-    if (!rfid_msg || !buffer_type || !buffer_key) return;
+//static void upload_rfid_data(can_message_t *rfid_msg, const byte *buffer_type, const byte *buffer_key)
+//{
+//    if (!rfid_msg || !buffer_type || !buffer_key) return;
 
-    can_id_union id;
-    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
-    id.can_id_struct.source_id = CAN_SOURCE_ID_RFID_UPLOAD;
-    id.can_id_struct.res = 0;
-    id.can_id_struct.ack = 0;
-    id.can_id_struct.func_id = 0;
+//    can_id_union id;
+//    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+//    id.can_id_struct.source_id = CAN_SOURCE_ID_RFID_UPLOAD;
+//    id.can_id_struct.res = 0;
+//    id.can_id_struct.ack = 0;
+//    id.can_id_struct.func_id = 0;
 
-    rfid_msg->id = id.can_id;
-    rfid_msg->data[0] = 0x00;
-    memcpy( (void *)&rfid_msg->data[1], buffer_key + 12, 4 );
-    rfid_msg->data_len = 5;
-    can.can_send( rfid_msg );
+//    rfid_msg->id = id.can_id;
+//    rfid_msg->data[0] = 0x00;
+//    memcpy( (void *)&rfid_msg->data[1], buffer_key + 12, 4 );
+//    rfid_msg->data_len = 5;
+//    can.can_send( rfid_msg );
 
-    return;
-}
+//    return;
+//}
 
 #if 0
 static void uart_print_type_and_key(byte *buffer_type, byte *buffer_key)

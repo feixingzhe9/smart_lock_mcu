@@ -22,10 +22,10 @@ void sys_tick_init(void)
 
 volatile uint32_t sys_tick_cnt = 0;
 
-uint32_t get_tick(void)
-{
-    return sys_tick_cnt;
-}
+//uint32_t get_tick(void)
+//{
+//    return sys_tick_cnt;
+//}
 
 void platform_mcu_reset(void)
 {

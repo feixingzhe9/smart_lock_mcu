@@ -1,6 +1,6 @@
 #include "cp2532.h"
 #include "myiic.h"
-#include "can_interface.h"
+//#include "can_interface.h"
 #include "delay.h"
 #include <string.h>
 #include "lock.h"
@@ -118,19 +118,19 @@ u16 quick_read(void)
 //----  test code ----//
 static void upload_touch_key_data(u16 key_value)
 {
-    can_message_t touch_key_test = {0};
-    can_id_union id;
-    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
-    id.can_id_struct.source_id = CAN_SOURCE_ID_KEY_TEST_UPLOAD;
-    id.can_id_struct.res = 0;
-    id.can_id_struct.ack = 0;
-    id.can_id_struct.func_id = 0;
+//    can_message_t touch_key_test = {0};
+//    can_id_union id;
+//    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+//    id.can_id_struct.source_id = CAN_SOURCE_ID_KEY_TEST_UPLOAD;
+//    id.can_id_struct.res = 0;
+//    id.can_id_struct.ack = 0;
+//    id.can_id_struct.func_id = 0;
 
-    touch_key_test.id = id.can_id;
-    touch_key_test.data[0] = 0x00;
-    *(u16 *)&(touch_key_test.data[1]) = key_value;
-    touch_key_test.data_len = 3;
-    can.can_send( &touch_key_test );
+//    touch_key_test.id = id.can_id;
+//    touch_key_test.data[0] = 0x00;
+//    *(u16 *)&(touch_key_test.data[1]) = key_value;
+//    touch_key_test.data_len = 3;
+//    can.can_send( &touch_key_test );
 }
 
 void set_key_value(u16 key_vlaue)
@@ -319,19 +319,19 @@ static void insert_one_pass_word(pass_word_t *key_info)
 
 static void upload_password(const char *password)
 {
-    can_message_t password_msg;
-    can_id_union id;
-    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
-    id.can_id_struct.source_id = CAN_SOURCE_ID_PW_UPLOAD;
-    id.can_id_struct.res = 0;
-    id.can_id_struct.ack = 0;
-    id.can_id_struct.func_id = 0;
+//    can_message_t password_msg;
+//    can_id_union id;
+//    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+//    id.can_id_struct.source_id = CAN_SOURCE_ID_PW_UPLOAD;
+//    id.can_id_struct.res = 0;
+//    id.can_id_struct.ack = 0;
+//    id.can_id_struct.func_id = 0;
 
-    password_msg.id = id.can_id;
-    password_msg.data[0] = 0x00;
-    memcpy( (void *)&password_msg.data[1], password, 4 );
-    password_msg.data_len = 5;
-    can.can_send( &password_msg );
+//    password_msg.id = id.can_id;
+//    password_msg.data[0] = 0x00;
+//    memcpy( (void *)&password_msg.data[1], password, 4 );
+//    password_msg.data_len = 5;
+//    can.can_send( &password_msg );
 }
 
 
