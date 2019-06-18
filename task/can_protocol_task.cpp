@@ -212,12 +212,12 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
                     }
                     return CMD_NOT_FOUND;
 
-                case CAN_SOURCE_ID_UNLOCK:
-                    {
-                        u32 to_unlock = *(u32 *)&data_in[0];
-                        start_to_unlock(to_unlock);
-                        return 0;
-                    }
+//                case CAN_SOURCE_ID_UNLOCK:
+//                    {
+//                        u32 to_unlock = *(u32 *)&data_in[0];
+//                        start_to_unlock(to_unlock);
+//                        return 0;
+//                    }
 
                 case CAN_SOURCE_ID_SET_SUPER_RFID:
                     {
@@ -253,27 +253,27 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
 //                        return 0;
 //                    }
 
-                case CAN_SOURCE_ID_BEEPER_TIMES_CTRL:
-                    {
-                        if(data_in_len == 4)
-                        {
-                            beeper_times.times = data_in[0];
-                            beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
-                            beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
-                            beeper_times.frequency = data_in[3];
-                        }
-                        else
-                        {
-                            printf("CAN_SOURCE_ID_BEEPER_TIMES_CTRL  param length error: %d", data_in_len);
-                        }
-                    }
-                    break;
+//                case CAN_SOURCE_ID_BEEPER_TIMES_CTRL:
+//                    {
+//                        if(data_in_len == 4)
+//                        {
+//                            beeper_times.times = data_in[0];
+//                            beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
+//                            beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
+//                            beeper_times.frequency = data_in[3];
+//                        }
+//                        else
+//                        {
+//                            printf("CAN_SOURCE_ID_BEEPER_TIMES_CTRL  param length error: %d", data_in_len);
+//                        }
+//                    }
+//                    break;
 
-                case CAN_SOURCE_ID_GET_DOORS_STATE:
-                    data_out[0] = lock_1.current_lock_input_status;
-                    data_out[1] = lock_2.current_lock_input_status;
-                    data_out[2] = lock_3.current_lock_input_status;
-                    return 3;
+//                case CAN_SOURCE_ID_GET_DOORS_STATE:
+//                    data_out[0] = lock_1.current_lock_input_status;
+//                    data_out[1] = lock_2.current_lock_input_status;
+//                    data_out[2] = lock_3.current_lock_input_status;
+//                    return 3;
 
 
                 default :

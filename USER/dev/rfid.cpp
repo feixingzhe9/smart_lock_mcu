@@ -53,13 +53,13 @@ static bool match_rfid(const char *rfid_in_flash, const char *rfid)
     return true;
 }
 
-static void super_rfid_unlock_proc(const char *rfid_in_flash, const char *rfid)
-{
-    if(match_rfid(rfid_in_flash, rfid) == true)
-    {
-        start_to_unlock(0xffffffff);
-    }
-}
+//static void super_rfid_unlock_proc(const char *rfid_in_flash, const char *rfid)
+//{
+//    if(match_rfid(rfid_in_flash, rfid) == true)
+//    {
+//        start_to_unlock(0xffffffff);
+//    }
+//}
 
 
 static void init_exti(void)
@@ -185,12 +185,12 @@ void rfid_proc()
             //upload_rfid_data(&upload_msg, buffer_type, buffer_key);
             extern void upload_rfid_data(const uint8_t *buffer_key);
             upload_rfid_data(&buffer_key[12]);
-            u16 rfid_int = buffer_key[14];
-            rfid_int = rfid_int<<8;
-            rfid_int += buffer_key[15];
-            char rfid_str[10] = {0};
-            build_rfid(rfid_int, rfid_str);
-            super_rfid_unlock_proc(rfid_in_flash, rfid_str);
+//            u16 rfid_int = buffer_key[14];
+//            rfid_int = rfid_int<<8;
+//            rfid_int += buffer_key[15];
+//            char rfid_str[10] = {0};
+//            build_rfid(rfid_int, rfid_str);
+//            super_rfid_unlock_proc(rfid_in_flash, rfid_str);
 
             rfid_start_tick = get_tick();
 

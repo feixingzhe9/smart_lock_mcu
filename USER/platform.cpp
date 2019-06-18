@@ -65,5 +65,5 @@ void user_param_init(void)
     uint16_t id = get_id();
     rfid_src_mac_id = id + RFID_CAN_MAC_SRC_ID_BASE;
 //    rfid_src_mac_id = get_id() + RFID_CAN_MAC_SRC_ID_BASE;
-    //rfid_src_mac_id = 0xd6;
+    rfid_src_mac_id = 0xd6;
 }

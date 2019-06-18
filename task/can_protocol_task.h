@@ -16,8 +16,8 @@ void can_protocol_task(void *pdata);
 void can_send_task(void *pdata);
 
 
-#define HW_VERSION                      "M30_SUNWAY_INTE_V0.1"
-#define SW_VERSION                      "MCU_CONVEYOR_V102"
+#define HW_VERSION                      "M30_RFID_V0.1"
+#define SW_VERSION                      "MCU_M30_RFID_0.0.1"
 #define PROTOCOL_VERSION                "20170619P0001"
 
 #define CMD_NOT_FOUND   0
@@ -56,16 +56,16 @@ void can_send_task(void *pdata);
 #define CAN_SOURCE_ID_SET_SUPER_PW              0x84
 #define CAN_SOURCE_ID_SET_SUPER_RFID            0x85
 
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD_1          0x90
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD_2          0x91
-#define CAN_SOURCE_ID_QR_CODE_UPLOAD_3          0x92
+//#define CAN_SOURCE_ID_QR_CODE_UPLOAD_1          0x90
+//#define CAN_SOURCE_ID_QR_CODE_UPLOAD_2          0x91
+//#define CAN_SOURCE_ID_QR_CODE_UPLOAD_3          0x92
 
 #define CAN_SOURCE_ID_KEY_TEST_UPLOAD           0xa0
 
-#define CAN_SOURCE_ID_LOCK_STATUS_UPLOAD        0xa1
+//#define CAN_SOURCE_ID_LOCK_STATUS_UPLOAD        0xa1
 
-#define CAN_SOURCE_ID_BEEPER_TIMES_CTRL         0xb0
-#define CAN_SOURCE_ID_GET_DOORS_STATE           0xb1
+//#define CAN_SOURCE_ID_BEEPER_TIMES_CTRL         0xb0
+//#define CAN_SOURCE_ID_GET_DOORS_STATE           0xb1
 
 
 #define CAN_ONE_FRAME_DATA_LENTH    7
