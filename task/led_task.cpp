@@ -14,6 +14,7 @@ OS_STK indicator_led_task_stk[INDICATOR_LED_STK_SIZE];
 void indicator_led_task(void *pdata)
 {
     delay_ms(500);
+    LED.init();
     while(1)
     {
         LED.led_on();

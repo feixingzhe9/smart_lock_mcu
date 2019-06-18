@@ -3,7 +3,7 @@
 
 #include "sys.h"
 #include <stdio.h>
-#include "lock_param.h"
+#include "param.h"
 
 
 //struct gpio_t

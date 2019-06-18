@@ -4,35 +4,16 @@
  */
 
 #include "platform.h"
-//#include "led.h"
 #include "can.h"
 #include "sys.h"
 #include "delay.h"
-//#include "sanwei_rfid.h"
+#include "param.h"
+#include "rfid.h"
+
 
 sys_status_t sys_status_ram = {0};
 sys_status_t *sys_status = &sys_status_ram;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-const platform_gpio_t platform_gpio_pins[] =
-{
-    [PLATFORM_GPIO_SYS_LED]                     = { GPIOB,  GPIO_Pin_3},
-
-    [PLATFORM_GPIO_PHO_SWITCH_3]                = {GPIOB, GPIO_Pin_4},
-    [PLATFORM_GPIO_PHO_SWITCH_2]                = {GPIOB, GPIO_Pin_5},
-    [PLATFORM_GPIO_PHO_SWITCH_1]                = {GPIOB, GPIO_Pin_6},
-    [PLATFORM_GPIO_MOTOR_DIR]                   = {GPIOA, GPIO_Pin_6},
-    [PLATFORM_GPIO_MOTOR_EN]                    = {GPIOA, GPIO_Pin_5},
-    [PLATFORM_GPIO_MOTOR_PWR_EN]                = {GPIOA, GPIO_Pin_4},
-    [PLATFORM_GPIO_LOCK_CTRL]                   = {GPIOB, GPIO_Pin_7},
-};
-
-#ifdef __cplusplus
-  }
-#endif
 
 uint32_t get_tick(void)
 {
@@ -223,14 +204,12 @@ uint8_t get_pho_switch_3_state(void)
 }
 
 uint32_t test_hardware_version = 0;
+
 void hardware_init(void)
 {
     platform_gpio_init();
-    //led_init();
     init_can1();
-//    sanwei_rfid_init();
-    //test code
-    //test_sanwei_rfid_send_data();
+    rfid_init();
 }
 
 void user_param_init(void)

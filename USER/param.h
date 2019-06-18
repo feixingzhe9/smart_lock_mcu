@@ -3,7 +3,7 @@
 
 #include "sys.h"
 #include <stdio.h>
-
+#include "platform.h"
 
 //#define LOCK_NUM_MAX        4
 
@@ -54,7 +54,7 @@ struct gpio_in_int_param_t
     uint8_t gpio_pin_int_source;
 };
 
-
+extern const platform_gpio_t platform_gpio_pins[];
 extern const struct gpio_in_int_param_t gpio_in_int_param[LOCK_NUM_MAX];
 extern uint32_t lock_status_change_start_tick;
 extern uint8_t is_lock_status_changed;

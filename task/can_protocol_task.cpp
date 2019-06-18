@@ -17,7 +17,11 @@
 //#include "conveyor_belt.h"
 //#include "photoelectric_switch.h"
 //#include "sanwei_rfid.h"
-
+//#include "cp2532.h"
+#include "beeper.h"
+#include "stmflash.h"
+#include "lock.h"
+#include "rfid.h"
 //#define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
 
 
@@ -151,67 +155,9 @@ void Can1_TX(uint32_t canx_id,uint8_t* pdata,uint16_t len)
 
 
 
-void upload_sys_state(void)
-{
-    can_id_union id;
-    can_buf_t can_buf;
-    id.can_id_t.ack = 0;
-    id.can_id_t.dest_mac_id = 0;////
-    id.can_id_t.func_id = CAN_FUN_ID_TRIGGER;
-    id.can_id_t.source_id = CAN_SOURCE_ID_GET_SYS_STATE;
-    id.can_id_t.src_mac_id = CONVEYOR_CAN_MAC_SRC_ID;////
-    can_buf.id = id.canx_id;
-    can_buf.data[0] = 0;
-    *(uint16_t*)&can_buf.data[1] = sys_status->sys_status;
-    send_can_msg(&can_buf);
-}
 
-void upload_conveyor_belt_status(uint8_t status)
-{
-    can_id_union id;
-    can_buf_t can_buf;
-    id.can_id_t.ack = 0;
-    id.can_id_t.dest_mac_id = 0;////
-    id.can_id_t.func_id = CAN_FUN_ID_TRIGGER;
-    id.can_id_t.source_id = CAN_SOURCE_ID_SET_CONVEYOR_BELT_DIRCTION;
-    id.can_id_t.src_mac_id = CONVEYOR_CAN_MAC_SRC_ID;////
-    can_buf.id = id.canx_id;
-    can_buf.data_len = 1;
-    can_buf.data[0] = status;
-    send_can_msg(&can_buf);
-}
 
-void upload_pho_state(uint8_t state)
-{
-    can_id_union id;
-    can_buf_t can_buf;
-    id.can_id_t.ack = 0;
-    id.can_id_t.dest_mac_id = 0;////
-    id.can_id_t.func_id = CAN_FUN_ID_TRIGGER;
-    id.can_id_t.source_id = CAN_SOURCE_ID_GET_PHO_ELEC_SWITCH_STATE;
-    id.can_id_t.src_mac_id = CONVEYOR_CAN_MAC_SRC_ID;////
-    can_buf.id = id.canx_id;
-    can_buf.data_len = 1;
-    can_buf.data[0] = state;
-    send_can_msg(&can_buf);
-}
-
-void upload_pho_elec_switch_status(uint8_t status)
-{
-    can_id_union id;
-    can_buf_t can_buf;
-    id.can_id_t.ack = 0;
-    id.can_id_t.dest_mac_id = 0;////
-    id.can_id_t.func_id = CAN_FUN_ID_TRIGGER;
-    id.can_id_t.source_id = CAN_SOURCE_ID_GET_PHO_ELEC_SWITCH_STATE;
-    id.can_id_t.src_mac_id = CONVEYOR_CAN_MAC_SRC_ID;////
-    can_buf.id = id.canx_id;
-    can_buf.data_len = 1;
-    can_buf.data[0] = status;
-    send_can_msg(&can_buf);
-}
-
-uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_len, uint8_t *data_out)
+uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len, uint8_t *data_out)
 {
     id->can_id_t.ack = 1;
     id->can_id_t.ack = 1;
@@ -251,9 +197,69 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_len, ui
                     }
                     return CMD_NOT_FOUND;
 
-                case CAN_SOURCE_ID_GET_SYS_STATE:
-                    *(uint16_t*)&data_out[1] = sys_status->sys_status;
+                case CAN_SOURCE_ID_UNLOCK:
+                    {
+                        u32 to_unlock = *(u32 *)&data_in[0];
+                        start_to_unlock(to_unlock);
+                        return 0;
+                    }
+
+                case CAN_SOURCE_ID_SET_SUPER_RFID:
+                    {
+                        if(RFID_WORD_LENTH == data_in_len)
+                        {
+                            char rfid[RFID_WORD_LENTH] = {0};
+                            for(u8 i = 0; i < RFID_WORD_LENTH; i++)
+                            {
+                                rfid[i] = data_in[i];
+                            }
+                            save_rfid_to_flash(rfid);
+                            get_rfid_in_flash(rfid_in_flash);
+                            memcpy(data_out, rfid_in_flash, RFID_WORD_LENTH);
+                            return RFID_WORD_LENTH;
+                        }
+                        return 0;
+                    }
+
+//                case CAN_SOURCE_ID_SET_SUPER_PW:
+//                    {
+//                        if(PASS_WORD_LENTH == data_in_len)
+//                        {
+//                            char password[PASS_WORD_LENTH] = {0};
+//                            for(u8 i = 0; i < PASS_WORD_LENTH; i++)
+//                            {
+//                                password[i] = data_in[i];
+//                            }
+//                            save_password_to_flash(password);
+//                            get_password_in_flash(psss_word_in_flash);
+//                            memcpy(data_out, psss_word_in_flash, PASS_WORD_LENTH);
+//                            return RFID_WORD_LENTH;
+//                        }
+//                        return 0;
+//                    }
+
+                case CAN_SOURCE_ID_BEEPER_TIMES_CTRL:
+                    {
+                        if(data_in_len == 4)
+                        {
+                            beeper_times.times = data_in[0];
+                            beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
+                            beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
+                            beeper_times.frequency = data_in[3];
+                        }
+                        else
+                        {
+                            printf("CAN_SOURCE_ID_BEEPER_TIMES_CTRL  param length error: %d", data_in_len);
+                        }
+                    }
+                    break;
+
+                case CAN_SOURCE_ID_GET_DOORS_STATE:
+                    data_out[0] = lock_1.current_lock_input_status;
+                    data_out[1] = lock_2.current_lock_input_status;
+                    data_out[2] = lock_3.current_lock_input_status;
                     return 3;
+
 
                 default :
                     break;

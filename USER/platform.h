@@ -9,7 +9,7 @@ extern "C" {
 
 typedef enum
 {
-    PLATFORM_GPIO_SYS_LED,
+    PLATFORM_GPIO_SYS_LED = 0,
 
     PLATFORM_GPIO_PHO_SWITCH_1,
     PLATFORM_GPIO_PHO_SWITCH_2,
@@ -38,7 +38,7 @@ typedef struct
 }sys_status_t;
 
 extern sys_status_t *sys_status;
-extern const platform_gpio_t platform_gpio_pins[];
+
 
 uint32_t get_tick(void);
 void mcu_restart(void);

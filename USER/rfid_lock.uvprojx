@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>..\OBJ\</OutputDirectory>
-          <OutputName>SmartLock</OutputName>
+          <OutputName>rfid_lock</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER,CP2532_INT_ENABLE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\LED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\RTC;..\HARDWARE\RTC;..\HARDWARE\WKUP;..\HARDWARE\ADC;..\HARDWARE\DAC;..\HARDWARE\DMA;..\HARDWARE\IIC;..\HARDWARE\24CXX;..\HARDWARE\SPI;..\HARDWARE\FLASH;..\HARDWARE\RFID;..\HARDWARE\CAN;.\dev;..\SYSTEM;..\HARDWARE\STMFLASH;..\HARDWARE\TIMER;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\task;..\module;..\HARDWARE</IncludePath>
+              <IncludePath>..\HARDWARE\LED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\SPI;..\HARDWARE\FLASH;..\HARDWARE\RFID;.\dev;..\SYSTEM;..\HARDWARE\STMFLASH;..\HARDWARE\TIMER;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\task;..\module;..\HARDWARE</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -379,16 +379,6 @@
         <Group>
           <GroupName>USER</GroupName>
           <Files>
-            <File>
-              <FileName>stm32f10x_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\stm32f10x_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\system_stm32f10x.c</FilePath>
-            </File>
             <File>
               <FileName>main.cpp</FileName>
               <FileType>8</FileType>
@@ -445,14 +435,29 @@
               </FileOption>
             </File>
             <File>
-              <FileName>common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\common.c</FilePath>
+              <FileName>platform.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\platform.cpp</FilePath>
             </File>
             <File>
-              <FileName>platform.c</FileName>
+              <FileName>param.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\platform.c</FilePath>
+              <FilePath>.\param.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\stm32f10x_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\system_stm32f10x.c</FilePath>
+            </File>
+            <File>
+              <FileName>common.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\common.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -465,14 +470,14 @@
               <FilePath>..\task\can_protocol_task.cpp</FilePath>
             </File>
             <File>
-              <FileName>charge_task.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\task\charge_task.cpp</FilePath>
-            </File>
-            <File>
               <FileName>led_task.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\task\led_task.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rfid_task.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\task\rfid_task.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -553,11 +558,6 @@
               <FileName>lock.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\dev\lock.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>lock_param.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\dev\lock_param.c</FilePath>
             </File>
           </Files>
         </Group>

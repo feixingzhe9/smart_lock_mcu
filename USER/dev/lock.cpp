@@ -1,5 +1,5 @@
 #include "lock.h"
-#include "lock_param.h"
+#include "param.h"
 //#include "can_interface.h"
 
 struct lock_lock_ctrl_t lock_lock_ctrl;

@@ -4,6 +4,11 @@
 
 LEDClass::LEDClass(void)
 {
+
+}
+
+void LEDClass::init(void)
+{
     GPIO_InitTypeDef  GPIO_InitStructure;
 
     RCC_APB2PeriphClockCmd(LED_RCC_APB2, ENABLE);

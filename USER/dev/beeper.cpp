@@ -1,6 +1,6 @@
 #include "beeper.h"
 #include "timer.h"
-#include "cp2532.h"
+//#include "cp2532.h"
 #include "lock.h"
 extern u32 rfid_start_tick;
 

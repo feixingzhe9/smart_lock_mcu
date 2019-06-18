@@ -9,12 +9,8 @@ static void task_create(void)
 {
     OSTaskCreate(can_protocol_task,                 (void *)0,  (OS_STK*)&can_protocol_task_stk[CAN_PROTOCOL_TASK_STK_SIZE - 1],                    CAN_RPOTOCOL_TASK_PRIO);
     OSTaskCreate(can_send_task,                     (void *)0,  (OS_STK*)&can_send_task_stk[CAN_SEND_TASK_STK_SIZE - 1],                            CAN_SEND_TASK_PRIO);
-//    OSTaskCreate(pho_switch_status_task,            (void *)0,  (OS_STK*)&pho_switch_status_task_stk[PHO_SWITCH_STATUS_TASK_STK_SIZE - 1],          PHO_SWITCH_STATUS_PRIO);
-//    OSTaskCreate(conveyor_belt_task,                (void *)0,  (OS_STK*)&conveyor_belt_task_stk[CONVEYOR_BELT_TASK_STK_SIZE - 1],                  CONVEYOR_BELT_PRIO);
     OSTaskCreate(indicator_led_task,                (void *)0,  (OS_STK*)&indicator_led_task_stk[INDICATOR_LED_STK_SIZE - 1],                       INDICATOR_LED_TASK_PRIO);
-//    OSTaskCreate(upload_pho_state_upload_task,      (void *)0,  (OS_STK*)&pho_state_upload_task_stk[PHO_STATE_UPLOAD_TASK_STK_SIZE - 1],            PHO_STATE_UPLOAD_TASK_PRIO);
-//    OSTaskCreate(sanwei_rfid_main_task,             (void *)0,  (OS_STK*)&sanwei_rfid_main_task_stk[SANWEI_RFID_MAIN_TASK_STK_SIZE - 1],            SANWEI_RFID_MAIN_TASK_PRIO);
-//    OSTaskCreate(sanwei_rfid_rcv_task,              (void *)0,  (OS_STK*)&sanwei_rfid_rcv_task_stk[SANWEI_RFID_RCV_TASK_STK_SIZE - 1],              SANWEI_RFID_RCV_TASK_PRIO);
+    OSTaskCreate(rfid_task,                         (void *)0,  (OS_STK*)&rfid_task_stk[RFID_STK_SIZE - 1],                                         RFID_TASK_PRIO);
 }
 
 static void sem_create(void)

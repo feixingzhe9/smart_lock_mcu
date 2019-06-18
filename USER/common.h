@@ -5,33 +5,21 @@
 
 #include "led_task.h"
 #include "can_protocol_task.h"
-//#include "conveyor_belt_task.h"
-//#include "sanwei_rfid_task.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "rfid_task.h"
 
 typedef enum
 {
     CAN_SEND_TASK_PRIO = 5,
     CAN_RPOTOCOL_TASK_PRIO,
-    PHO_SWITCH_STATUS_PRIO,
-    CONVEYOR_BELT_PRIO,
-    PHO_STATE_UPLOAD_TASK_PRIO,
-    SANWEI_RFID_RCV_TASK_PRIO,
-    SANWEI_RFID_MAIN_TASK_PRIO,
+    RFID_TASK_PRIO,
     INDICATOR_LED_TASK_PRIO
 }task_prio_e;
 
 void os_user_config(void);
 void user_init_depend_on_os_config(void);
 
-
 uint32_t get_tick(void);
 void user_init(void);
-#ifdef __cplusplus
-  }
-#endif
+
 #endif
 

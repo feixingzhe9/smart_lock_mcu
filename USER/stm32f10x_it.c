@@ -26,7 +26,7 @@
 #include "sys.h"
 #include "usart.h"
 #include "stm32f10x.h"
-#include "lock_param.h"
+#include "param.h"
 #include <stdio.h>
 
 
