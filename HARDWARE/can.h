@@ -6,8 +6,9 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-#define RFID_CAN_MAC_SRC_ID             0x00d6
-#define CAN_FILTER_ID                   (RFID_CAN_MAC_SRC_ID << 13)
+//#define RFID_CAN_MAC_SRC_ID             0x00d6
+#define RFID_CAN_MAC_SRC_ID_BASE        0x0080
+//#define CAN_FILTER_ID                   (RFID_CAN_MAC_SRC_ID << 13)
 #define CAN_FILTER_MASK                 (0x00ff << 13)
 
 //CAN1

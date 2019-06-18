@@ -108,10 +108,10 @@ void Test_Write(u32 WriteAddr,u16 WriteData)
 #define SUPER_PASSWORD_DEFAULT_VALUE    "6666"
 #define RFID_SIZE           4
 #define PASSWORD_SIZE       4
-#define FLASH_SAVE_ADDR     0X08070000 				//设置FLASH 保存地址(必须为偶数)
+#define FLASH_SAVE_ADDR     0X0801FC00 				//设置FLASH 保存地址(必须为偶数)
 
 #define FLASH_PASSWORD_ADDR         0X08070000
-#define FLASH_RFID_ADDR             0X08070010
+#define FLASH_RFID_ADDR             0X0801FC10
 
 void get_rfid_in_flash(char *rfid)
 {

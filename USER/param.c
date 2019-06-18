@@ -65,15 +65,12 @@ const struct gpio_in_int_param_t gpio_in_int_param[LOCK_NUM_MAX] =
 
 const platform_gpio_t platform_gpio_pins[] =
 {
-    [PLATFORM_GPIO_SYS_LED]                     = { GPIOB,  GPIO_Pin_3},
-
-    [PLATFORM_GPIO_PHO_SWITCH_3]                = {GPIOB, GPIO_Pin_4},
-    [PLATFORM_GPIO_PHO_SWITCH_2]                = {GPIOB, GPIO_Pin_5},
-    [PLATFORM_GPIO_PHO_SWITCH_1]                = {GPIOB, GPIO_Pin_6},
-    [PLATFORM_GPIO_MOTOR_DIR]                   = {GPIOA, GPIO_Pin_6},
-    [PLATFORM_GPIO_MOTOR_EN]                    = {GPIOA, GPIO_Pin_5},
-    [PLATFORM_GPIO_MOTOR_PWR_EN]                = {GPIOA, GPIO_Pin_4},
-    [PLATFORM_GPIO_LOCK_CTRL]                   = {GPIOB, GPIO_Pin_7},
+    [PLATFORM_GPIO_ID_S1]                       = {GPIOB, GPIO_Pin_3},
+    [PLATFORM_GPIO_ID_S2]                       = {GPIOB, GPIO_Pin_4},
+    [PLATFORM_GPIO_ID_S3]                       = {GPIOB, GPIO_Pin_5},
+    [PLATFORM_GPIO_ID_S4]                       = {GPIOB, GPIO_Pin_6},
+    [PLATFORM_GPIO_ID_S5]                       = {GPIOB, GPIO_Pin_7},
+    [PLATFORM_GPIO_ID_S6]                       = {GPIOB, GPIO_Pin_8},
 };
 
 #ifdef __cplusplus
