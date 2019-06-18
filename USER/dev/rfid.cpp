@@ -9,9 +9,9 @@
 #include "lock.h"
 #include "MFRC522.h"
 
-//MFRC522 mfrc522_B(chipSelectPinRfid2, resetPowerDownPinRfid2, &SPI_2, SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0, SPI2));
-MFRC522 mfrc522_A(chipSelectPinRfid1, resetPowerDownPinRfid1, &SPI_1, SPISettings(SPI_CLOCK_DIV8, MSBFIRST, SPI_MODE0, SPI1));
-static MFRC522 *mfrc522 = &mfrc522_A;
+MFRC522 mfrc522_B(chipSelectPinRfid2, resetPowerDownPinRfid2, &SPI_2, SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0, SPI2));
+//MFRC522 mfrc522_A(chipSelectPinRfid1, resetPowerDownPinRfid1, &SPI_1, SPISettings(SPI_CLOCK_DIV8, MSBFIRST, SPI_MODE0, SPI1));
+static MFRC522 *mfrc522 = &mfrc522_B;
 
 //static can_message_t upload_msg;
 
@@ -95,10 +95,10 @@ static void init_exti(void)
 
 void rfid_init()
 {
-    SPI_1.begin();
-    mfrc522 = &mfrc522_A;
+    SPI_2.begin();
+    mfrc522 = &mfrc522_B;
     mfrc522->PCD_Init();
-    mfrc522->PCD_SetAntennaGain(0x50);
+    mfrc522->PCD_SetAntennaGain(0x70);
     printf("RFID_A DB:0x%02x\r\n", mfrc522->PCD_GetAntennaGain());
     mfrc522->PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
     init_exti();
@@ -110,7 +110,7 @@ u32 rfid_start_tick = 0;
 void rfid_proc()
 {
 
-    mfrc522 = &mfrc522_A;
+    mfrc522 = &mfrc522_B;
 
     // Look for new cards
     if (mfrc522->PICC_IsNewCardPresent())
@@ -183,6 +183,8 @@ void rfid_proc()
 //            uart_print_type_and_key(buffer_type, buffer_key);
 
             //upload_rfid_data(&upload_msg, buffer_type, buffer_key);
+            extern void upload_rfid_data(const uint8_t *buffer_key);
+            upload_rfid_data(&buffer_key[12]);
             u16 rfid_int = buffer_key[14];
             rfid_int = rfid_int<<8;
             rfid_int += buffer_key[15];

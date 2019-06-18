@@ -2,7 +2,7 @@
 #define __LED_H
 
 #include "sys.h"
-#define LED_PIN         GPIO_Pin_9
+#define LED_PIN         GPIO_Pin_11
 #define LED_PORT        GPIOC
 #define LED_RCC_APB2    RCC_APB2Periph_GPIOC
 

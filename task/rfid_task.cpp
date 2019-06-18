@@ -15,7 +15,7 @@ void rfid_task(void *pdata)
     for(;;)
     {
         rfid_proc();
-        delay_ms(20);
+        delay_ms(50);
     }
 }
 

@@ -156,13 +156,30 @@ void Can1_TX(uint32_t canx_id,uint8_t* pdata,uint16_t len)
 
 
 
+void upload_rfid_data(const uint8_t *buffer_key)
+{
+    can_id_union id;
+    can_buf_t can_buf;
+    id.can_id_t.ack = 1;
+    id.can_id_t.dest_mac_id = 0;////
+    id.can_id_t.func_id = CAN_FUN_ID_TRIGGER;
+    id.can_id_t.source_id = CAN_SOURCE_ID_RFID_UPLOAD;
+    id.can_id_t.src_mac_id = RFID_CAN_MAC_SRC_ID;////
+    can_buf.id = id.canx_id;
+    can_buf.data_len = 4;
+    memcpy(&can_buf.data[0], buffer_key, 4);
+    send_can_msg(&can_buf);
+}
+
+
+
 
 uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len, uint8_t *data_out)
 {
     id->can_id_t.ack = 1;
     id->can_id_t.ack = 1;
     id->can_id_t.dest_mac_id = id->can_id_t.src_mac_id;
-    id->can_id_t.src_mac_id = CONVEYOR_CAN_MAC_SRC_ID;
+    id->can_id_t.src_mac_id = RFID_CAN_MAC_SRC_ID;
     id->can_id_t.res = 0;
     switch(id->can_id_t.func_id)
     {
@@ -349,7 +366,7 @@ void can_protocol_task(void *pdata)
             seg_polo = rx_buf.can_data_t.seg_polo;
             seg_num = rx_buf.can_data_t.seg_num;
             OSMemPut(can_rcv_buf_mem_handle, can_rcv_buf);
-            if(id.can_id_t.dest_mac_id == CONVEYOR_CAN_MAC_SRC_ID)
+            if(id.can_id_t.dest_mac_id == RFID_CAN_MAC_SRC_ID)
             {
                 if(id.can_id_t.ack == 1)
                 {
