@@ -158,7 +158,7 @@ void upload_rfid_data(const uint8_t *buffer_key)
 {
     can_id_union id;
     can_buf_t can_buf;
-    id.can_id_t.ack = 1;
+    id.can_id_t.ack = 0;
     id.can_id_t.dest_mac_id = 0;////
     id.can_id_t.func_id = CAN_FUN_ID_TRIGGER;
     id.can_id_t.source_id = CAN_SOURCE_ID_RFID_UPLOAD;
@@ -175,7 +175,6 @@ void upload_rfid_data(const uint8_t *buffer_key)
 uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len, uint8_t *data_out)
 {
     id->can_id_t.ack = 1;
-    id->can_id_t.ack = 1;
     id->can_id_t.dest_mac_id = id->can_id_t.src_mac_id;
     id->can_id_t.src_mac_id = rfid_src_mac_id;
     id->can_id_t.res = 0;
@@ -190,25 +189,26 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
             {
                 case CAN_SOURCE_ID_READ_VERSION:
                     data_out[0] = data_in[0];
-                    if(data_in[0] == 1)//read software version
+                    data_out[1] = data_in[1];
+                    if(data_in[1] == 1)//read software version
                     {
-                        memcpy(&data_out[2], SW_VERSION, sizeof(SW_VERSION));
+                        memcpy(&data_out[3], SW_VERSION, sizeof(SW_VERSION));
                         //return strlen(SW_VERSION) + 1;
-                        data_out[1] = strlen(SW_VERSION);
-                        return sizeof(SW_VERSION) + 2;
+                        data_out[2] = strlen(SW_VERSION);
+                        return sizeof(SW_VERSION) + 3;
                     }
-                    else if(data_in[0] == 2)//protocol version
+                    else if(data_in[1] == 2)//protocol version
                     {
-                        memcpy(&data_out[2], PROTOCOL_VERSION, sizeof(PROTOCOL_VERSION));
-                        data_out[1] = strlen(PROTOCOL_VERSION);
-                        return sizeof(PROTOCOL_VERSION) + 2;
+                        memcpy(&data_out[3], PROTOCOL_VERSION, sizeof(PROTOCOL_VERSION));
+                        data_out[2] = strlen(PROTOCOL_VERSION);
+                        return sizeof(PROTOCOL_VERSION) + 3;
 
                     }
-                    else if(data_in[0] == 3)//hardware version
+                    else if(data_in[1] == 3)//hardware version
                     {
-                        memcpy(&data_out[2], HW_VERSION, strlen(HW_VERSION));
-                        data_out[1] = strlen(HW_VERSION);
-                        return strlen(HW_VERSION) + 2;
+                        memcpy(&data_out[3], HW_VERSION, strlen(HW_VERSION));
+                        data_out[2] = strlen(HW_VERSION);
+                        return strlen(HW_VERSION) + 3;
                     }
                     return CMD_NOT_FOUND;
 

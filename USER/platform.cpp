@@ -60,10 +60,22 @@ void hardware_init(void)
     rfid_init();
 }
 
+
+static uint8_t get_src_mac_id(void)
+{
+    uint16_t id = get_id() & 0x0f;
+    uint8_t rfid_src_mac_id = RFID_CAN_MAC_SRC_ID_BASE;
+    if(id > 0)
+    {
+        rfid_src_mac_id = id + RFID_CAN_MAC_SRC_ID_BASE - 1;
+    }
+    else
+    {
+        rfid_src_mac_id = RFID_CAN_MAC_SRC_ID_BASE;
+    }
+    return rfid_src_mac_id;
+}
 void user_param_init(void)
 {
-    uint16_t id = get_id();
-    rfid_src_mac_id = id + RFID_CAN_MAC_SRC_ID_BASE;
-//    rfid_src_mac_id = get_id() + RFID_CAN_MAC_SRC_ID_BASE;
-    rfid_src_mac_id = 0xd6;
+    rfid_src_mac_id = get_src_mac_id();
 }
