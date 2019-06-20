@@ -5,8 +5,6 @@
 #include "rfid.h"
 #include "usart.h"
 #include "delay.h"
-//#include "can_interface.h"
-#include "lock.h"
 #include "MFRC522.h"
 
 MFRC522 mfrc522_B(chipSelectPinRfid2, resetPowerDownPinRfid2, &SPI_2, SPISettings(SPI_CLOCK_DIV4, MSBFIRST, SPI_MODE0, SPI2));

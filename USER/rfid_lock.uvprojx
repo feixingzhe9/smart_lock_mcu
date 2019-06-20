@@ -740,11 +740,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>stmflash.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\HARDWARE\STMFLASH\stmflash.cpp</FilePath>
-            </File>
-            <File>
               <FileName>can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\can.c</FilePath>
