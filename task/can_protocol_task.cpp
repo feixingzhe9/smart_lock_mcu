@@ -167,28 +167,32 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
             switch(id->can_id_t.source_id)
             {
                 case CAN_SOURCE_ID_READ_VERSION:
-                    data_out[0] = data_in[0];
-                    if(data_in[0] == 1)//read software version
-                    {
-                        memcpy(&data_out[2], SW_VERSION, sizeof(SW_VERSION));
-                        //return strlen(SW_VERSION) + 1;
-                        data_out[1] = strlen(SW_VERSION);
-                        return sizeof(SW_VERSION) + 2;
-                    }
-                    else if(data_in[0] == 2)//protocol version
-                    {
-                        memcpy(&data_out[2], PROTOCOL_VERSION, sizeof(PROTOCOL_VERSION));
-                        data_out[1] = strlen(PROTOCOL_VERSION);
-                        return sizeof(PROTOCOL_VERSION) + 2;
+//                    data_out[0] = data_in[0];
+                    memcpy(&data_out[0], SW_VERSION, sizeof(SW_VERSION));
+                    //return strlen(SW_VERSION) + 1;
+//                    data_out[1] = strlen(SW_VERSION);
+                    return sizeof(SW_VERSION);
+//                    if(data_in[0] == 1)//read software version
+//                    {
+//                        memcpy(&data_out[2], SW_VERSION, sizeof(SW_VERSION));
+//                        //return strlen(SW_VERSION) + 1;
+//                        data_out[1] = strlen(SW_VERSION);
+//                        return sizeof(SW_VERSION) + 2;
+//                    }
+//                    else if(data_in[0] == 2)//protocol version
+//                    {
+//                        memcpy(&data_out[2], PROTOCOL_VERSION, sizeof(PROTOCOL_VERSION));
+//                        data_out[1] = strlen(PROTOCOL_VERSION);
+//                        return sizeof(PROTOCOL_VERSION) + 2;
 
-                    }
-                    else if(data_in[0] == 3)//hardware version
-                    {
-                        memcpy(&data_out[2], HW_VERSION, strlen(HW_VERSION));
-                        data_out[1] = strlen(HW_VERSION);
-                        return strlen(HW_VERSION) + 2;
-                    }
-                    return CMD_NOT_FOUND;
+//                    }
+//                    else if(data_in[0] == 3)//hardware version
+//                    {
+//                        memcpy(&data_out[2], HW_VERSION, strlen(HW_VERSION));
+//                        data_out[1] = strlen(HW_VERSION);
+//                        return strlen(HW_VERSION) + 2;
+//                    }
+//                    return CMD_NOT_FOUND;
 
                 case CAN_SOURCE_ID_UNLOCK:
                     {
