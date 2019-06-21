@@ -214,10 +214,10 @@ bool LockClass::is_to_my_turn(void)
 }
 
 
-#define TIMER_TICK_PERIOD       50
-#define LOCK_CTRL_PERIOD        100/TIMER_TICK_PERIOD
-#define SELF_LOCK_TIME          1000/TIMER_TICK_PERIOD
-#define BETWEEN_LOCK_TIME       300/TIMER_TICK_PERIOD
+#define TIMER_TICK_PERIOD       20
+#define LOCK_CTRL_PERIOD        (100 / TIMER_TICK_PERIOD)
+#define SELF_LOCK_TIME          (1000 / TIMER_TICK_PERIOD)
+#define BETWEEN_LOCK_TIME       (300 / TIMER_TICK_PERIOD)
 void LockClass::lock_task(u32 tick)
 {
     switch(this->lock_machine_state)
@@ -315,26 +315,13 @@ void LockClass::lock_task(u32 tick)
 }
 
 
-static void upload_lock_status(uint8_t *lock_status)
-{
-//    can_id_union id;
-
-//    id.can_id_struct.source_id = CAN_SOURCE_ID_LOCK_STATUS_UPLOAD;
-
-//    id.can_id_struct.src_mac_id = LOCK_CAN_MAC_SRC_ID;
-
-//    id.can_id_struct.res = 0;
-//    id.can_id_struct.ack = 0;
-//    id.can_id_struct.func_id = 0;
-
-//    Can1_TX(id.can_id, lock_status, LOCK_NUM_MAX);
-}
+extern void upload_lock_status(uint8_t *lock_status);
 
 //uint32_t lock_status_change_start_tick = 0;
 //uint8_t is_lock_status_changed = 0;
 //#define LOCK_IN_STATUS_STABLE_DELAY_TICK    100/SYSTICK_PERIOD
 
-#define LOCK_INPUT_DETECTION_PERIOD     10/SYSTICK_PERIOD
+#define LOCK_INPUT_DETECTION_PERIOD     (10 / SYSTICK_PERIOD)
 void lock_input_status_task(void)
 {
     uint8_t lock_status[LOCK_NUM_MAX] = {0};
@@ -348,7 +335,7 @@ void lock_input_status_task(void)
         lock_status_tmp[LOCK_1] = lock_1.is_lock_input_status_changed();
         lock_status_tmp[LOCK_2] = lock_2.is_lock_input_status_changed();
         lock_status_tmp[LOCK_3] = lock_3.is_lock_input_status_changed();
-        lock_status_tmp[LOCK_4] = lock_3.is_lock_input_status_changed();
+        lock_status_tmp[LOCK_4] = lock_4.is_lock_input_status_changed();
 
         for(uint8_t i = LOCK_1; i < LOCK_NUM_MAX; i++)
         {
@@ -364,7 +351,7 @@ void lock_input_status_task(void)
             lock_status[LOCK_1] = lock_1.current_lock_input_status;
             lock_status[LOCK_2] = lock_2.current_lock_input_status;
             lock_status[LOCK_3] = lock_3.current_lock_input_status;
-            lock_status[LOCK_4] = lock_3.current_lock_input_status;
+            lock_status[LOCK_4] = lock_4.current_lock_input_status;
             upload_lock_status(lock_status);
         }
     }

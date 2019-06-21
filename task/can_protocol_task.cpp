@@ -148,6 +148,21 @@ void Can1_TX(uint32_t canx_id,uint8_t* pdata,uint16_t len)
 
 
 
+void upload_lock_status(uint8_t *lock_status)
+{
+    can_id_union id;
+
+    id.can_id_t.source_id = CAN_SOURCE_ID_LOCK_STATUS_UPLOAD;
+
+    id.can_id_t.src_mac_id = LOCK_CAN_MAC_SRC_ID;
+
+    id.can_id_t.res = 0;
+    id.can_id_t.ack = 0;
+    id.can_id_t.func_id = 0;
+
+    Can1_TX(id.canx_id, lock_status, LOCK_NUM_MAX);
+}
+
 
 
 uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len, uint8_t *data_out)
@@ -238,7 +253,8 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
                     data_out[0] = lock_1.current_lock_input_status;
                     data_out[1] = lock_2.current_lock_input_status;
                     data_out[2] = lock_3.current_lock_input_status;
-                    return 3;
+                    data_out[3] = lock_4.current_lock_input_status;
+                    return 4;
 
 
                 default :

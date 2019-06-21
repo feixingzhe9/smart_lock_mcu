@@ -18,6 +18,7 @@ void lock_task(void *pdata)
     {
         tick++;
         all_lock_task(tick);
-        delay_ms(50);
+        lock_input_status_task();
+        delay_ms(20);
     }
 }

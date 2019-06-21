@@ -67,7 +67,7 @@ class LockClass
     #define LOCK_MACHINE_STATE_BETWEEN_LOCK_DELAY   5
 
         u8 lock_machine_state;
-    #define LOCK_IN_STATE_DEBOUNCE_CNT              3
+    #define LOCK_IN_STATE_DEBOUNCE_CNT              39
         uint8_t debounce_cnt;
         uint8_t previous_state;
 
@@ -89,6 +89,7 @@ void start_to_unlock(uint32_t lock);
 extern LockClass lock_1;
 extern LockClass lock_2;
 extern LockClass lock_3;
+extern LockClass lock_4;
 
 extern uint32_t unlock_start_tick;
 

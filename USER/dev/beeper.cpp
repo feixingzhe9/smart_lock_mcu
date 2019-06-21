@@ -1,8 +1,5 @@
 #include "beeper.h"
-#include "timer.h"
-//#include "cp2532.h"
 #include "lock.h"
-extern u32 rfid_start_tick;
 
 
 void beeper_init(u16 arr,u16 psc)
@@ -81,8 +78,8 @@ void beeper_off(void)
 }
 
 
-#define TOUCH_KEY_BEEPER_TIME   30/SYSTICK_PERIOD
-#define RFID_BEEPER_TIME    120/SYSTICK_PERIOD
+//#define TOUCH_KEY_BEEPER_TIME   30/SYSTICK_PERIOD
+//#define RFID_BEEPER_TIME    120/SYSTICK_PERIOD
 #define UNLOCK_BEEPER_TIME  500/SYSTICK_PERIOD
 #define BEEPER_ON_DELAY_PERIOD      50/SYSTICK_PERIOD
 
@@ -178,7 +175,6 @@ void beeper_ctrl(void)
         default:
             break;
     }
-
 }
 
 struct beeper_times_t beeper_times = {0};
@@ -196,7 +192,7 @@ void beeper_times_exe(void)
     {
         switch(state)
         {
-            case 0:     //开始蜂鸣
+            case 0:
                 if(beeper_times.start_tick == 0)
                 {
                     beeper_on(0);
@@ -208,7 +204,7 @@ void beeper_times_exe(void)
                     break;
                 }
 
-            case 1: //蜂鸣特定时间后，停止蜂鸣
+            case 1:
                 if(get_tick() - beeper_times.start_tick >= beeper_times.durantion / SYSTICK_PERIOD)
                 {
                     beeper_times.start_tick = get_tick();
@@ -220,7 +216,7 @@ void beeper_times_exe(void)
                     break;
                 }
 
-            case 2: //停止蜂鸣特定时间后，开始下一个周期
+            case 2:
                 if(get_tick() - beeper_times.start_tick >= beeper_times.period / SYSTICK_PERIOD)
                 {
                     beeper_times.start_tick = 0;
@@ -237,9 +233,7 @@ void beeper_times_exe(void)
 
             default :
                 break;
-
         }
-
     }
     else
     {

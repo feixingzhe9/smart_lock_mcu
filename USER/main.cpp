@@ -3,7 +3,6 @@
 #include "delay.h"
 #include "sys.h"
 #include "usart.h"
-#include "timer.h"
 #include "beeper.h"
 #include "lock.h"
 #include <ucos_ii.h>

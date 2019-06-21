@@ -60,7 +60,7 @@
 #define PGin(n)    BIT_ADDR(GPIOG_IDR_Addr,n)  // ‰»Î
 
 
-#define SYSTICK_PERIOD       1      //1ms
+#define SYSTICK_PERIOD       (1000 /  OS_TICKS_PER_SEC)     //1ms
 
 #define SYS_CP2532_INIT_ERR     (0x00000001)
 
