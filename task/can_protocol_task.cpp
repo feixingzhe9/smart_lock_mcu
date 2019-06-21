@@ -14,15 +14,8 @@
 #include <stdio.h>
 #include "can.h"
 #include "can_fifo.h"
-//#include "conveyor_belt.h"
-//#include "photoelectric_switch.h"
-//#include "sanwei_rfid.h"
-//#include "cp2532.h"
 #include "beeper.h"
-#include "stmflash.h"
 #include "lock.h"
-#include "rfid.h"
-//#define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
 
 
 
@@ -162,7 +155,7 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
     id->can_id_t.ack = 1;
     id->can_id_t.ack = 1;
     id->can_id_t.dest_mac_id = id->can_id_t.src_mac_id;
-    id->can_id_t.src_mac_id = CONVEYOR_CAN_MAC_SRC_ID;
+    id->can_id_t.src_mac_id = LOCK_CAN_MAC_SRC_ID;
     id->can_id_t.res = 0;
     switch(id->can_id_t.func_id)
     {
@@ -204,35 +197,18 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
                         return 0;
                     }
 
-                case CAN_SOURCE_ID_SET_SUPER_RFID:
-                    {
-                        if(RFID_WORD_LENTH == data_in_len)
-                        {
-                            char rfid[RFID_WORD_LENTH] = {0};
-                            for(u8 i = 0; i < RFID_WORD_LENTH; i++)
-                            {
-                                rfid[i] = data_in[i];
-                            }
-                            save_rfid_to_flash(rfid);
-                            get_rfid_in_flash(rfid_in_flash);
-                            memcpy(data_out, rfid_in_flash, RFID_WORD_LENTH);
-                            return RFID_WORD_LENTH;
-                        }
-                        return 0;
-                    }
-
-//                case CAN_SOURCE_ID_SET_SUPER_PW:
+//                case CAN_SOURCE_ID_SET_SUPER_RFID:
 //                    {
-//                        if(PASS_WORD_LENTH == data_in_len)
+//                        if(RFID_WORD_LENTH == data_in_len)
 //                        {
-//                            char password[PASS_WORD_LENTH] = {0};
-//                            for(u8 i = 0; i < PASS_WORD_LENTH; i++)
+//                            char rfid[RFID_WORD_LENTH] = {0};
+//                            for(u8 i = 0; i < RFID_WORD_LENTH; i++)
 //                            {
-//                                password[i] = data_in[i];
+//                                rfid[i] = data_in[i];
 //                            }
-//                            save_password_to_flash(password);
-//                            get_password_in_flash(psss_word_in_flash);
-//                            memcpy(data_out, psss_word_in_flash, PASS_WORD_LENTH);
+//                            save_rfid_to_flash(rfid);
+//                            get_rfid_in_flash(rfid_in_flash);
+//                            memcpy(data_out, rfid_in_flash, RFID_WORD_LENTH);
 //                            return RFID_WORD_LENTH;
 //                        }
 //                        return 0;
@@ -349,7 +325,7 @@ void can_protocol_task(void *pdata)
             seg_polo = rx_buf.can_data_t.seg_polo;
             seg_num = rx_buf.can_data_t.seg_num;
             OSMemPut(can_rcv_buf_mem_handle, can_rcv_buf);
-            if(id.can_id_t.dest_mac_id == CONVEYOR_CAN_MAC_SRC_ID)
+            if(id.can_id_t.dest_mac_id == LOCK_CAN_MAC_SRC_ID)
             {
                 if(id.can_id_t.ack == 1)
                 {

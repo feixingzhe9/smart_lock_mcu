@@ -110,14 +110,14 @@ void beeper_ctrl(void)
 //            }
 //        }
 
-        if(rfid_start_tick != 0)
-        {
-            beeper_on_period = RFID_BEEPER_TIME;
-            beeper_machine = 1;
-            rfid_start_tick = 0;
-            beeper_start_tick = get_tick();
-            break;
-        }
+//        if(rfid_start_tick != 0)
+//        {
+//            beeper_on_period = RFID_BEEPER_TIME;
+//            beeper_machine = 1;
+//            rfid_start_tick = 0;
+//            beeper_start_tick = get_tick();
+//            break;
+//        }
 
         if(unlock_start_tick != 0)
         {

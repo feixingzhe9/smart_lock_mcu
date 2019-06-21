@@ -16,8 +16,8 @@ void can_protocol_task(void *pdata);
 void can_send_task(void *pdata);
 
 
-#define HW_VERSION                      "M30_SUNWAY_INTE_V0.1"
-#define SW_VERSION                      "MCU_CONVEYOR_V102"
+#define HW_VERSION                      "M30_Door_Ctlboard_V0.1"
+#define SW_VERSION                      "MCU_LOCK_v0.0.1"
 #define PROTOCOL_VERSION                "20170619P0001"
 
 #define CMD_NOT_FOUND   0

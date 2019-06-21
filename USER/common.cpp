@@ -9,8 +9,8 @@ static void task_create(void)
 {
     OSTaskCreate(can_protocol_task,                 (void *)0,  (OS_STK*)&can_protocol_task_stk[CAN_PROTOCOL_TASK_STK_SIZE - 1],                    CAN_RPOTOCOL_TASK_PRIO);
     OSTaskCreate(can_send_task,                     (void *)0,  (OS_STK*)&can_send_task_stk[CAN_SEND_TASK_STK_SIZE - 1],                            CAN_SEND_TASK_PRIO);
+    OSTaskCreate(lock_task,                         (void *)0,  (OS_STK*)&lock_task_stk[LOCK_TASK_STK_SIZE - 1],                                    LOCK_TASK_PRIO);
     OSTaskCreate(indicator_led_task,                (void *)0,  (OS_STK*)&indicator_led_task_stk[INDICATOR_LED_STK_SIZE - 1],                       INDICATOR_LED_TASK_PRIO);
-    OSTaskCreate(rfid_task,                         (void *)0,  (OS_STK*)&rfid_task_stk[RFID_STK_SIZE - 1],                                         RFID_TASK_PRIO);
 }
 
 static void sem_create(void)
@@ -20,14 +20,6 @@ static void sem_create(void)
 
 static int mailbox_create(void)
 {
-//    pho_state_mailbox = OSMboxCreate((void*)0);
-//    if(pho_state_mailbox == 0)
-//    {
-//         /*
-//        todo: err process
-//        */
-////        return -1;
-//    }
     return 0;
 }
 
@@ -61,24 +53,6 @@ static int mem_create(void)
 //        return -1;
     }
 
-//    sw_rfid_uart_rcv_mem_handle = OSMemCreate((void *)&sw_rfid_uart_rcv_mem[0][0], sizeof(sw_rfid_uart_rcv_mem) / sizeof(sw_rfid_uart_rcv_mem[0]), sizeof(sw_rfid_uart_rcv_buf_t), &err);
-//    if(sw_rfid_uart_rcv_mem_handle == 0)
-//    {
-//        /*
-//        todo: err process
-//        */
-//        return -1;
-//    }
-
-//    sw_rfid_ack_mem_handle = OSMemCreate((void *)&sw_rfid_ack_mem[0][0], sizeof(sw_rfid_ack_mem) / sizeof(sw_rfid_ack_mem[0]), sizeof(sw_rfid_ack_t), &err);
-//    if(sw_rfid_ack_mem_handle == 0)
-//    {
-//        /*
-//        todo: err process
-//        */
-//        return -1;
-//    }
-
     return 0;
 }
 
@@ -111,14 +85,6 @@ static int queue_create(void)
 //        return -1;
     }
 
-//    sw_rfid_ack_queue_handle = OSQCreate(&sw_rfid_ack_queue_p[0], SW_RFID_ACK_QUEUE_NUM);
-//    if(sw_rfid_ack_queue_handle == 0)
-//    {
-//        /*
-//        todo: err process
-//        */
-////        return -1;
-//    }
     return 0;
 }
 
@@ -133,12 +99,7 @@ static void os_user_config(void)
 
 static void user_init_depend_on_os_config(void)
 {
-//    if(sw_rfid_uart_rcv_buf_head_init() < 0)
-//    {
-//        /*
-//        todo: err process
-//        */
-//    }
+
 }
 
 void user_init(void)

@@ -6,8 +6,8 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-#define CONVEYOR_CAN_MAC_SRC_ID       0x0053
-#define CAN_FILTER_ID                   (CONVEYOR_CAN_MAC_SRC_ID << 13)
+#define LOCK_CAN_MAC_SRC_ID              0xd6
+#define CAN_FILTER_ID                   (LOCK_CAN_MAC_SRC_ID << 13)
 #define CAN_FILTER_MASK                 (0x00ff << 13)
 
 //CAN1
