@@ -10,6 +10,7 @@ static void task_create(void)
     OSTaskCreate(can_protocol_task,                 (void *)0,  (OS_STK*)&can_protocol_task_stk[CAN_PROTOCOL_TASK_STK_SIZE - 1],                    CAN_RPOTOCOL_TASK_PRIO);
     OSTaskCreate(can_send_task,                     (void *)0,  (OS_STK*)&can_send_task_stk[CAN_SEND_TASK_STK_SIZE - 1],                            CAN_SEND_TASK_PRIO);
     OSTaskCreate(lock_task,                         (void *)0,  (OS_STK*)&lock_task_stk[LOCK_TASK_STK_SIZE - 1],                                    LOCK_TASK_PRIO);
+    OSTaskCreate(beeper_task,                       (void *)0,  (OS_STK*)&beeper_task_stk[BEEPER_TASK_STK_SIZE - 1],                                BEEPER_TASK_PRIO);
     OSTaskCreate(indicator_led_task,                (void *)0,  (OS_STK*)&indicator_led_task_stk[INDICATOR_LED_STK_SIZE - 1],                       INDICATOR_LED_TASK_PRIO);
 }
 
@@ -20,6 +21,13 @@ static void sem_create(void)
 
 static int mailbox_create(void)
 {
+    beeper_mailbox_handle = OSMboxCreate((void *)0);
+    if(beeper_mailbox_handle == 0)
+    {
+        /*
+        todo: err process
+        */
+    }
     return 0;
 }
 

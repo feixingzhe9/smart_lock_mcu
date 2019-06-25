@@ -6,12 +6,14 @@
 #include "led_task.h"
 #include "can_protocol_task.h"
 #include "lock_task.h"
+#include "beeper_task.h"
 
 typedef enum
 {
     CAN_SEND_TASK_PRIO = 5,
     CAN_RPOTOCOL_TASK_PRIO,
     LOCK_TASK_PRIO,
+    BEEPER_TASK_PRIO,
     INDICATOR_LED_TASK_PRIO
 }task_prio_e;
 

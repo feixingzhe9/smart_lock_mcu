@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include "can.h"
 #include "can_fifo.h"
-#include "beeper.h"
+#include "beeper_task.h"
 #include "lock.h"
 
 
@@ -237,10 +237,16 @@ uint16_t CmdProcessing(can_id_union *id, uint8_t *data_in, uint16_t data_in_len,
                     {
                         if(data_in_len == 4)
                         {
-                            beeper_times.times = data_in[0];
-                            beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
-                            beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
-                            beeper_times.frequency = data_in[3];
+                            extern beeper_ctrl_t g_beeper_ctrl;
+                            g_beeper_ctrl.ctrl_t.times = data_in[0];
+                            g_beeper_ctrl.ctrl_t.duration = data_in[1];
+                            g_beeper_ctrl.ctrl_t.interval_time = data_in[2];
+                            g_beeper_ctrl.ctrl_t.cmd = data_in[3];
+                            OSMboxPost(beeper_mailbox_handle, (void*)&(g_beeper_ctrl.ctrl));
+//                            beeper_times.times = data_in[0];
+//                            beeper_times.durantion = data_in[1] * 20 / SYSTICK_PERIOD; //data_in[1] unit:50ms
+//                            beeper_times.period = data_in[2] * 20 / SYSTICK_PERIOD;    //data_in[2] unit:50ms
+//                            beeper_times.frequency = data_in[3];
                         }
                         else
                         {

@@ -14,11 +14,25 @@ struct beeper_times_t
 };
 
 
+typedef union
+{
+    struct
+    {
+        uint32_t duration       : 8;
+        uint32_t interval_time  : 8;
+        uint32_t times          : 8;
+        uint32_t cmd            : 8;
+    }ctrl_t;
+    uint32_t ctrl;
+}beeper_ctrl_t;
+
 extern struct beeper_times_t beeper_times;
 
 void beeper_task(void);
 
 void beeper_init(u16 arr,u16 psc);
+void beeper_on(uint16_t);
+void beeper_off(void);
 
 #endif
 
