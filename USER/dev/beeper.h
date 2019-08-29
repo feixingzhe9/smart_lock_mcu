@@ -30,7 +30,7 @@ extern struct beeper_times_t beeper_times;
 
 void beeper_task(void);
 
-void beeper_init(u16 arr,u16 psc);
+void beeper_init(u16 arr,u16 psc, uint16_t pulse);
 void beeper_on(uint16_t);
 void beeper_off(void);
 

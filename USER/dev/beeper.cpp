@@ -2,8 +2,21 @@
 #include "lock.h"
 
 
-void beeper_init(u16 arr,u16 psc)
+typedef struct
 {
+    uint16_t arr;
+    uint16_t psc;
+    uint16_t pulse;
+}beeper_timer_t;
+
+static beeper_timer_t beeper_timer = {0};
+
+void beeper_init(u16 arr, u16 psc, uint16_t pulse)
+{
+    beeper_timer.arr = arr;
+    beeper_timer.psc = psc;
+    beeper_timer.pulse = pulse;
+
     GPIO_InitTypeDef GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_OCInitTypeDef  TIM_OCInitStructure;
@@ -18,8 +31,8 @@ void beeper_init(u16 arr,u16 psc)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    TIM_TimeBaseStructure.TIM_Period = arr;
-    TIM_TimeBaseStructure.TIM_Prescaler =psc;
+    TIM_TimeBaseStructure.TIM_Period = beeper_timer.arr;
+    TIM_TimeBaseStructure.TIM_Prescaler =beeper_timer.psc;
     TIM_TimeBaseStructure.TIM_ClockDivision = 0;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
@@ -27,6 +40,7 @@ void beeper_init(u16 arr,u16 psc)
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+    TIM_OCInitStructure.TIM_Pulse = beeper_timer.pulse;
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);
 
     TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
@@ -37,12 +51,17 @@ void beeper_init(u16 arr,u16 psc)
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable;
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);
 
-    TIM_SetCompare3(TIM3,50);
+    TIM_CtrlPWMOutputs(TIM3, ENABLE);
+    //TIM_SetCompare3(TIM3, 100);
 
 }
 
-void beeper_on(u16 hz)
+void beeper_on(u16 duty)
 {
+    if(duty > 100)
+    {
+        duty = 100;
+    }
     TIM_OCInitTypeDef  TIM_OCInitStructure;
 
     TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
@@ -50,10 +69,12 @@ void beeper_on(u16 hz)
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);
 
+    beeper_timer.pulse = (100 - duty) * beeper_timer.arr / 100;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OCInitStructure.TIM_Pulse = beeper_timer.pulse;
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);
 
-    TIM_SetCompare3(TIM3,50);/////test code, frequecy is not right
+    TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
 }
 
 
@@ -68,11 +89,11 @@ void beeper_off(void)
 
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable;
     TIM_OC3Init(TIM3, &TIM_OCInitStructure);
-
-    TIM_SetCompare3(TIM3,50);/////test code, frequecy is not right
 }
 
 
+
+#if 0
 #define UNLOCK_BEEPER_TIME  500/SYSTICK_PERIOD
 #define BEEPER_ON_DELAY_PERIOD      50/SYSTICK_PERIOD
 
@@ -239,4 +260,4 @@ void beeper_task(void)
     beeper_ctrl();
     beeper_times_exe();
 }
-
+#endif
